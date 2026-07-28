@@ -176,12 +176,34 @@ This structure allows queries such as:
 - Contains two celebrated dome chambers: the southern qibla dome (associated with Nizam al-Mulk) and the northern dome (Taj al-Mulk, 1088–89).
 - Later additions from Ilkhanid, Timurid, Safavid, and Qajar periods create a rich stratigraphy of styles and spaces.
 
-### 5.2 Eric Schroeder’s 1931 Plan
+### 5.2 Eric Schroeder’s 1931 Plan – A Pioneering Structural Inventory
 
-Drawn by Eric Schroeder for the American Institute for Persian Art and Archaeology (1931).  
-Archival location: Ernst Herzfeld Papers, National Museum of Asian Art Archives, Smithsonian Institution (Item D-704 / FSA A.06 05.0704).
+In 1931 Eric Schroeder produced a meticulously numbered ground plan of the Masjid-i Jāmiʿ of Isfahan for the **American Institute for Persian Art and Archaeology**, the organisation closely associated with Arthur Upham Pope. The original drawing is preserved in the Ernst Herzfeld Papers at the National Museum of Asian Art Archives, Smithsonian Institution (Item D-704 / FSA A.06 05.0704). The verso caption reads: “Plan of MASJID-I-JAMI' of ISFAHAN. drawn by Eric Schroeder for the American Institute for Persian Art and Archaeology, 1931.”
 
-The plan systematically numbers the spaces of the complex. In this repository each numbered area is modelled as a `bot:Space` (or more specific subclass) while preserving the original number as an identifier. This creates a high-fidelity, scholarly-grounded spatial inventory.
+This was not merely a conventional architectural survey drawing. By systematically numbering every space, bay, iwan, dome chamber, and secondary structure, Schroeder created what can be understood as an early form of **structured spatial data**. At a time when most documentation of Islamic architecture still relied on descriptive prose, selective photographs, or un-numbered sketches, the decision to assign unique identifiers to the constituent parts of this vast, multi-period complex was a conceptual leap. It implicitly treated the mosque as a system of discrete, referenceable units — exactly the kind of decomposition that modern topological ontologies (BOT and its extensions) formalise.
+
+The intellectual value of this approach was quickly recognised. Later researchers, including Albert Gabriel (whose 1935 study of the mosque appeared in *Ars Islamica*) and especially Eugenio Galdieri (whose multi-volume IsMEO publications of the 1970s–1980s remain foundational), worked within and built upon the spatial framework that Schroeder and the Pope circle had established. The numbered plan became a shared reference that allowed successive generations of scholars to discuss individual spaces with precision rather than ambiguity.
+
+In the present project we treat Schroeder’s numbering as a primary scholarly authority. Each numbered area is modelled as a `bot:Space` (or a more specific subclass such as `persarch:Iwan`, `persarch:DomeChamber`, or `persarch:Shabestan`) while the original number is retained as a stable identifier. This preserves the historical integrity of the 1931 survey and simultaneously converts it into machine-readable topological data.
+
+**Embedding the original drawing**  
+A published version of the plan is available on ArchNet:  
+![Isfahan. Friday Mosque. Schroeder's Original Plan]([https://www.archnet.org/sites/1621?media_content_id=62965](https://archnet.sourceimage.cloud/iiif/3/6kqt8xp37esnvra2d66g6hwzxwl7;1/full/max/0/default.jpg))  
+
+
+For the repository we recommend:
+- Hosting a high-resolution scan (or a carefully prepared derivative) in the `media/` folder, with clear attribution to Schroeder / American Institute for Persian Art and Archaeology / Smithsonian archival source.
+- Linking to the ArchNet record and the Smithsonian catalogue entry.
+- Respecting any applicable rights; the Smithsonian record notes that permission is required for reproduction beyond fair scholarly use.
+
+**Toward a vector version**  
+One of the longer-term goals of this case study is to produce a clean vector redrawing of Schroeder’s plan (SVG or layered CAD) that:
+- Retains every original number,
+- Makes each numbered space a discrete, selectable object,
+- Can be aligned with modern survey data or photogrammetric models,
+- Serves as a visual and computational bridge between the 1931 inventory and the RDF instance data.
+
+Such a vector layer would allow the numbered spaces to be linked directly to `bot:Space` individuals, enabling both human reading of the historic plan and machine querying of the ontology. This continues, in digital form, the very impulse that made Schroeder’s original drawing so far-sighted.
 
 ### 5.3 Four-Iwan Spatial Organisation (Simplified)
 
