@@ -274,6 +274,8 @@ persarch:hasSlidePresentation    rdfs:subPropertyOf persarch:hasPresentation .
 :Masjid_i_Jami a persarch:Mosque , bot:Building ;
     rdfs:label "Masjid-i Jāmiʿ of Isfahan"@en ;
     rdfs:label "مسجد جامع اصفهان"@fa ;
+    dcterms:source <https://www.archnet.org/sites/1621?media_content_id=62965> ;
+    dcterms:source <https://www.si.edu/object/archives/components/sova-fsa-a-06-ref24401>
     dcterms:description "The Friday Mosque of Isfahan (Great Mosque). Multi-period complex documented in Eric Schroeder’s 1931 numbered plan."@en .
 
 # South / Qibla Iwan (illustrative Schroeder number 42)
@@ -284,8 +286,7 @@ persarch:hasSlidePresentation    rdfs:subPropertyOf persarch:hasPresentation .
     rdfs:comment "Main qibla-oriented iwan on the southern side of the central courtyard. Numbered 42 on Eric Schroeder’s 1931 plan."@en ;
     bot:adjacentZone :Schroeder_055 ;
     geo:hasGeometry :Geom_Schroeder_042 ;
-    dcterms:source <https://www.archnet.org/sites/1621?media_content_id=62965> ;
-    dcterms:source <https://www.si.edu/object/archives/components/sova-fsa-a-06-ref24401> .
+    persarch:hasIIIFManifest <https://example.org/iiif/smith-qibla-iwan/manifest.json> .
 
 :Geom_Schroeder_042 a geo:Geometry ;
     geo:asWKT """POLYGON((45.2 12.8, 58.7 12.8, 58.7 28.4, 45.2 28.4, 45.2 12.8))"""^^geo:wktLiteral ;
