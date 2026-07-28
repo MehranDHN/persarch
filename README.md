@@ -3,7 +3,7 @@
 **Extending the Building Topology Ontology (BOT) for Persian / Iranian Islamic Architecture**  
 Focus: Masjid-i Jāmiʿ of Isfahan · Sheikh Lotfollah Mosque · Naqsh-e Jahan Square Ensemble
 
-[![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Ontology](https://img.shields.io/badge/Ontology-OWL%20%2F%20Turtle-blue)](https://www.w3.org/OWL/)
 [![BOT](https://img.shields.io/badge/Core-BOT%20(W3C%20LBD)-green)](https://w3c-lbd-cg.github.io/bot/)
 
@@ -167,7 +167,7 @@ This structure allows queries such as:
 
 ---
 
-## 5. Case Study 2 – Masjid-i Jāmiʿ of Isfahan (Friday Mosque)
+## 5. Case Study – Masjid-i Jāmiʿ of Isfahan (Friday Mosque) with Schroeder Numbers
 
 ### 5.1 Architectural Significance
 
@@ -188,24 +188,60 @@ In the present project we treat Schroeder’s numbering as a primary scholarly a
 
 **Embedding the original drawing**  
 A published version of the plan is available on ArchNet:  
-![Isfahan. Friday Mosque. Schroeder's Original Plan](https://archnet.sourceimage.cloud/iiif/3/6kqt8xp37esnvra2d66g6hwzxwl7;1/full/max/0/default.jpg) 
-
-
-For the repository we recommend:
-- Hosting a high-resolution scan (or a carefully prepared derivative) in the `media/` folder, with clear attribution to Schroeder / American Institute for Persian Art and Archaeology / Smithsonian archival source.
-- Linking to the ArchNet record and the Smithsonian catalogue entry.
-- Respecting any applicable rights; the Smithsonian record notes that permission is required for reproduction beyond fair scholarly use.
+[https://www.archnet.org/sites/1621?media_content_id=62965](https://www.archnet.org/sites/1621?media_content_id=62965)  
+(Title on ArchNet: “Isfahan. Friday Mosque. Plan. Schroeder.”)
 
 **Toward a vector version**  
-One of the longer-term goals of this case study is to produce a clean vector redrawing of Schroeder’s plan (SVG or layered CAD) that:
-- Retains every original number,
-- Makes each numbered space a discrete, selectable object,
-- Can be aligned with modern survey data or photogrammetric models,
-- Serves as a visual and computational bridge between the 1931 inventory and the RDF instance data.
+One of the longer-term goals is to produce a clean vector redrawing (SVG) that retains every original number as a discrete, selectable object that can be linked directly to `bot:Space` individuals.
 
-Such a vector layer would allow the numbered spaces to be linked directly to `bot:Space` individuals, enabling both human reading of the historic plan and machine querying of the ontology. This continues, in digital form, the very impulse that made Schroeder’s original drawing so far-sighted.
+### 5.3 Sample Instance Data – South Iwan and Southern Dome Chamber
 
-### 5.3 Four-Iwan Spatial Organisation (Simplified)
+The following Turtle illustrates the recommended pattern: Schroeder number as stable identifier, domain typing, adjacency, and illustrative WKT geometry (local coordinate system – replace with surveyed values later).
+
+```turtle
+@prefix bot:      <https://w3id.org/bot#> .
+@prefix persarch: <https://w3id.org/persian-architecture#> .
+@prefix geo:      <http://www.opengis.net/ont/geosparql#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms:  <http://purl.org/dc/terms/> .
+
+:Masjid_i_Jami a persarch:Mosque , bot:Building ;
+    rdfs:label "Masjid-i Jāmiʿ of Isfahan"@en ;
+    rdfs:label "مسجد جامع اصفهان"@fa ;
+    dcterms:description "The Friday Mosque of Isfahan (Great Mosque). Multi-period complex documented in Eric Schroeder’s 1931 numbered plan."@en .
+
+# South / Qibla Iwan (illustrative Schroeder number 42)
+:Schroeder_042 a persarch:Iwan , bot:Space ;
+    rdfs:label "South Iwan (Qibla Iwan)"@en ;
+    rdfs:label "ایوان جنوبی (ایوان قبله)"@fa ;
+    persarch:schroederNumber "42"^^xsd:string ;
+    rdfs:comment "Main qibla-oriented iwan on the southern side of the central courtyard. Numbered 42 on Eric Schroeder’s 1931 plan."@en ;
+    bot:adjacentZone :Schroeder_055 ;
+    geo:hasGeometry :Geom_Schroeder_042 ;
+    dcterms:source <https://www.archnet.org/sites/1621?media_content_id=62965> ;
+    dcterms:source <https://www.si.edu/object/archives/components/sova-fsa-a-06-ref24401> .
+
+:Geom_Schroeder_042 a geo:Geometry ;
+    geo:asWKT """POLYGON((45.2 12.8, 58.7 12.8, 58.7 28.4, 45.2 28.4, 45.2 12.8))"""^^geo:wktLiteral ;
+    rdfs:comment "Illustrative WKT in a local metric coordinate system. Replace with accurate surveyed coordinates."@en .
+
+# Southern Dome Chamber
+:Schroeder_055 a persarch:DomeChamber , bot:Space ;
+    rdfs:label "Southern Dome Chamber (Qibla Dome)"@en ;
+    rdfs:label "گنبدخانه جنوبی (گنبد قبله)"@fa ;
+    persarch:schroederNumber "55"^^xsd:string ;
+    rdfs:comment "The main southern dome chamber behind the qibla iwan."@en ;
+    bot:adjacentZone :Schroeder_042 ;
+    geo:hasGeometry :Geom_Schroeder_055 .
+
+:Geom_Schroeder_055 a geo:Geometry ;
+    geo:asWKT """POLYGON((46.1 28.4, 57.9 28.4, 57.9 41.6, 46.1 41.6, 46.1 28.4))"""^^geo:wktLiteral .
+
+:Masjid_i_Jami bot:hasSpace :Schroeder_042 , :Schroeder_055 .
+```
+
+### 5.4 Four-Iwan Spatial Organisation (Simplified)
 
 ```mermaid
 graph TB
@@ -221,7 +257,7 @@ graph TB
     S --> DomeS["persarch:DomeChamber<br/>South / Qibla Dome"]
     N --> DomeN["persarch:DomeChamber<br/>North Dome<br/>(Taj al-Mulk)"]
 
-    Sahn --- Hypostyle["persarch:Shabestan<br/>Hypostyle Prayer Halls<br/>(multiple bays & small domes)"]
+    Sahn --- Hypostyle["persarch:Shabestan<br/>Hypostyle Prayer Halls"]
 
     style Sahn fill:#bbdefb,stroke:#1565c0
     style S fill:#ffcdd2,stroke:#c62828
@@ -229,59 +265,126 @@ graph TB
     style DomeN fill:#c8e6c9,stroke:#2e7d32
 ```
 
-The southern iwan is deliberately larger and leads into the main dome chamber, reinforcing the qibla direction.
-
 ---
 
-## 6. Case Study 3 – Sheikh Lotfollah Mosque
+## 6. Case Study – Naqsh-e Jahan Square as a Large 3D Site
 
-### 6.1 Key Facts
+Naqsh-e Jahan Square is modelled as a single `bot:Site` that contains three major buildings. Each building is given at least one `bot:Storey` (Ground Storey) that in turn contains its principal spaces. This demonstrates multi-building urban topology while remaining fully BOT-compliant and ready for later 3D enrichment.
 
-| Attribute | Value |
-|-----------|-------|
-| Construction | Started 1011 AH (1602/1603 CE) – Completed 1028 AH (1618/1619 CE) |
-| Patron | Shah Abbas I |
-| Architect | Muhammad Reza Isfahani (son of Husayn) |
-| Location | East side of Naqsh-e Jahan Square |
-| Type | Private royal mosque (no public courtyard, no minarets) |
-| Dome chamber | Approx. 19 m per side |
-| Outer dome height | Approx. 32 m |
-| Outer dome diameter | Approx. 22 m |
-| Special feature | 45° rotation of the prayer hall relative to the entrance axis to achieve correct qibla orientation |
-
-### 6.2 Spatial Sequence
-
-The building is a masterpiece of controlled spatial experience. The visitor moves from the grand square through a portal, then along a carefully angled corridor that reorients the body toward the qibla before entering the single, luminous dome chamber.
-
-```mermaid
-flowchart LR
-    A["Portal / Pishtaq<br/>facing the Square"] --> B["Entrance Vestibule"]
-    B --> C["Twisting Corridor<br/>(≈45° then 90° turns)"]
-    C --> D["persarch:DomeChamber<br/>Main Prayer Hall"]
-    D --> E["persarch:Mihrab"]
-
-    style D fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
-    style E fill:#ffebee,stroke:#b71c1c
-```
-
-This sequence is an excellent test case for ordered spatial relationships and for modelling orientation properties (`persarch:orientedToQibla`).
-
-### 6.3 Element Decomposition Example – Mihrab
+### 6.1 Site Hierarchy Overview
 
 ```mermaid
 graph TD
-    Mihrab["persarch:Mihrab<br/>Main Prayer Niche"]
-    
-    Mihrab -->|bot:hasSubElement| Niche["Niche structure"]
-    Mihrab -->|bot:hasSubElement| Arch["Framing Arch"]
-    Mihrab -->|bot:hasSubElement| Muqarnas["Muqarnas hood"]
-    Mihrab -->|bot:hasSubElement| Inscription["persarch:Inscription<br/>(Thuluth / Quranic)"]
-    Mihrab -->|bot:hasSubElement| Tile["persarch:TilePanel<br/>+ Floral patterns"]
+    Site["bot:Site<br/>Naqsh-e Jahan Square"]
 
-    style Mihrab fill:#ffcdd2,stroke:#c62828,stroke-width:2px
+    Site -->|bot:hasBuilding| Shah["persarch:Mosque<br/>Shah / Imam Mosque"]
+    Site -->|bot:hasBuilding| Lotfollah["persarch:Mosque<br/>Sheikh Lotfollah Mosque"]
+    Site -->|bot:hasBuilding| AliQapu["persarch:Palace<br/>Ali Qapu Palace"]
+
+    Shah -->|bot:hasStorey| ShahGS["bot:Storey<br/>Ground Storey"]
+    Lotfollah -->|bot:hasStorey| LotfGS["bot:Storey<br/>Ground Storey"]
+    AliQapu -->|bot:hasStorey| AQGS["bot:Storey<br/>Ground Storey"]
+
+    style Site fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    style Shah fill:#fff3e0,stroke:#e65100
+    style Lotfollah fill:#f3e5f5,stroke:#6a1b9a
+    style AliQapu fill:#e8f5e9,stroke:#2e7d32
 ```
 
-The same pattern applies to the dome (squinches, drum, shell, interior tile registers) and, where present, to minarets.
+### 6.2 Sample Instance Data – Site + Three Buildings with Ground Storeys
+
+```turtle
+@prefix bot:      <https://w3id.org/bot#> .
+@prefix persarch: <https://w3id.org/persian-architecture#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix geo:      <http://www.opengis.net/ont/geosparql#> .
+
+#################################################################
+# The Site
+#################################################################
+
+:Naqsh_e_Jahan_Square a bot:Site ;
+    rdfs:label "Naqsh-e Jahan Square"@en ;
+    rdfs:label "میدان نقش جهان"@fa ;
+    dcterms:description "UNESCO World Heritage Site (1979). Safavid urban ensemble laid out under Shah Abbas I (approx. 1598–1629). Dimensions ~160 × 560 m."@en ;
+    bot:hasBuilding :Shah_Mosque ,
+                    :Sheikh_Lotfollah_Mosque ,
+                    :Ali_Qapu_Palace .
+
+#################################################################
+# 1. Shah Mosque (Imam Mosque) – South side
+#################################################################
+
+:Shah_Mosque a persarch:Mosque , bot:Building ;
+    rdfs:label "Shah Mosque (Imam Mosque)"@en ;
+    rdfs:label "مسجد شاه (مسجد امام)"@fa ;
+    bot:hasStorey :Shah_Ground_Storey .
+
+:Shah_Ground_Storey a bot:Storey ;
+    rdfs:label "Ground Storey – Shah Mosque"@en ;
+    bot:hasSpace :Shah_Sahn ,
+                 :Shah_South_Iwan ,
+                 :Shah_Dome_Chamber .
+
+:Shah_Sahn a persarch:Sahn , bot:Space ;
+    rdfs:label "Central Courtyard (Sahn)"@en .
+
+:Shah_South_Iwan a persarch:Iwan , bot:Space ;
+    rdfs:label "South / Qibla Iwan"@en ;
+    bot:adjacentZone :Shah_Dome_Chamber .
+
+:Shah_Dome_Chamber a persarch:DomeChamber , bot:Space ;
+    rdfs:label "Main Dome Chamber"@en .
+
+#################################################################
+# 2. Sheikh Lotfollah Mosque – East side
+#################################################################
+
+:Sheikh_Lotfollah_Mosque a persarch:Mosque , bot:Building ;
+    rdfs:label "Sheikh Lotfollah Mosque"@en ;
+    rdfs:label "مسجد شیخ لطف‌الله"@fa ;
+    bot:hasStorey :Lotfollah_Ground_Storey .
+
+:Lotfollah_Ground_Storey a bot:Storey ;
+    rdfs:label "Ground Storey – Sheikh Lotfollah"@en ;
+    bot:hasSpace :Lotfollah_Portal ,
+                 :Lotfollah_Corridor ,
+                 :Lotfollah_Dome_Chamber .
+
+:Lotfollah_Portal a persarch:PishtaqSpace , bot:Space ;
+    rdfs:label "Entrance Portal (Pishtaq)"@en .
+
+:Lotfollah_Corridor a bot:Space ;
+    rdfs:label "Twisting Corridor (re-orientation sequence)"@en ;
+    rdfs:comment "Corridor that rotates the visitor approximately 45° then 90° to align the prayer hall with the qibla."@en .
+
+:Lotfollah_Dome_Chamber a persarch:DomeChamber , bot:Space ;
+    rdfs:label "Main Prayer Hall / Dome Chamber"@en ;
+    rdfs:comment "Single domed chamber (~19 m side). No courtyard, no minarets."@en .
+
+#################################################################
+# 3. Ali Qapu Palace – West side
+#################################################################
+
+:Ali_Qapu_Palace a persarch:Palace , bot:Building ;
+    rdfs:label "Ali Qapu Palace"@en ;
+    rdfs:label "عالی‌قاپو"@fa ;
+    bot:hasStorey :AliQapu_Ground_Storey .
+
+:AliQapu_Ground_Storey a bot:Storey ;
+    rdfs:label "Ground Storey – Ali Qapu"@en ;
+    bot:hasSpace :AliQapu_Entrance_Hall ,
+                 :AliQapu_Reception .
+
+:AliQapu_Entrance_Hall a bot:Space ;
+    rdfs:label "Entrance Hall / Portal zone"@en .
+
+:AliQapu_Reception a bot:Space ;
+    rdfs:label "Ceremonial / Reception spaces"@en .
+```
+
+This structure is deliberately minimal yet complete. It can be expanded later with additional storeys (Ali Qapu is multi-storey), more detailed spaces, elements (mihrabs, minarets, tile panels), and real geometric data.
 
 ---
 
@@ -289,21 +392,15 @@ The same pattern applies to the dome (squinches, drum, shell, interior tile regi
 
 Surface decorations are modelled as subclasses of `bot:Element` so they can be attached to parent elements and carry their own geometry and controlled vocabulary links.
 
-**Core classes**
-- `persarch:SurfaceDecoration`
-- `persarch:TilePanel`
-- `persarch:FloralPattern`
-- `persarch:Inscription`
+**Core classes**  
+`persarch:SurfaceDecoration` · `persarch:TilePanel` · `persarch:FloralPattern` · `persarch:Inscription`
 
-**Key properties**
-- `persarch:decorates` / `persarch:locatedOn` (sub-properties of BOT relations)
-- `persarch:hasScriptStyle` (Thuluth, Kufic, …)
-- `persarch:hasText` (Arabic original + optional translations)
-- `persarch:referencesQuranicVerse`
-- `persarch:hasMotifType` → Getty AAT concepts (e.g. arabesques `aat:300010206`, lotus motif, etc.)
-- `persarch:hasSurfaceGeometry` → GeoSPARQL / WKT for precise placement on surfaces
-
-This layer enables both art-historical analysis and computational extraction of Quranic text from inscriptions together with their exact location in the building.
+**Key properties**  
+- `persarch:decorates` / `persarch:locatedOn`  
+- `persarch:hasScriptStyle` (Thuluth, Kufic, …)  
+- `persarch:hasText` + `persarch:referencesQuranicVerse`  
+- `persarch:hasMotifType` → Getty AAT  
+- `persarch:hasSurfaceGeometry` → GeoSPARQL / WKT  
 
 ---
 
@@ -312,70 +409,83 @@ This layer enables both art-historical analysis and computational extraction of 
 ```
 persian-architecture-bot-case-studies/
 ├── ontology/
-│   ├── persarch.ttl                 # Core extension
-│   ├── alignments/                  # AAT, GeoSPARQL, CRMtex, …
-│   └── shapes/                      # Optional SHACL
+│   ├── persarch.ttl
+│   ├── alignments/
+│   └── shapes/
 ├── data/
 │   ├── naqsh-e-jahan-site.ttl
-│   ├── masjid-i-jami.ttl            # Schroeder-numbered spaces
+│   ├── masjid-i-jami.ttl          # Schroeder-numbered spaces
 │   ├── sheikh-lotfollah.ttl
 │   ├── shah-mosque.ttl
 │   └── ali-qapu.ttl
 ├── queries/
 │   └── competency-questions.rq
 ├── docs/
-│   ├── modelling-decisions.md
-│   └── diagrams/                    # Additional Mermaid / images
+│   └── modelling-decisions.md
 ├── media/
-│   └── (links or rights-cleared images of plans)
-└── README.md                        # This file
+│   └── (plans, images, vector SVG)
+└── README.md
 ```
 
 ---
 
-## 9. Competency Questions the Model Answers
+## 9. Competency Questions
 
-1. Which buildings are contained in the Naqsh-e Jahan Site?
-2. List all spaces of type `persarch:Iwan` in the Masjid-i Jāmiʿ and preserve their Schroeder numbers.
-3. What is the spatial sequence from the portal of Sheikh Lotfollah Mosque to its mihrab?
-4. Which sub-elements belong to a given mihrab or minaret?
-5. Retrieve all Thuluth inscriptions that reference a Quranic verse and return their WKT placement.
-6. Find all tile panels whose motif type is aligned to a specific Getty AAT concept (e.g. arabesque).
+1. Which buildings are contained in the Naqsh-e Jahan Site?  
+2. List all spaces of type `persarch:Iwan` in the Masjid-i Jāmiʿ together with their Schroeder numbers.  
+3. What is the spatial sequence from the portal of Sheikh Lotfollah Mosque to its dome chamber?  
+4. Which spaces are adjacent to the South Iwan of the Friday Mosque?  
+5. Retrieve geometries (WKT) of selected spaces.  
+6. Find all buildings that have a Ground Storey containing a `persarch:DomeChamber`.
 
 ---
 
 ## 10. Data Sources & Scholarly Grounding
 
-- Eric Schroeder, Plan of Masjid-i Jāmiʿ of Isfahan, 1931 (American Institute for Persian Art and Archaeology). Smithsonian Institution, Ernst Herzfeld Papers, D-704.
-- UNESCO World Heritage documentation for Naqsh-e Jahan Square (Reference 115).
-- Standard architectural literature on Safavid Isfahan (Shah Mosque, Sheikh Lotfollah, Ali Qapu).
-- BOT specification: https://w3c-lbd-cg.github.io/bot/
-- Getty Art & Architecture Thesaurus (AAT) for motif and material alignment.
-
-All modelling decisions prioritise fidelity to these primary sources while remaining computationally useful.
+- Eric Schroeder, Plan of Masjid-i Jāmiʿ of Isfahan, 1931 (American Institute for Persian Art and Archaeology). Smithsonian Institution, Ernst Herzfeld Papers, D-704.  
+- ArchNet media: https://www.archnet.org/sites/1621?media_content_id=62965  
+- UNESCO World Heritage documentation for Naqsh-e Jahan Square (Reference 115).  
+- BOT specification: https://w3c-lbd-cg.github.io/bot/  
+- Getty Art & Architecture Thesaurus (AAT).
 
 ---
 
-## 11. Next Steps & Contribution
+## 11. Next Steps & Enrichment Path
 
-1. Formalise the full `persarch.ttl` ontology module.
-2. Populate instance data for the three main buildings, starting with the numbered spaces of the Schroeder plan and the complete spatial sequence of Sheikh Lotfollah.
-3. Add sample SPARQL queries and a Jupyter / Observable notebook.
-4. Align key decorative motifs to Getty AAT and experiment with WKT surface geometries.
-5. Optionally link IIIF manifests of historic photographs and plans.
+1. Formalise the full `persarch.ttl` ontology module.  
+2. Expand the instance data with more Schroeder-numbered spaces and complete sequences for Sheikh Lotfollah.  
+3. Add real geometric data (vector plan + surveyed WKT).  
+4. Link historic photographs, plans, and IIIF manifests.  
+5. Introduce decorative elements, inscriptions, and AAT alignments.  
+6. Create SPARQL query library and NotebookLM-friendly documentation.
 
-Contributions that improve accuracy, add bilingual (Persian/English) labels, expand the instance data, or provide additional SHACL shapes are warmly welcome.
+After this foundational version is stable we can discuss concrete strategies for enriching the model with high-resolution plans, images, slides, and measured drawings.
 
 ---
 
-## 12. Citation
+## 12. License
+
+This repository is released under the **GNU General Public License v3.0**.
+
+**Suggestion regarding licensing**  
+GPL-3.0 is excellent for the software and ontology components (ensuring derivative works remain open). For pure documentation, images, and scholarly data, some projects dual-license or apply a Creative Commons license (e.g. CC BY 4.0) to the non-code parts so that the material can be more easily reused in publications, teaching materials, and NotebookLM-style tools without the copyleft obligations of GPL.  
+
+A practical approach is:
+- Ontology + instance data + scripts → GPL-3.0  
+- README, diagrams, and explanatory text → CC BY 4.0 (or keep everything under GPL-3.0 for simplicity)
+
+Either choice is valid; the important point is to state it clearly in the repository.
+
+---
+
+## 13. Citation
 
 If you use this work, please cite the repository and acknowledge the underlying scholarly sources (especially Schroeder’s 1931 plan and the UNESCO documentation of Naqsh-e Jahan Square).
 
 ---
 
-**Status**: Active development – foundational modelling and case-study design complete.  
+**Status**: Active development – foundational modelling and first detailed case-study instances complete.  
 **Maintainer**: [Your GitHub handle]  
-**License**: Creative Commons Attribution 4.0 International (CC BY 4.0) for documentation; ontology files under an open ontology-friendly license (to be confirmed).
+**License**: GNU General Public License v3.0
 
 This repository is intended both as a practical tool for digital cultural heritage and as a clear, diagram-rich source that tools such as Google NotebookLM can use to generate slide decks and infographics about the extension of BOT to Persian architecture.
