@@ -67,6 +67,7 @@ This repository implements that extension under the namespace `persarch:` (Persi
 ```mermaid
 classDiagram
     direction TB
+
     class bot_Zone {
         <<BOT>>
     }
@@ -126,6 +127,42 @@ classDiagram
     persarch_SurfaceDecoration <|-- persarch_Inscription
     persarch_SurfaceDecoration <|-- persarch_TilePanel
     persarch_SurfaceDecoration <|-- persarch_FloralPattern
+
+    %% New media / presentation layer
+    class persarch_PresentationResource {
+        <<Media>>
+    }
+    class persarch_Photograph
+    class persarch_ColorSlide
+    class persarch_PlanImage
+
+    persarch_PresentationResource <|-- persarch_Photograph
+    persarch_PresentationResource <|-- persarch_ColorSlide
+    persarch_PresentationResource <|-- persarch_PlanImage
+
+    bot_Zone --> persarch_PresentationResource : hasPresentation
+    bot_Element --> persarch_PresentationResource : hasPresentation
+```
+
+Separate visual Layer
+
+```mermaid
+graph TD
+    Space["bot:Space / persarch:Iwan<br/>e.g. Schroeder_042"]
+    Building["bot:Building"]
+    Element["bot:Element<br/>e.g. Tile Panel / Inscription"]
+
+    Photo["persarch:Photograph<br/>+ AAT classification"]
+    Slide["persarch:ColorSlide<br/>+ AAT classification"]
+    Plan["Plan / Drawing<br/>(IIIF Manifest)"]
+
+    Space -->|persarch:hasPresentation| Photo
+    Space -->|persarch:hasPresentation| Plan
+    Building -->|persarch:hasPresentation| Slide
+    Element -->|persarch:hasPresentation| Photo
+
+    Photo --> Agent["foaf:Person<br/>Myron Bement Smith"]
+    Slide --> Agent2["foaf:Person<br/>Harrison Forman"]
 ```
 
 ### 3.2 Key Modelling Decisions
@@ -198,6 +235,23 @@ One of the longer-term goals is to produce a clean vector redrawing (SVG) that r
 
 The following Turtle illustrates the recommended pattern: Schroeder number as stable identifier, domain typing, adjacency, and illustrative WKT geometry (local coordinate system – replace with surveyed values later).
 
+#### Classifying the Media Resources with AAT
+
+Treat every photograph or slide as a first-class resource that can be typed and classified:
+
+| Concept | Suggested AAT alignment | Notes |
+|---------|-------------------------|-------|
+| Black-and-white photograph | `aat:300128343` (black-and-white photographs) or broader `aat:300046300` (photographs) | Myron Bement Smith material |
+| Color slide | `aat:300128359` (color slides) | Harrison Forman material |
+| Architectural photograph | Can combine with subject terms | |
+| Subject matter | Use AAT for “inscriptions”, “tilework”, “arabesques / floral patterns”, “iwans”, etc. | Enables cross-collection discovery |
+
+Agents (photographers) become reusable nodes:
+
+- `Myron Bement Smith` (1897–1970) — major documentation of the Masjid-i Jāmiʿ, including detailed views of the Qibla iwan.
+- `Harrison Forman` (1904–1978) — 1967 colour slides of the Great Mosque and related Isfahan monuments (many already have IIIF manifests at UWM Libraries).
+
+
 ```turtle
 @prefix bot:      <https://w3id.org/bot#> .
 @prefix persarch: <https://w3id.org/persian-architecture#> .
@@ -205,6 +259,17 @@ The following Turtle illustrates the recommended pattern: Schroeder number as st
 @prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
 @prefix dcterms:  <http://purl.org/dc/terms/> .
+
+persarch:hasPresentation a owl:ObjectProperty ;
+    rdfs:label "has presentation"@en ;
+    rdfs:comment "Links any architectural zone or element to an IIIF Presentation resource (Manifest or Canvas) that depicts or documents it."@en ;
+    rdfs:domain bot:Zone ;          # or a union of bot:Zone and bot:Element
+    rdfs:range  persarch:PresentationResource .
+
+# Optional, more precise sub-properties (use if you want stronger semantics)
+persarch:hasPlanPresentation     rdfs:subPropertyOf persarch:hasPresentation .
+persarch:hasPhotographPresentation rdfs:subPropertyOf persarch:hasPresentation .
+persarch:hasSlidePresentation    rdfs:subPropertyOf persarch:hasPresentation .
 
 :Masjid_i_Jami a persarch:Mosque , bot:Building ;
     rdfs:label "Masjid-i Jāmiʿ of Isfahan"@en ;
@@ -239,6 +304,45 @@ The following Turtle illustrates the recommended pattern: Schroeder number as st
     geo:asWKT """POLYGON((46.1 28.4, 57.9 28.4, 57.9 41.6, 46.1 41.6, 46.1 28.4))"""^^geo:wktLiteral .
 
 :Masjid_i_Jami bot:hasSpace :Schroeder_042 , :Schroeder_055 .
+
+# A vintage B&W photograph by Myron Bement Smith
+:Photo_Smith_Qibla_Iwan_Tiles a persarch:Photograph , foaf:Document ;
+    rdfs:label "Detail of tilework and inscriptions, Qibla Iwan, Masjid-i Jāmiʿ"@en ;
+    dcterms:creator :Myron_Bement_Smith ;
+    dcterms:date "1930s" ;                     # approximate; refine when known
+    aat:300128343 aat:300128343 ;              # black-and-white photographs
+    # subject classification
+    dcterms:subject aat:300010206 ;            # arabesques (example)
+    dcterms:subject aat:300028704 ;            # inscriptions (or more precise term)
+    persarch:depicts :Schroeder_042 ;
+    # IIIF link
+    persarch:hasIIIFManifest <https://example.org/iiif/smith-qibla-iwan/manifest.json> ;
+    # or directly a Canvas if preferred
+
+# A colour slide by Harrison Forman (real IIIF example exists at UWM)
+:Slide_Forman_Great_Mosque a persarch:ColorSlide , foaf:Document ;
+    rdfs:label "Great Mosque of Isfahan (Masjid-i Juma), 1967"@en ;
+    dcterms:creator :Harrison_Forman ;
+    dcterms:date "1967"^^xsd:gYear ;
+    aat:300128359 aat:300128359 ;              # color slides
+    persarch:depicts :Masjid_i_Jami ;
+    persarch:hasIIIFManifest <https://collections.lib.uwm.edu/iiif/info/agsphoto/34594/manifest.json> .
+
+# Linking from the space/building back to the media
+:Schroeder_042 persarch:hasPhotographPresentation :Photo_Smith_Qibla_Iwan_Tiles .
+:Masjid_i_Jami   persarch:hasSlidePresentation :Slide_Forman_Great_Mosque .
+
+# Agents (reusable nodes)
+:Myron_Bement_Smith a foaf:Person ;
+    rdfs:label "Myron Bement Smith"@en ;
+    foaf:birthDate "1897" ;
+    foaf:deathDate "1970" .
+
+:Harrison_Forman a foaf:Person ;
+    rdfs:label "Harrison Forman"@en ;
+    foaf:birthDate "1904" ;
+    foaf:deathDate "1978" .
+
 ```
 
 ### 5.4 Four-Iwan Spatial Organisation (Simplified)
