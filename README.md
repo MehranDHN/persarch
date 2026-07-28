@@ -188,7 +188,7 @@ In the present project we treat Schroeder’s numbering as a primary scholarly a
 
 **Embedding the original drawing**  
 A published version of the plan is available on ArchNet:  
-![Isfahan. Friday Mosque. Schroeder's Original Plan]([https://www.archnet.org/sites/1621?media_content_id=62965](https://archnet.sourceimage.cloud/iiif/3/6kqt8xp37esnvra2d66g6hwzxwl7;1/full/max/0/default.jpg) 
+![Isfahan. Friday Mosque. Schroeder's Original Plan](https://archnet.sourceimage.cloud/iiif/3/6kqt8xp37esnvra2d66g6hwzxwl7;1/full/max/0/default.jpg) 
 
 
 For the repository we recommend:
