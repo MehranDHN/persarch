@@ -13,6 +13,8 @@ Focus: Masjid-i Jāmiʿ of Isfahan · Sheikh Lotfollah Mosque · Naqsh-e Jahan S
 
 This repository provides a practical, reusable extension of the **Building Topology Ontology (BOT)** tailored to the distinctive spatial, structural, decorative, and typological features of Persian architecture.  
 
+![Ontology](/images/hero_infograph.jpg)
+
 It demonstrates how a minimal, standards-compliant topological core can be systematically enriched to support:
 
 - Digital documentation of historic mosques, madrasas, caravanserais, and urban ensembles
