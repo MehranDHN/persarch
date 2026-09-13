@@ -237,6 +237,8 @@ One of the longer-term goals is to produce a clean vector redrawing (SVG) that r
 
 The following Turtle illustrates the recommended pattern: Schroeder number as stable identifier, domain typing, adjacency, and illustrative WKT geometry (local coordinate system – replace with surveyed values later).
 
+![Details are matter](/images/slide9.jpg.jpg)
+
 #### Classifying the Media Resources with AAT
 
 Treat every photograph or slide as a first-class resource that can be typed and classified:
