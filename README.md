@@ -538,7 +538,577 @@ persian-architecture-bot-case-studies/
 
 ---
 
-## 9. Competency Questions
+
+
+## 9. Why the event-centric core is correct
+
+CRM does not treat a monument as a bag of attributes. It treats change as first-class. That matches the mosque:
+
+- founding and Abbasid rebuild as `E12 Production`
+- Seljuq four-iwan transformation, Ilkhanid two-storey courtyard, Timurid shabestān, Safavid replacement of parts of that shabestān as `E11 Modification`, usually specialised as `E79 Part Addition` or `E80 Part Removal`
+- decoration campaigns (stucco mihrab, tile sheathing, muqarnas, inscriptions) as further `E12`/`E11` events whose products are features carried by the fabric
+
+Each event then takes:
+
+- `P4 has time-span` → `E52 Time-Span` (with `P82 at some time within`, `P81 ongoing throughout` when the sources only give a reign or a century)
+- `P7 took place at` → `E53 Place`
+- `P14 carried out by` → `E39 Actor` (`E21 Person` or `E74 Group`)
+- `P108 has produced` / `P31 has modified` → the physical thing or feature that came into being or was altered
+
+That is the right skeleton. Named actors already exist in the record: Neẓām-al-Molk and Tāj-al-Molk for the two Seljuq domes (1086 / 1088), Moḥammad Sāvi as patron and Badr as calligrapher-designer of the Öljeitü mihrab of 710/1310, Solṭān Moḥammad Bahādor for the Timurid hall of 851/1447, Uzun Ḥasan for courtyard tilework in 1475–76. Workshops and anonymous craftsmen should be `E74 Group` instances, not omitted. Patronage, design, execution, and later restoration are different roles (`P14.1 in the role of`), not one flattened “builder” property.
+
+### Topological vs. Morphological points of view.
+
+Better pattern, Introducing `CRMba` and `CRMarchaeo`
+
+- one `E24 Physical Human-Made Thing` (or CRMba `B1 Built Work`) for the monument as a continuing identity
+- that identity occupies an `E92 Spacetime Volume` whose spatial projection changes
+- each morphologically coherent piece — south iwan, north dome chamber, Öljeitü prayer hall, winter shabestān, a specific inscription band — is its own `E24`/`E25`/`B2 Morphologic Building Section`
+- `P46 is composed of` is used **phase-aware**, or better, composition is inferred from the events that added or removed parts
+
+The Safavid destruction of parts of the Timurid shabestān is not a footnote. It is `E80 Part Removal` (or `E6 Destruction` of those components) with the removed matter optionally surviving as documented fragments. If you only assert “the mosque has a winter hall,” you erase the sequence that UNESCO and the Italian–Iranian excavations actually recovered.
+
+Spaces of use (ṣahn, shabestān, madrasa, library, passage, rooftop) should not be conflated with fabric. A space is an `E53 Place` (or BOT `bot:Space`) *defined on* fabric at a time. Function is even more historical: the same volume can be hypostyle prayer hall, winter hall, or circulation. Encode function as time-bounded activities (`E7` “use of space X for Friday prayer”) or as `E13 Attribute Assignment`, not as a permanent type on the wall.
+
+### BOT is useful, but it is not the heritage layer
+
+BOT is a lean topology vocabulary: `Building`–`Storey`–`Space`–`Element`, containment and adjacency, optional 3D. It is excellent for linking a BIM/HBIM or point-cloud segmentation into RDF. It is **not** designed for standing-building stratigraphy, uncertain dating, or argumentation about phases.
+
+For this mosque I would invert the stack:
+
+| Layer | Role |
+|---|---|
+| CIDOC CRM | events, actors, time, provenance, information objects |
+| CRMba | morphological sections, interfaces, building stratigraphy, part/whole through time |
+| CRMarchaeo | excavated early phases (the 772 and 840–41 mosques under the Seljuq plan, different qibla) |
+| CRMgeo | geometry, GeoSPARQL places, changing footprints |
+| CRMtex | inscriptions as texts with carriers, scripts, reading events |
+| CRMinf | competing attributions and dating hypotheses |
+| BOT (+ IFC/LBD if you have a model) | current spatial topology and 3D navigation |
+| AAT / ULAN / TGN / Wikidata | types, persons, places |
+
+CRMba exists because CRM-base plus “has part” is too weak for a building that grew by cutting into older fabric. Jāmeʿ Isfahan is the textbook CRMba object: Seljuq brick core, Ilkhanid stucco inserted into it, Timurid colour over plain brick, Safavid muqarnas and minarets on the qibla iwan.
+
+BOT can still sit beside this. Align `bot:Building` ≈ `B1`/`E24`, `bot:Space` ≈ a phase-specific `E53` or empty morphological section, `bot:Element` ≈ `E24`/`E25`. Do not let BOT become the historical ontology.
+
+### AAT reconciliation is the right enrichment — if you type events and parts, not only objects
+
+Getty AAT should type:
+
+- building types and parts: mosque, four-iwan plan, iwan, pishtaq, minaret, mihrab, shabestān, muqarnas
+- techniques and materials: glazed mosaic tile, haft rang, carved stucco, baked brick, kufic / thuluth / nastaʿlīq
+- object types for movable or conceptually distinct works: inscription, tile panel
+
+Bind them with `P2 has type`. Prefer AAT (and Wikidata as hub) over local string labels so the graph can join other mosque corpora.
+
+Inscriptions need a second treatment. They are not only decoration. They are `E34 Inscription` (`P128 carries`) with language, script, transcription, and often a speech-act (foundation, Shiʿi hadith on the Öljeitü mihrab, patron’s name highlighted in colour). CRMtex is the clean extension here. That is how “Badr designed this” becomes a machine-readable claim rather than caption text.
+
+### What will actually make or break the knowledge graph
+
+**1. Event granularity policy.**  
+One “Safavid era” mega-event will hide the fact that Shah ʿAbbās I largely ignored this mosque while other Safavid rulers tiled and restored it. One event per tile panel will explode the graph. A workable rule: one event per documented campaign that produced a coherent morphological or decorative unit, then optional sub-activities for named crafts.
+
+**2. Identity of parts across modification.**  
+Is the south iwan one thing continuously modified, or a Seljuq structure plus later vaults plus later tile skin? CRM allows both. For conservation and building archaeology, split skin from structure; for architectural history of type, keep the iwan as one `B2` with modification events. Record both readings if the project serves both communities.
+
+**3. Uncertainty and disagreement.**  
+Dates such as “Ilkhanid,” rival attributions, and reconstructed early orientations are interpretations. Put them behind `E13` or CRMinf beliefs with sources (`E31 Document`, ADAMJI archive, Honarfar, UNESCO dossier). A heritage KG that asserts every date as fact will be brittle.
+
+**4. Mereology vs topology vs geometry.**  
+`P46 is composed of` ≠ `bot:containsZone` ≠ GeoSPARQL `sfWithin`. Keep them distinct. Query “what was added to the western iwan before 1350?” should walk events, not only current IFC containment.
+
+**5. Use and ritual, not only fabric.**  
+Friday prayer, teaching, waqf administration, and later tourist/heritage use are `E7` activities. They are how “spaces with different usages” become historical, not just BIM room functions.
+
+**6. Named vs anonymous labour.**  
+Insist on groups (brick masons of campaign X, tile workshop of campaign Y). Otherwise the graph reproduces the usual elite-patron bias and loses the decorative programmes you rightly want to include.
+
+
+### The two modelling moves that make the graph work
+
+**1. One identity, many productions**
+
+```turtle
+jame:mosque a jame:MosqueComplex ;          # subclass of crmba:B1 + bot:Building
+    crm:P2_has_type jame:type_mosque ;       # aat:300007544
+    owl:sameAs wd:Q1256501 .
+
+jame:evt_south_dome a crm:E12_Production ;
+    crm:P4_has_time-span jame:ts_1086 ;
+    jame:commissionedBy jame:actor_nizam_al_mulk ;
+    crm:P108_has_produced jame:part_south_dome ;
+    crm:P31_has_modified jame:mosque .
+```
+
+The mosque is not “built in 1086.” The *south dome* is produced in 1086; that event modifies the continuing built work.
+
+**2. BOT for topology, CRM for history**
+
+```turtle
+jame:mosque
+    bot:hasSpace  jame:space_sahn ;
+    bot:hasElement jame:part_south_iwan .
+
+jame:part_south_iwan
+    crmba:BP1_is_section_of jame:mosque ;
+    crm:P2_has_type jame:type_iwan .
+```
+
+`bot:hasElement` answers “what is in the building now?”  
+`crmba:BP1` + events answer “which campaign created or altered this section?”  
+Do not collapse those two relations.
+
+### Roles without CRM’s awkward P14.1
+
+In RDF, `P14.1 in the role of` needs a reified PC class. An application profile can do the same work with subproperties:
+
+```turtle
+jame:commissionedBy rdfs:subPropertyOf crm:P14_carried_out_by .
+jame:designedBy     rdfs:subPropertyOf crm:P14_carried_out_by .
+jame:executedBy     rdfs:subPropertyOf crm:P14_carried_out_by .
+```
+
+That is how the Öljeitü mihrab keeps patron and calligrapher distinct:
+
+```turtle
+jame:evt_oljeitu_mihrab a crm:E12_Production ;
+    crm:P4_has_time-span jame:ts_1310 ;
+    jame:commissionedBy jame:actor_muhammad_savi ;
+    jame:designedBy     jame:actor_badr ;
+    crm:P108_has_produced jame:part_oljeitu_mihrab , jame:inscription_oljeitu ;
+    crm:P126_employed jame:type_stucco .
+
+jame:part_oljeitu_mihrab
+    crm:P128_carries jame:inscription_oljeitu .
+```
+
+The inscription is an `E34_Inscription` (information), not another wall.
+
+### Addition and removal must both be events
+
+The Safavid winter hall is the test of the model. If you only assert `P46 is composed of` on the present plan, the Timurid hall vanishes.
+
+```turtle
+jame:evt_safavid_winter_hall a crm:E12_Production , crm:E80_Part_Removal ;
+    crm:P108_has_produced jame:part_safavid_winter_hall ;
+    crm:P113_removed      jame:part_timurid_hall ;
+    crm:P31_has_modified  jame:mosque .
+```
+
+Identity of the mosque survives; identity of the removed fabric also survives as a documented section.
+
+
+
+
+
+
+
+
+## 10. What CRMba actually is
+
+CRMba is a **CIDOC CRM family extension for buildings archaeology** — the study of standing buildings as stratified objects, not as single dated artefacts. It was written by Paola Ronzino (PhD, PIN / ARIADNE, 2015) with Niccolucci, Felicetti and Doerr, and last issued as **version 1.4 (December 2016)**, declared compatible with CRM 6.2.2.
+
+It answers questions CRM-base cannot ask cleanly:
+
+- Which *morphological parts* make up this building?
+- Which of those parts are matter, and which are intentional voids (rooms, iwans, doorways)?
+- Which *stratigraphic units* of construction or decoration sit on those parts?
+- When did a part start or stop being a constituent of the whole (`E79` / `E80`)?
+- How do two parts touch or connect?
+
+It is **not** a BIM schema, **not** a style vocabulary, and **not** a replacement for CRM events. Events stay in CRM (`E12`, `E11`, `E79`, `E80`). CRMba adds the *anatomy* those events act on.
+
+Intellectual parents are Harris-matrix thinking applied to standing fabric (Brogiolo, Parenti, Schuller, Morriss), plus CRMarchaeo for buried strata. Buried site : CRMarchaeo :: standing wall : CRMba.
+
+### Official status, honestly
+
+| Claim on the website | What that means in practice |
+|---|---|
+| Homepage: “proposal for approval” | Text never updated |
+| Versions table: **Stable**, v1.4 | You may implement 1.4 |
+| Compatible-models board (2025): **Draft**, maintainer “?” | No active editor |
+| SIG issue 654 “Review of CRMba”: **open** (updated 2025-09-08) | A revision is acknowledged as needed |
+| Encoding | One RDFS file, 5.87 KB, CRM 6.2 names (`Man-Made`, not `Human-Made`) |
+| Alignment to CRM 7.1 / 7.4 | Not done |
+
+So: **usable as a community profile**, not a frozen ISO-style standard. If you cite it, cite “CRMba 1.4 (Ronzino et al.; compatible with CRM 6.2.2)” and keep local alignments to CRM 7 class names.
+
+Primary documents, in useful order:
+
+1. Specification PDF (the only full definition): [CRMba v1.4.1](https://cidoc-crm.org/sites/default/files/2016-12-3%23CRMba_v1.4.1_UR.pdf)  
+2. Tiny RDFS: [CRMba_v1.4.rdfs](https://cidoc-crm.org/sites/default/files/CRMba_v1.4.rdfs)  
+3. Paper that explains the *idea*: Ronzino et al., “CRMba a CRM extension for the documentation of standing buildings,” *IJDL* 17 (2016)  
+4. Worked later example: Ronzino, Toth, Falcidieno, Roman amphitheatres, *JOCCH* 15 (2022) — this is the best “how to instantiate” text  
+5. Class pages on OntoME, e.g. [B1 Built Work](https://ontome.net/class/680/namespace/114)
+
+The PhD thesis is richer than the SIG document. The SIG document reprints large stretches of CRM/CRMsci/CRMarchaeo, which is why it feels like there is no CRMba in the CRMba spec.
+
+### The five classes that matter
+
+CRMba adds very few classes. Almost everything else is borrowed.
+
+```
+E24 Physical Human-Made Thing
+E92 Spacetime Volume
+        └── B1 Built Work
+                └── B2 Morphological Building Section
+                        ├── B3 Filled Morphological Building Section   (matter)
+                        └── B4 Empty Morphological Building Section    (intentional void)
+
+A2 Stratigraphic Volume Unit   (from CRMarchaeo)
+        └── B5 Stratigraphic Building Unit
+```
+
+**B1 Built Work**  
+The continuing building or complex: a mosque, a palace, a ruin, even a component treated as a work in its own right. It is both physical thing and spacetime volume, so its footprint may change. AAT’s “built work” is the explicit source of the scope note.
+
+For Isfahan: `jame:mosque` is one B1 from c. 771 to now.
+
+**B2 Morphological Building Section**  
+A *functional / morphological unit* of that work: south iwan, north dome chamber, winter hall, minaret. A B2 is a spacetime volume made of filled parts (B3) and the voids those parts enclose (B4). Constituency in the whole is opened by `E79 Part Addition` (`BP5`) and closed by `E80 Part Removal` (`BP4`).
+
+This is the class you will instantiate most often.
+
+**B3 Filled**  
+Matter: brick leaf, tile skin, stucco mihrab, column. A set of B3s *defines* a B4.
+
+**B4 Empty**  
+An *intentional* void that serves a function: the volume of the sahn, the iwan opening, a doorway, a *compluvium*. Not every empty place is a B4 — only voids produced on purpose by the arrangement of B3s. That is the BIM-like move in the model.
+
+**B5 Stratigraphic Building Unit**  
+The smallest *construction event made visible as fabric*: one mortar campaign, one fresco skin, one tile revetment, a cut for a later window. B5 is a CRMarchaeo `A2` specialised for standing structures. A B2 (the iwan) is constituted by many B5s (Seljuq brick core, Ilkhanid plaster, Safavid tile).
+
+If you only need architectural history, you can stop at B1/B2. If you are doing building archaeology or conservation stratigraphy, you need B5.
+
+**B6 Function** was proposed and **not adopted**. SIG issue 296 closed with: encode intended use as `P103 was intended for` / use as `P16 was used for` an `E7 Activity`. Do not invent `B6` in new data. The 2022 amphitheatre paper says this only half-solves dated changes of use, because a type cannot take `P4 has time-span`. The robust pattern remains: function = activity with a time-span.
+
+### The properties
+
+Native CRMba properties are also few.
+
+| Property | From → to | Meaning |
+|---|---|---|
+| **BP1** is section of | B2 → B1 | This iwan is a section of this mosque |
+| **BP2** is constituent of | B5 → B1 (shortcut also B5 → B2) | This fresco unit constitutes the hall / the work |
+| **BP3** is spatial temporary equal to | STV → STV | Two spacetime volumes coincide for a while (e.g. plaster covering a wall) |
+| **BP4** terminates the constituency | E80 → B2 | Part removal ends a section’s membership |
+| **BP5** initiates the constituency | E79 → B2 | Part addition starts a section’s membership |
+| **BP8** is adjacent to | B2 → B2 | Side-by-side, no shared fabric required |
+| **BP11** is connected to | B2 → B2 | Connection; qualified by .1 mode (type) and .2 through (the connecting E24) |
+| **BP13** used specific object | E12 → B5 | This production used / produced that stratigraphic unit |
+
+Borrowed, and you will use them constantly:
+
+- CRM `P46 is composed of` — B2 composed of B3s  
+- CRMarchaeo `AP12 confines` — B3 confines B4; stratigraphic interface confines a B5  
+- CRM `P108` / `P31` / `P16` / `P103` — production, modification, use, intended function  
+
+`BP11.1` / `BP11.2` are `.1` properties of a property, the same RDF headache as CRM `P14.1`. In GraphDB, use a subproperty (`jame:connectedThroughPortal`) or a small reification. Do not expect the official RDFS to give you a clean PC class.
+
+### How the pieces nest (the picture the PDF never draws)
+
+```
+B1  Masjed-e Jāmeʿ
+ │
+ ├─ B2  South iwan
+ │    ├─ B3  Seljuq brick flanks
+ │    ├─ B3  Safavid tile skin
+ │    ├─ B3  muqarnas vault
+ │    ├─ B4  vaulted void of the iwan
+ │    └─ B5  Aq Qoyunlu mosaic campaign (1475)
+ │
+ ├─ B2  South dome chamber (Niẓām al-Mulk)
+ │    ├─ B3  brick shell
+ │    └─ B4  interior volume
+ │
+ ├─ B2  Öljeitü hall
+ │    ├─ B3/B5  1310 stucco mihrab
+ │    └─ B4  hall volume
+ │
+ └─ B2  Timurid hall     ← BP4 / E80 when Safavid winter hall cuts it
+      └─ B2  Safavid winter hall   ← BP5 / E79
+```
+
+CRM events hang off these nodes. CRMba does not replace `E12 Production of the south dome`; it tells you *what kind of thing* that production produced (a B2, made of B3s, enclosing a B4).
+
+### CRMba vs CRM vs CRMarchaeo vs BOT
+
+| Need | Use |
+|---|---|
+| Who built it, when, from which source | CRM (`E12`, `E21`, `E52`, `E31`) |
+| Anatomy of the standing building | **CRMba B1–B5, BP1–BP5, BP8, BP11** |
+| Buried phases under the Seljuq floor, Harris matrix of excavation | CRMarchaeo (`A2`, `A3`, `AP` relations) |
+| Current rooms, adjacency, 3D navigation, IFC link | BOT (`Space`, `Element`, `hasElement`) |
+| Geometry | CRMgeo / GeoSPARQL, not CRMba |
+
+B4 Empty Section and `bot:Space` look similar and are not the same. B4 is an intentional void *as a morphological product of fabric*. `bot:Space` is a zone in a topological model of the present (or of a chosen phase). For the mosque, instantiate both on the same individual only if you accept that alignment explicitly, as the application profile did.
+
+
+### One-sentence scopes
+
+**BOT** (W3C Linked Building Data): a *minimal topology vocabulary* for Site → Building → Storey → Space → Element, plus adjacency and optional 3D. It was written so BIM, sensors and product catalogues can talk on the Web. It has 7 classes. It has no events, no actors, no phases, no inscriptions.
+
+**CRMba**: a *CRM extension for buildings archaeology*. It records how standing fabric is composed of morphological parts, which of those parts are matter and which are intentional voids, which construction units sit on them, and when a part began or ceased to belong to the whole. History is done with CRM events (`E12`, `E79`, `E80`). CRMba supplies the anatomy those events act on.
+
+### What each is allowed to say
+
+```mermaid
+flowchart LR
+  subgraph BOT["BOT — present topology"]
+    Site --> Building
+    Building --> Storey
+    Building --> Space
+    Space --> Element
+    Space -. adjacent .-> Space
+  end
+  subgraph CRMba["CRMba — historical anatomy"]
+    B1["B1 Built Work"] --> B2["B2 Morphological section"]
+    B2 --> B3["B3 Filled / matter"]
+    B2 --> B4["B4 Empty / intentional void"]
+    B2 --> B5["B5 Stratigraphic unit"]
+    E79["E79 Part addition"] --> B2
+    E80["E80 Part removal"] --> B2
+  end
+```
+
+| Question | BOT | CRMba |
+|---|---|---|
+| What rooms exist in the current plan? | yes — `bot:Space` | only indirectly, as `B4` if the void is an intended product of fabric |
+| Which wall bounds that room? | yes — `adjacentElement` / `Interface` | yes — `B3` confines `B4` (`AP12`) |
+| Which campaign built that wall? | no | yes — `E12` + `BP5` / `B5` |
+| Did a later campaign remove part of it? | no | yes — `E80` + `BP4` |
+| Who commissioned the tile skin? | no | no — that is CRM `P14` / your `commissionedBy` |
+| When was this volume used for winter prayer? | no | no — CRM `E7` + `P4` |
+| Link a glTF / IFC body? | yes — `has3DModel` | not its job |
+| Harris-style interface on a standing wall? | no | yes — `B5` + CRMarchaeo `A3` |
+
+### The three pairs people mix up
+
+**1. `bot:Building` ≠ `B1 Built Work`**
+
+- `bot:Building` = a zone that contains storeys and spaces. Identity is spatial.
+- `B1` = a persistent human-made work that is also a spacetime volume. Identity can survive a changed footprint.
+
+Same mosque can be both. The *type* does different work.
+
+**2. `bot:Space` ≠ `B4 Empty Morphological Building Section`**
+
+- `bot:Space` is a zone: “the volume we currently call the sahn.” It does not care how the void was made.
+- `B4` is a *product of design*: the void that exists because a particular set of `B3`s were placed that way. A ruin gap caused by collapse is not a `B4`. A thermal zone drawn on a BIM plan is a `bot:Space` and usually not a `B4`.
+
+**3. `bot:Element` ≠ `B2` / `B3` / `B5`**
+
+- `bot:Element` = any constituent with a technical function, form or position (wall, door, sensor, tile panel) in the *current* model.
+- `B2` = a morphological unit of the work (the south iwan as a whole, across centuries).
+- `B3` = the matter of that unit.
+- `B5` = one construction/decoration episode visible as fabric (the 1475 mosaic on that iwan).
+
+One physical wall can be all four if you need all four questions. Most projects should not.
+
+### What each refuses to be
+
+BOT refuses to be:
+
+- a history model
+- a classification of styles or building types (no “iwan”, no “mihrab”)
+- a documentation standard for excavation or conservation
+- an actor/time/provenance model
+
+CRMba refuses to be:
+
+- a storey/space tree for navigation
+- a live BIM / IoT index
+- a complete CRM (it has almost no events of its own)
+- a function vocabulary (`B6` was rejected; use CRM `P16` / `P103`)
+
+That last point is important. CRMba talks about *form and constituency*, not about “this room is for Friday prayer.” Use is an activity.
+
+### How they should sit together related to our purpose
+
+Think in two snapshots plus a history spine.
+
+```text
+CRM events     E12 / E11 / E79 / E80     ← when, who, what changed
+CRMba anatomy  B1 / B2 / B3 / B4 / B5   ← what kind of part was changed
+BOT topology   Building / Space / Element ← how the present plan is nested
+```
+
+A practical assignment for Jāmeʿ Isfahan:
+
+| Individual | BOT | CRMba | Why |
+|---|---|---|---|
+| the mosque | `bot:Building` | `B1` | one identity, two facets |
+| south iwan (fabric) | `bot:Element` | `B2` (+ `B3`s) | morphological unit with matter |
+| volume of the south iwan | `bot:Space` | `B4` | present zone *and* intended void |
+| 1475 tile skin | `bot:Element` (optional) | `B5` | stratigraphic unit; skip BOT unless you have a 3D object for it |
+| demolished Timurid bays | — | `B2` + `E80`/`BP4` | they are not in the present topology |
+| sahn | `bot:Space` | `B4` | courtyard as usable void |
+
+BOT never sees the Timurid hall after the Safavid cut. CRMba must still have that `B2`, because the removal is historical fact.
+
+### A decision rule
+
+Ask only this:
+
+- If deleting time from the triple still leaves a true sentence (“space A contains element B”), it is BOT.
+- If the sentence becomes false when you change the century (“this skin constitutes the iwan after 1475”), it is CRMba plus CRM events.
+
+“The south iwan is adjacent to the sahn” is BOT.  
+“The south iwan received a mosaic constituent in 1475–76” is CRMba/`B5` + CRM `E11`.  
+“Uzun Ḥasan commissioned that campaign” is CRM only.
+
+Keep those three sentences on three property families. The graph stays queryable; the scopes stay honest.
+
+
+# 11. What is CRMarchaeo?
+
+**CRMarchaeo** is a CIDOC CRM + CRMsci extension for the *archaeological excavation process* and for the *stratified deposits* that excavation observes: how layers and interfaces formed, how they physically and stratigraphically relate, how digging removed them, and how finds sit in them. Current stable version is **2.1 / 2.1.1 (2024)**, aligned to CRM 7.1.2 — unlike CRMba, this one is maintained.
+
+Edward Harris’s rule is the design brief: the past is read from the order of strata, and that order is inferred from physical contacts. CRMarchaeo splits those two relations on purpose.
+
+### The class set that matters
+
+Two families: **things in the ground** and **events that made or opened them**.
+
+```mermaid
+flowchart TB
+  subgraph Things
+    A8["A8 Stratigraphic Unit"]
+    A2["A2 Stratigraphic Volume Unit<br/>the fill / layer / dump"]
+    A3["A3 Stratigraphic Interface<br/>the surface / cut"]
+    A10["A10 Excavation Interface"]
+    A7["A7 Embedding<br/>find-in-layer"]
+    A8 --> A2
+    A8 --> A3
+  end
+  subgraph Events
+    A9["A9 Archaeological Excavation"]
+    A1["A1 Excavation Processing Unit<br/>one recorded spit / context dig"]
+    A4["A4 Stratigraphic Genesis<br/>layer comes into being"]
+    A5["A5 Stratigraphic Modification"]
+    A6["A6 Group Declaration Event<br/>archaeologist groups contexts"]
+    A9 --> A1
+    A4 --> A2
+    A4 --> A3
+  end
+```
+
+| Class | What it is | Mosque analogue, if any |
+|---|---|---|
+| **A8** | Parent of every stratigraphic thing | — |
+| **A2** | A *volume* of more-or-less homogeneous matter: a fill, a floor makeup, a dump, a mud-brick collapse | Buyid/Abbasid deposits *under* the Seljuq plan (ADAMJI trenches) |
+| **A3** | A *surface*: the top of a layer, a cut, a floor surface, a robber trench edge | the cut that destroyed the first qibla orientation |
+| **A4** | The genesis event of a unit (deposition, construction of a layer) | formation of that fill |
+| **A5** | Later disturbance of a unit without replacing it | later pit cutting the fill |
+| **A1** | One documented digging act (context sheet / spit) | an ADAMJI excavation unit |
+| **A9** | The excavation as a whole campaign | the 1972–78 Italian–Iranian project |
+| **A7** | The embedding of a find in a unit | a potsherd in an Abbasid fill |
+| **A6** | An interpretive grouping of units | “all contexts of the first mosque phase” |
+| **A10** | Surface created *by digging*, not by ancient genesis | the cleaned face of a section drawing |
+
+`A2` may contain objects. `A3` is a boundary, not a bag of finds. That distinction is the whole model.
+
+### The two relations you must not collapse
+
+| Property | Relates | Meaning |
+|---|---|---|
+| **AP11** has physical relation to | A8 → A8 | Observed contact: abuts, covers, is cut by, bonds with. Typed by `AP11.1` |
+| **AP13** has stratigraphic relation to | A8 → A8 | *Interpreted* earlier-than / later-than / equals. Justified by physical relations via `AP13.2` |
+| **AP12** confines | A3 → A2 | This interface bounds that volume |
+| **AP7** produced | A4 → A8 | Genesis produced this unit |
+| **AP5** removed part or all of | A1 → A8 | Digging took this unit away |
+| **AP15** is or contains remains of | A8 → physical thing | This layer holds / is the remains of X |
+| **AP18** is embedding of | A7 → object | Find–matrix link |
+
+Harris matrix boxes are `A8`s. The lines between boxes are `AP13`. The section drawing that *justifies* those lines is a set of `AP11`s. CRMarchaeo refuses to treat “context 45 is later than context 44” as a raw observation. It is an argument.
+
+### What CRMarchaeo is allowed to say — and what it refuses
+
+It **does** say:
+
+- this deposit exists as a volume or as a surface
+- this deposit was created by a genesis event (natural or human)
+- this deposit was later cut, truncated, or mixed
+- this find was embedded in that deposit
+- this excavation unit removed that deposit
+- physical contact X is the reason we infer sequence Y
+
+It **does not** say:
+
+- this is an iwan / dome / storey / space (no building typology, no topology tree)
+- this wall is a morphological section of a standing work (that is CRMba `B2`)
+- this room is adjacent to that room in the present plan (that is BOT)
+- who commissioned a decorative campaign in 1310 (CRM `E7` / `P14`)
+- how to navigate an IFC model
+
+Excavation creates *new* interfaces (`A10`) by destroying ancient ones. CRMba does not model the trowel. CRMarchaeo does.
+
+### The three-way split, now complete
+
+```text
+BOT          present spatial topology     walk the plan
+CRMba        standing-building anatomy    read the walls as a building
+CRMarchaeo   deposit stratigraphy         read the ground (and cuts in walls
+                                          when treated as excavated contexts)
+CRM core     events, actors, time, texts  who / when / why / source
+```
+
+| Question | BOT | CRMba | CRMarchaeo |
+|---|---|---|---|
+| Which spaces exist now? | yes | only as `B4` if intended void | no |
+| Which part is the south iwan as a work-section? | element, maybe | **yes — B2** | no |
+| Which brick skin is one construction unit on that iwan? | no | **yes — B5** | only if you record that skin as an excavated SU |
+| Which fill lies under the Seljuq floor, cut by later foundations? | no | no | **yes — A2 + A3 + AP11/AP13** |
+| Which 1970s trench removed that fill? | no | no | **yes — A1 / A9 + AP5** |
+| Which sherd came from that fill? | no | no | **yes — A7 / AP15 / AP18** |
+| Who paid for the 1086 dome? | no | no | no — CRM |
+
+### CRMarchaeo vs CRMba at the join
+
+This is the only place they are meant to touch.
+
+CRMba **B5 Stratigraphic Building Unit** is declared a subclass of CRMarchaeo **A2 Stratigraphic Volume Unit**. A plaster campaign on a standing wall *is* a stratigraphic volume. You may therefore:
+
+- describe it as `B5` when you care that it belongs to a `B2` iwan (`BP2`)
+- describe the same individual as `A2` when you care that it covers / is cut by another unit (`AP11`, `AP13`)
+
+Harmonization paper in one line: **buried site → CRMarchaeo; standing fabric → CRMba; a unit that is both gets both type triples.** Do not duplicate the node.
+
+What you should *not* do:
+
+- type the whole mosque as `A2`
+- type the sahn as `A3`
+- use `AP13` “later than” as a substitute for CRM `E79`/`E80` on standing parts (sequence of *deposits* ≠ sequence of *building campaigns*, even when they coincide)
+
+A Safavid cut through Timurid vaults can be recorded two ways, and both can be true:
+
+- CRMba: `E80` + `BP4` on the Timurid `B2` (that section left the work)
+- CRMarchaeo: `A3` cut interface `AP11`/`AP13` against the Timurid fabric treated as `A2`/`B5`
+
+Pick the level your evidence is at. Field drawings of interfaces → CRMarchaeo. Architectural-historical “the winter hall replaced the Timurid shabestān” → CRMba + CRM events.
+
+### Decision rule
+
+- If the sentence is about **containment in the live plan**, it is BOT.  
+- If it is about **a named part of a building as a work**, it is CRMba.  
+- If it is about **a context, a cut, a fill, a matrix, or a Harris line**, it is CRMarchaeo.  
+- If it is about **a person, a date, a text, or a use**, it is CRM core.
+
+For Jāmeʿ Isfahan that means:
+
+- ADAMJI / Galdieri buried phases, first qibla, 772 and 840–41 plans under the Seljuq floor → **CRMarchaeo**
+- south iwan, Öljeitü mihrab, Timurid hall vs Safavid winter hall as standing parts → **CRMba**
+- courtyard, prayer halls as rooms you can walk in a model → **BOT**
+- Niẓām al-Mulk, 1086, the inscription → **CRM**
+
+CRMarchaeo is the only one of the three that is allowed to destroy evidence in its own model (`AP5`, `AP10`). That is how you know you are in the excavation layer and not in the building layer.
+
+
+
+
+
+
+## 12. Competency Questions
 
 1. Which buildings are contained in the Naqsh-e Jahan Site?  
 2. List all spaces of type `persarch:Iwan` in the Masjid-i Jāmiʿ together with their Schroeder numbers.  
@@ -549,7 +1119,7 @@ persian-architecture-bot-case-studies/
 
 ---
 
-## 10. Data Sources & Scholarly Grounding
+## 13. Data Sources & Scholarly Grounding
 
 - Eric Schroeder, Plan of Masjid-i Jāmiʿ of Isfahan, 1931 (American Institute for Persian Art and Archaeology). Smithsonian Institution, Ernst Herzfeld Papers, D-704.  
 - ArchNet media: https://www.archnet.org/sites/1621?media_content_id=62965  
@@ -559,7 +1129,7 @@ persian-architecture-bot-case-studies/
 
 ---
 
-## 11. Next Steps & Enrichment Path
+## 14. Next Steps & Enrichment Path
 
 1. Formalise the full `persarch.ttl` ontology module.  
 2. Expand the instance data with more Schroeder-numbered spaces and complete sequences for Sheikh Lotfollah.  
@@ -572,7 +1142,7 @@ After this foundational version is stable we can discuss concrete strategies for
 
 ---
 
-## 12. License
+## 15. License
 
 This repository is released under the **GNU General Public License v3.0**.
 
@@ -587,7 +1157,7 @@ Either choice is valid; the important point is to state it clearly in the reposi
 
 ---
 
-## 13. Citation
+## 16. Citation
 
 If you use this work, please cite the repository and acknowledge the underlying scholarly sources (especially Schroeder’s 1931 plan and the UNESCO documentation of Naqsh-e Jahan Square).
 
