@@ -1,4 +1,4 @@
-# Persian Architecture Ontology – BOT Extension Case Studies
+# Persian Architecture Ontology – CIDOC CRM, CRMba, CRMarcjaeo and BOT Extensions Case Studies
 
 **Extending the Building Topology Ontology (BOT) for Persian / Iranian Islamic Architecture**  
 Focus: Masjid-i Jāmiʿ of Isfahan · Sheikh Lotfollah Mosque · Naqsh-e Jahan Square Ensemble
@@ -6,6 +6,7 @@ Focus: Masjid-i Jāmiʿ of Isfahan · Sheikh Lotfollah Mosque · Naqsh-e Jahan S
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Ontology](https://img.shields.io/badge/Ontology-OWL%20%2F%20Turtle-blue)](https://www.w3.org/OWL/)
 [![BOT](https://img.shields.io/badge/Core-BOT%20(W3C%20LBD)-green)](https://w3c-lbd-cg.github.io/bot/)
+[![CIDOC CRM](https://img.shields.io/badge/Standard-CIDOC%20CRM-orange)](https://cidoc-crm.org/)
 
 ---
 
