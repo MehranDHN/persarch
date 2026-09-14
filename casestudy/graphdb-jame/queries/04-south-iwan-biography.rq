@@ -1,0 +1,25 @@
+# Building-archaeology question: full event biography of the south iwan
+PREFIX crm:   <http://www.cidoc-crm.org/cidoc-crm/>
+PREFIX crmba: <http://www.cidoc-crm.org/extensions/crmba/>
+PREFIX jame:  <https://example.org/jame-isfahan/>
+PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?eventLabel ?predicate ?year
+WHERE {
+  {
+    ?event crm:P108_has_produced|crm:P31_has_modified|crm:P111_added|crm:P110_augmented
+           jame:part_south_iwan .
+    BIND("direct" AS ?predicate)
+  } UNION {
+    ?sub crm:P46i_forms_part_of|crmba:BP1_is_section_of jame:part_south_iwan .
+    ?event crm:P108_has_produced|crm:P31_has_modified ?sub .
+    BIND("via part" AS ?predicate)
+  }
+  ?event rdfs:label ?eventLabel .
+  FILTER (LANG(?eventLabel) = "en")
+  OPTIONAL {
+    ?event crm:P4_has_time-span ?ts .
+    ?ts crm:P82_at_some_time_within|crm:P82a_begin_of_the_begin ?year .
+  }
+}
+ORDER BY ?year

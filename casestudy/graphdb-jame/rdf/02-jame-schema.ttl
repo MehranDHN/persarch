@@ -1,0 +1,139 @@
+# Application TBox — alignments and local properties/classes
+# Named graph: https://example.org/jame-isfahan/graph/schema
+
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix crm:   <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix bot:   <https://w3id.org/bot#> .
+@prefix aat:   <http://vocab.getty.edu/aat/> .
+@prefix wd:    <http://www.wikidata.org/entity/> .
+@prefix jame:  <https://example.org/jame-isfahan/> .
+
+<https://example.org/jame-isfahan/>
+    a owl:Ontology ;
+    dct:title "Jameh Mosque of Isfahan CRM-BOT Application Ontology"@en ;
+    dct:title "هستی‌شناسی کاربردی مسجد جامع اصفهان"@fa ;
+    dct:created "2026-09-11"^^xsd:date ;
+    owl:versionInfo "0.2.0-graphdb" ;
+    rdfs:seeAlso wd:Q1256501 ;
+    owl:imports <http://www.cidoc-crm.org/cidoc-crm/> , <https://w3id.org/bot> .
+
+jame:MosqueComplex
+    a owl:Class ;
+    rdfs:label "Historic mosque complex"@en ;
+    rdfs:subClassOf crmba:B1_Built_Work , bot:Building , crm:E22_Human-Made_Object .
+
+jame:ArchitecturalSection
+    a owl:Class ;
+    rdfs:label "Architectural section of a historic mosque"@en ;
+    rdfs:subClassOf crmba:B2_Morphological_Building_Section , bot:Element .
+
+jame:HistoricSpace
+    a owl:Class ;
+    rdfs:label "Historic space"@en ;
+    rdfs:subClassOf bot:Space , crm:E53_Place .
+
+jame:commissionedBy
+    a owl:ObjectProperty ;
+    rdfs:label "commissioned by"@en ;
+    rdfs:subPropertyOf crm:P14_carried_out_by ;
+    rdfs:domain crm:E7_Activity ;
+    rdfs:range crm:E39_Actor .
+
+jame:designedBy
+    a owl:ObjectProperty ;
+    rdfs:label "designed by"@en ;
+    rdfs:subPropertyOf crm:P14_carried_out_by ;
+    rdfs:domain crm:E7_Activity ;
+    rdfs:range crm:E39_Actor .
+
+jame:executedBy
+    a owl:ObjectProperty ;
+    rdfs:label "executed by"@en ;
+    rdfs:subPropertyOf crm:P14_carried_out_by ;
+    rdfs:domain crm:E7_Activity ;
+    rdfs:range crm:E39_Actor .
+
+jame:restoredBy
+    a owl:ObjectProperty ;
+    rdfs:label "restored by"@en ;
+    rdfs:subPropertyOf crm:P14_carried_out_by ;
+    rdfs:domain crm:E11_Modification ;
+    rdfs:range crm:E39_Actor .
+
+jame:hasCampaign
+    a owl:ObjectProperty ;
+    rdfs:label "has campaign"@en ;
+    rdfs:subPropertyOf crm:P16i_was_used_for ;
+    rdfs:domain jame:MosqueComplex ;
+    rdfs:range crm:E7_Activity .
+
+# Controlled types. External IDs use skos:exactMatch, not owl:sameAs,
+# so GraphDB sameAs reasoning will not merge AAT/Wikidata nodes into the local graph.
+
+jame:type_mosque a crm:E55_Type ;
+    rdfs:label "mosque (building)"@en ; rdfs:label "مسجد"@fa ;
+    skos:exactMatch aat:300007544 , wd:Q32815 .
+
+jame:type_four_iwan_plan a crm:E55_Type ;
+    rdfs:label "four-iwan plan"@en ; rdfs:label "طرح چهارایوانی"@fa .
+
+jame:type_iwan a crm:E55_Type ;
+    rdfs:label "iwan"@en ; rdfs:label "ایوان"@fa ;
+    skos:exactMatch wd:Q209669 .
+
+jame:type_sahn a crm:E55_Type ;
+    rdfs:label "sahn (mosque courtyard)"@en ; rdfs:label "صحن"@fa ;
+    skos:exactMatch wd:Q12519 .
+
+jame:type_mihrab a crm:E55_Type ;
+    rdfs:label "mihrab"@en ; rdfs:label "محراب"@fa ;
+    skos:exactMatch wd:Q189451 .
+
+jame:type_dome_chamber a crm:E55_Type ;
+    rdfs:label "dome chamber"@en ; rdfs:label "گنبدخانه"@fa .
+
+jame:type_shabestan a crm:E55_Type ;
+    rdfs:label "shabestan (prayer hall)"@en ; rdfs:label "شبستان"@fa .
+
+jame:type_minaret a crm:E55_Type ;
+    rdfs:label "minaret"@en ; rdfs:label "مناره"@fa ;
+    skos:exactMatch wd:Q48374 .
+
+jame:type_muqarnas a crm:E55_Type ;
+    rdfs:label "muqarnas"@en ; rdfs:label "مقرنس"@fa ;
+    skos:exactMatch wd:Q837669 .
+
+jame:type_hypostyle a crm:E55_Type ;
+    rdfs:label "hypostyle hall"@en ;
+    skos:exactMatch wd:Q1065655 .
+
+jame:type_inscription a crm:E55_Type ;
+    rdfs:label "inscription"@en ; rdfs:label "کتیبه"@fa ;
+    skos:exactMatch wd:Q1640824 .
+
+jame:type_stucco a crm:E57_Material ;
+    rdfs:label "carved stucco"@en ; rdfs:label "گچ‌بری"@fa .
+
+jame:type_glazed_tile a crm:E57_Material ;
+    rdfs:label "glazed tile"@en ; rdfs:label "کاشی لعاب‌دار"@fa .
+
+jame:type_brick a crm:E57_Material ;
+    rdfs:label "baked brick"@en ; rdfs:label "آجر"@fa .
+
+jame:type_thuluth a crm:E55_Type ;
+    rdfs:label "thuluth script"@en ;
+    skos:exactMatch wd:Q1999548 .
+
+jame:type_kufic a crm:E55_Type ;
+    rdfs:label "kufic script"@en ;
+    skos:exactMatch wd:Q185425 .
+
+jame:role_patron a crm:E55_Type ; rdfs:label "patron"@en .
+jame:role_calligrapher a crm:E55_Type ; rdfs:label "calligrapher-designer"@en .
+jame:role_workshop a crm:E55_Type ; rdfs:label "craft workshop"@en .

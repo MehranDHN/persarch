@@ -1,0 +1,390 @@
+# Instance graph — Masjed-e Jāmeʿ-e Eṣfahān
+# Named graph: https://example.org/jame-isfahan/graph/data
+
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix crm:   <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix bot:   <https://w3id.org/bot#> .
+@prefix wd:    <http://www.wikidata.org/entity/> .
+@prefix jame:  <https://example.org/jame-isfahan/> .
+
+# ----- Places -----
+
+jame:place_isfahan a crm:E53_Place ;
+    rdfs:label "Isfahan"@en ;
+    rdfs:label "اصفهان"@fa ;
+    skos:exactMatch wd:Q16556 ;
+    geo:lat "32.66972"^^xsd:float ;
+    geo:long "51.68528"^^xsd:float .
+
+jame:place_mosque_site a crm:E53_Place ;
+    rdfs:label "Site of Masjed-e Jāmeʿ-e Eṣfahān"@en ;
+    crm:P89_falls_within jame:place_isfahan ;
+    geo:lat "32.66972"^^xsd:float ;
+    geo:long "51.68528"^^xsd:float .
+
+# ----- Actors -----
+
+jame:actor_nizam_al_mulk a crm:E21_Person ;
+    rdfs:label "Niẓām al-Mulk"@en ;
+    rdfs:label "نظام‌الملک"@fa ;
+    skos:exactMatch wd:Q298427 ;
+    crm:P131_is_identified_by jame:app_nizam .
+
+jame:app_nizam a crm:E41_Appellation ;
+    rdfs:label "Abū ʿAlī Ḥasan ibn ʿAlī Ṭūsī, Niẓām al-Mulk"@en .
+
+jame:actor_taj_al_mulk a crm:E21_Person ;
+    rdfs:label "Tāj al-Mulk"@en ;
+    rdfs:label "تاج‌الملک"@fa ;
+    crm:P3_has_note "Seljuq vizier; patron of the north dome, 1088."@en .
+
+jame:actor_malik_shah a crm:E21_Person ;
+    rdfs:label "Malik-Shāh I"@en ;
+    skos:exactMatch wd:Q298448 .
+
+jame:actor_oljeitu a crm:E21_Person ;
+    rdfs:label "Öljaitü (Uljāytū)"@en ;
+    rdfs:label "اولجایتو"@fa ;
+    skos:exactMatch wd:Q298439 .
+
+jame:actor_muhammad_savi a crm:E21_Person ;
+    rdfs:label "Moḥammad Sāvi (Saʿd al-Dīn Muḥammad Mustawfī Sāvajī)"@en ;
+    rdfs:label "محمد ساوی"@fa ;
+    crm:P3_has_note "Ilkhanid vizier; patron of the 710/1310 stucco mihrab."@en .
+
+jame:actor_badr a crm:E21_Person ;
+    rdfs:label "Badr"@en ;
+    rdfs:label "بدر"@fa ;
+    crm:P3_has_note "Calligrapher-designer named on the Öljeitü mihrab."@en .
+
+jame:actor_sultan_muhammad_bahadur a crm:E21_Person ;
+    rdfs:label "Sulṭān Muḥammad Bahādur"@en ;
+    crm:P3_has_note "Grandson of Shāhrukh; named in the 851/1447 hall inscription."@en .
+
+jame:actor_uzun_hasan a crm:E21_Person ;
+    rdfs:label "Uzun Ḥasan"@en ;
+    rdfs:label "اوزون حسن"@fa ;
+    skos:exactMatch wd:Q298407 .
+
+jame:group_seljuq_masons a crm:E74_Group ;
+    rdfs:label "Seljuq brick masons of the Isfahan Jāmeʿ campaigns"@en ;
+    crm:P2_has_type jame:role_workshop .
+
+jame:group_safavid_tile_workshop a crm:E74_Group ;
+    rdfs:label "Safavid tile workshop active on the Jāmeʿ courtyard façades"@en ;
+    crm:P2_has_type jame:role_workshop .
+
+# ----- Time-spans -----
+
+jame:ts_771 a crm:E52_Time-Span ;
+    rdfs:label "c. 771 CE / 154 AH"@en ;
+    crm:P82_at_some_time_within "0771"^^xsd:gYear .
+
+jame:ts_840 a crm:E52_Time-Span ;
+    rdfs:label "840–841 CE"@en ;
+    crm:P82a_begin_of_the_begin "0840"^^xsd:gYear ;
+    crm:P82b_end_of_the_end "0841"^^xsd:gYear .
+
+jame:ts_1086 a crm:E52_Time-Span ;
+    rdfs:label "1086–1087 CE"@en ;
+    crm:P82a_begin_of_the_begin "1086"^^xsd:gYear ;
+    crm:P82b_end_of_the_end "1087"^^xsd:gYear .
+
+jame:ts_1088 a crm:E52_Time-Span ;
+    rdfs:label "1088–1089 CE"@en ;
+    crm:P82a_begin_of_the_begin "1088"^^xsd:gYear ;
+    crm:P82b_end_of_the_end "1089"^^xsd:gYear .
+
+jame:ts_seljuq_iwans a crm:E52_Time-Span ;
+    rdfs:label "early 12th century CE (four-iwan conversion)"@en ;
+    crm:P82a_begin_of_the_begin "1100"^^xsd:gYear ;
+    crm:P82b_end_of_the_end "1125"^^xsd:gYear .
+
+jame:ts_1310 a crm:E52_Time-Span ;
+    rdfs:label "710 AH / 1310 CE"@en ;
+    crm:P82_at_some_time_within "1310"^^xsd:gYear .
+
+jame:ts_ilkhanid_arcade a crm:E52_Time-Span ;
+    rdfs:label "Ilkhanid reign of Öljaitü, early 14th c."@en ;
+    crm:P82a_begin_of_the_begin "1304"^^xsd:gYear ;
+    crm:P82b_end_of_the_end "1317"^^xsd:gYear .
+
+jame:ts_1447 a crm:E52_Time-Span ;
+    rdfs:label "851 AH / 1447 CE"@en ;
+    crm:P82_at_some_time_within "1447"^^xsd:gYear .
+
+jame:ts_1475 a crm:E52_Time-Span ;
+    rdfs:label "1475–1476 CE"@en ;
+    crm:P82a_begin_of_the_begin "1475"^^xsd:gYear ;
+    crm:P82b_end_of_the_end "1476"^^xsd:gYear .
+
+jame:ts_safavid_17c a crm:E52_Time-Span ;
+    rdfs:label "17th century CE (Safavid restorations)"@en ;
+    crm:P82a_begin_of_the_begin "1600"^^xsd:gYear ;
+    crm:P82b_end_of_the_end "1700"^^xsd:gYear .
+
+# ----- Built work -----
+
+jame:app_mosque_en a crm:E41_Appellation ; rdfs:label "Jāmeh Mosque of Isfahan"@en .
+jame:app_mosque_fa a crm:E41_Appellation ; rdfs:label "مسجد جامع اصفهان"@fa .
+
+jame:mosque a jame:MosqueComplex ;
+    rdfs:label "Jāmeh Mosque of Isfahan"@en ;
+    rdfs:label "مسجد جامع اصفهان"@fa ;
+    crm:P1_is_identified_by jame:app_mosque_en , jame:app_mosque_fa ;
+    crm:P2_has_type jame:type_mosque , jame:type_four_iwan_plan ;
+    crm:P53_has_former_or_current_location jame:place_mosque_site ;
+    crm:P45_consists_of jame:type_brick ;
+    skos:exactMatch wd:Q1256501 ;
+    foaf:homepage <https://isfahanjamehmosque.com/> ;
+    crm:P3_has_note "Continuing identity of the Friday Mosque from the late 8th century. Fabric changes through campaigns; identity does not."@en ;
+    bot:hasSpace
+        jame:space_sahn , jame:space_south_iwan , jame:space_north_iwan ,
+        jame:space_east_iwan , jame:space_west_iwan , jame:space_south_dome ,
+        jame:space_north_dome , jame:space_oljeitu_hall , jame:space_winter_hall ;
+    bot:hasElement
+        jame:part_south_iwan , jame:part_north_iwan , jame:part_east_iwan ,
+        jame:part_west_iwan , jame:part_south_dome , jame:part_north_dome ,
+        jame:part_oljeitu_mihrab , jame:part_safavid_minaret_e ,
+        jame:part_safavid_minaret_w .
+
+jame:part_south_iwan a jame:ArchitecturalSection ;
+    rdfs:label "South (qibla) iwan"@en ;
+    rdfs:label "ایوان جنوبی"@fa ;
+    crm:P2_has_type jame:type_iwan ;
+    crmba:BP1_is_section_of jame:mosque ;
+    crm:P46i_forms_part_of jame:mosque .
+
+jame:part_north_iwan a jame:ArchitecturalSection ;
+    rdfs:label "North iwan"@en ;
+    crm:P2_has_type jame:type_iwan ;
+    crmba:BP1_is_section_of jame:mosque .
+
+jame:part_east_iwan a jame:ArchitecturalSection ;
+    rdfs:label "East iwan"@en ;
+    crm:P2_has_type jame:type_iwan ;
+    crmba:BP1_is_section_of jame:mosque .
+
+jame:part_west_iwan a jame:ArchitecturalSection ;
+    rdfs:label "West iwan"@en ;
+    crm:P2_has_type jame:type_iwan ;
+    crmba:BP1_is_section_of jame:mosque .
+
+jame:part_south_dome a jame:ArchitecturalSection ;
+    rdfs:label "South dome chamber of Niẓām al-Mulk"@en ;
+    rdfs:label "گنبد نظام‌الملک"@fa ;
+    crm:P2_has_type jame:type_dome_chamber ;
+    crmba:BP1_is_section_of jame:mosque ;
+    crm:P45_consists_of jame:type_brick .
+
+jame:part_north_dome a jame:ArchitecturalSection ;
+    rdfs:label "North dome chamber of Tāj al-Mulk"@en ;
+    rdfs:label "گنبد تاج‌الملک"@fa ;
+    crm:P2_has_type jame:type_dome_chamber ;
+    crmba:BP1_is_section_of jame:mosque ;
+    crm:P45_consists_of jame:type_brick .
+
+jame:part_oljeitu_hall a jame:ArchitecturalSection ;
+    rdfs:label "Ilkhanid prayer hall (Öljeitü hall)"@en ;
+    crm:P2_has_type jame:type_shabestan ;
+    crmba:BP1_is_section_of jame:mosque .
+
+jame:part_oljeitu_mihrab a crm:E25_Human-Made_Feature , jame:ArchitecturalSection ;
+    rdfs:label "Stucco mihrab of Öljaitü"@en ;
+    rdfs:label "محراب الجایتو"@fa ;
+    crm:P2_has_type jame:type_mihrab ;
+    crm:P45_consists_of jame:type_stucco ;
+    crm:P128_carries jame:inscription_oljeitu ;
+    crmba:BP1_is_section_of jame:part_oljeitu_hall .
+
+jame:part_timurid_hall a jame:ArchitecturalSection ;
+    rdfs:label "Timurid southwestern prayer hall"@en ;
+    crm:P2_has_type jame:type_shabestan ;
+    crmba:BP1_is_section_of jame:mosque ;
+    crm:P3_has_note "Partly destroyed in the Safavid winter-hall campaign."@en .
+
+jame:part_safavid_winter_hall a jame:ArchitecturalSection ;
+    rdfs:label "Safavid winter prayer hall"@en ;
+    crm:P2_has_type jame:type_shabestan ;
+    crmba:BP1_is_section_of jame:mosque .
+
+jame:part_safavid_minaret_e a jame:ArchitecturalSection ;
+    rdfs:label "Eastern minaret of the south iwan"@en ;
+    crm:P2_has_type jame:type_minaret ;
+    crmba:BP1_is_section_of jame:part_south_iwan .
+
+jame:part_safavid_minaret_w a jame:ArchitecturalSection ;
+    rdfs:label "Western minaret of the south iwan"@en ;
+    crm:P2_has_type jame:type_minaret ;
+    crmba:BP1_is_section_of jame:part_south_iwan .
+
+jame:part_south_iwan_muqarnas a crm:E25_Human-Made_Feature ;
+    rdfs:label "Muqarnas vault of the south iwan"@en ;
+    crm:P2_has_type jame:type_muqarnas ;
+    crm:P46i_forms_part_of jame:part_south_iwan .
+
+# ----- Spaces -----
+
+jame:space_sahn a jame:HistoricSpace ;
+    rdfs:label "Central courtyard (sahn)"@en ;
+    rdfs:label "صحن"@fa ;
+    crm:P2_has_type jame:type_sahn ;
+    bot:hasElement jame:part_south_iwan , jame:part_north_iwan ,
+                   jame:part_east_iwan , jame:part_west_iwan .
+
+jame:space_south_iwan a jame:HistoricSpace ;
+    rdfs:label "Space of the south iwan"@en ;
+    bot:adjacentElement jame:part_south_iwan ;
+    bot:adjacentZone jame:space_sahn , jame:space_south_dome .
+
+jame:space_north_iwan a jame:HistoricSpace ;
+    rdfs:label "Space of the north iwan"@en ;
+    bot:adjacentZone jame:space_sahn , jame:space_north_dome .
+
+jame:space_east_iwan a jame:HistoricSpace ; rdfs:label "Space of the east iwan"@en .
+jame:space_west_iwan a jame:HistoricSpace ; rdfs:label "Space of the west iwan"@en .
+jame:space_south_dome a jame:HistoricSpace ; rdfs:label "Interior of the south dome chamber"@en .
+jame:space_north_dome a jame:HistoricSpace ; rdfs:label "Interior of the north dome chamber"@en .
+jame:space_oljeitu_hall a jame:HistoricSpace ; rdfs:label "Interior of the Öljeitü prayer hall"@en .
+jame:space_winter_hall a jame:HistoricSpace ; rdfs:label "Interior of the Safavid winter hall"@en .
+
+# ----- Events -----
+
+jame:evt_foundation a crm:E12_Production ;
+    rdfs:label "Foundation of the first Friday Mosque of Isfahan"@en ;
+    crm:P4_has_time-span jame:ts_771 ;
+    crm:P7_took_place_at jame:place_mosque_site ;
+    crm:P108_has_produced jame:mosque ;
+    crm:P3_has_note "Earliest mosque on the site, c. 771. Smaller and differently oriented than the later Seljuq plan."@en .
+
+jame:evt_rebuild_840 a crm:E11_Modification ;
+    rdfs:label "Rebuild under al-Muʿtaṣim, 840–841"@en ;
+    crm:P4_has_time-span jame:ts_840 ;
+    crm:P7_took_place_at jame:place_mosque_site ;
+    crm:P31_has_modified jame:mosque .
+
+jame:evt_south_dome a crm:E12_Production ;
+    rdfs:label "Construction of the south dome of Niẓām al-Mulk"@en ;
+    crm:P4_has_time-span jame:ts_1086 ;
+    crm:P7_took_place_at jame:place_mosque_site ;
+    jame:commissionedBy jame:actor_nizam_al_mulk ;
+    crm:P14_carried_out_by jame:group_seljuq_masons ;
+    crm:P108_has_produced jame:part_south_dome ;
+    crm:P31_has_modified jame:mosque .
+
+jame:evt_north_dome a crm:E12_Production ;
+    rdfs:label "Construction of the north dome of Tāj al-Mulk"@en ;
+    crm:P4_has_time-span jame:ts_1088 ;
+    crm:P7_took_place_at jame:place_mosque_site ;
+    jame:commissionedBy jame:actor_taj_al_mulk ;
+    crm:P14_carried_out_by jame:group_seljuq_masons ;
+    crm:P108_has_produced jame:part_north_dome ;
+    crm:P31_has_modified jame:mosque .
+
+jame:evt_four_iwan a crm:E11_Modification , crm:E79_Part_Addition ;
+    rdfs:label "Conversion to the four-iwan courtyard plan"@en ;
+    crm:P4_has_time-span jame:ts_seljuq_iwans ;
+    crm:P7_took_place_at jame:place_mosque_site ;
+    crm:P31_has_modified jame:mosque ;
+    crm:P110_augmented jame:mosque ;
+    crm:P111_added jame:part_south_iwan , jame:part_north_iwan ,
+                    jame:part_east_iwan , jame:part_west_iwan ;
+    crm:P3_has_note "Prototype of the Iranian four-iwan congregational mosque."@en .
+
+jame:evt_ilkhanid_arcade a crm:E11_Modification ;
+    rdfs:label "Ilkhanid conversion of courtyard elevations to two storeys"@en ;
+    crm:P4_has_time-span jame:ts_ilkhanid_arcade ;
+    jame:commissionedBy jame:actor_oljeitu ;
+    crm:P31_has_modified jame:mosque .
+
+jame:evt_oljeitu_mihrab a crm:E12_Production ;
+    rdfs:label "Carving of the Öljeitü stucco mihrab"@en ;
+    crm:P4_has_time-span jame:ts_1310 ;
+    crm:P7_took_place_at jame:place_mosque_site ;
+    jame:commissionedBy jame:actor_muhammad_savi ;
+    jame:designedBy jame:actor_badr ;
+    crm:P108_has_produced jame:part_oljeitu_mihrab , jame:inscription_oljeitu ;
+    crm:P31_has_modified jame:part_oljeitu_hall ;
+    crm:P126_employed jame:type_stucco .
+
+jame:evt_timurid_hall a crm:E12_Production , crm:E79_Part_Addition ;
+    rdfs:label "Construction of the Timurid southwestern prayer hall"@en ;
+    crm:P4_has_time-span jame:ts_1447 ;
+    jame:commissionedBy jame:actor_sultan_muhammad_bahadur ;
+    crm:P108_has_produced jame:part_timurid_hall ;
+    crm:P110_augmented jame:mosque .
+
+jame:evt_uzun_hasan_tile a crm:E11_Modification ;
+    rdfs:label "Courtyard façade tilework under Uzun Ḥasan"@en ;
+    crm:P4_has_time-span jame:ts_1475 ;
+    jame:commissionedBy jame:actor_uzun_hasan ;
+    crm:P31_has_modified jame:part_south_iwan ;
+    crm:P126_employed jame:type_glazed_tile .
+
+jame:evt_safavid_winter_hall a crm:E12_Production , crm:E80_Part_Removal ;
+    rdfs:label "Safavid winter hall replacing part of the Timurid shabestān"@en ;
+    crm:P4_has_time-span jame:ts_safavid_17c ;
+    crm:P108_has_produced jame:part_safavid_winter_hall ;
+    crm:P113_removed jame:part_timurid_hall ;
+    crm:P31_has_modified jame:mosque ;
+    crm:P3_has_note "E80 records loss of Timurid fabric, not loss of the mosque identity."@en .
+
+jame:evt_safavid_minarets a crm:E12_Production , crm:E79_Part_Addition ;
+    rdfs:label "Erection of the south-iwan minarets"@en ;
+    crm:P4_has_time-span jame:ts_safavid_17c ;
+    crm:P108_has_produced jame:part_safavid_minaret_e , jame:part_safavid_minaret_w ;
+    crm:P110_augmented jame:part_south_iwan ;
+    jame:executedBy jame:group_safavid_tile_workshop .
+
+jame:evt_safavid_tile_restoration a crm:E11_Modification ;
+    rdfs:label "Safavid tile revetment of iwans and minarets"@en ;
+    crm:P4_has_time-span jame:ts_safavid_17c ;
+    crm:P31_has_modified jame:part_south_iwan , jame:part_west_iwan ,
+                         jame:part_east_iwan , jame:part_north_iwan ;
+    crm:P126_employed jame:type_glazed_tile ;
+    jame:executedBy jame:group_safavid_tile_workshop .
+
+# ----- Inscription -----
+
+jame:lang_arabic a crm:E56_Language ;
+    rdfs:label "Arabic"@en ;
+    skos:exactMatch wd:Q13955 .
+
+jame:inscription_oljeitu a crm:E34_Inscription ;
+    rdfs:label "Foundation and religious inscriptions of the Öljeitü mihrab"@en ;
+    crm:P2_has_type jame:type_inscription , jame:type_thuluth , jame:type_kufic ;
+    crm:P72_has_language jame:lang_arabic ;
+    crm:P3_has_note "Names Moḥammad Sāvi as patron and Badr as designer; includes a ḥadīth attributed to ʿAlī."@en .
+
+# ----- Use -----
+
+jame:use_friday_prayer a crm:E7_Activity ;
+    rdfs:label "Use of the mosque for congregational Friday prayer"@en ;
+    crm:P16_used_specific_object jame:mosque ;
+    crm:P7_took_place_at jame:space_sahn , jame:space_south_dome .
+
+jame:use_winter_prayer a crm:E7_Activity ;
+    rdfs:label "Winter congregational prayer"@en ;
+    crm:P16_used_specific_object jame:part_safavid_winter_hall ;
+    crm:P7_took_place_at jame:space_winter_hall ;
+    crm:P4_has_time-span jame:ts_safavid_17c .
+
+jame:mosque jame:hasCampaign
+    jame:evt_foundation ,
+    jame:evt_rebuild_840 ,
+    jame:evt_south_dome ,
+    jame:evt_north_dome ,
+    jame:evt_four_iwan ,
+    jame:evt_ilkhanid_arcade ,
+    jame:evt_oljeitu_mihrab ,
+    jame:evt_timurid_hall ,
+    jame:evt_uzun_hasan_tile ,
+    jame:evt_safavid_winter_hall ,
+    jame:evt_safavid_minarets ,
+    jame:evt_safavid_tile_restoration .

@@ -1,0 +1,26 @@
+# Case study sanity check — counts by named graph and class
+PREFIX crm:  <http://www.cidoc-crm.org/cidoc-crm/>
+PREFIX jame: <https://example.org/jame-isfahan/>
+PREFIX bot:  <https://w3id.org/bot#>
+
+SELECT ?kind (COUNT(DISTINCT ?s) AS ?n)
+WHERE {
+  {
+    BIND("events" AS ?kind)
+    ?s a crm:E7_Activity .
+  } UNION {
+    BIND("productions" AS ?kind)
+    ?s a crm:E12_Production .
+  } UNION {
+    BIND("persons" AS ?kind)
+    ?s a crm:E21_Person .
+  } UNION {
+    BIND("sections" AS ?kind)
+    ?s a jame:ArchitecturalSection .
+  } UNION {
+    BIND("spaces" AS ?kind)
+    ?s a bot:Space .
+  }
+}
+GROUP BY ?kind
+ORDER BY ?kind

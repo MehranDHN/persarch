@@ -1,0 +1,30 @@
+# Campaign timeline: what was produced or modified, by whom, when
+PREFIX crm:  <http://www.cidoc-crm.org/cidoc-crm/>
+PREFIX jame: <https://example.org/jame-isfahan/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?year ?eventLabel ?kind ?thingLabel ?actorLabel
+WHERE {
+  ?event a ?evtClass ;
+         rdfs:label ?eventLabel ;
+         crm:P4_has_time-span ?ts .
+  FILTER (LANG(?eventLabel) = "en")
+  VALUES ?evtClass { crm:E12_Production crm:E11_Modification crm:E79_Part_Addition crm:E80_Part_Removal }
+  BIND(REPLACE(STR(?evtClass), "^.*/", "") AS ?kind)
+
+  OPTIONAL {
+    ?ts crm:P82_at_some_time_within|crm:P82a_begin_of_the_begin ?yearLit .
+    BIND(STR(?yearLit) AS ?year)
+  }
+  OPTIONAL {
+    ?event crm:P108_has_produced|crm:P31_has_modified|crm:P111_added|crm:P113_removed ?thing .
+    ?thing rdfs:label ?thingLabel .
+    FILTER (LANG(?thingLabel) = "en")
+  }
+  OPTIONAL {
+    ?event crm:P14_carried_out_by|jame:commissionedBy|jame:designedBy|jame:executedBy ?actor .
+    ?actor rdfs:label ?actorLabel .
+    FILTER (LANG(?actorLabel) = "en")
+  }
+}
+ORDER BY ?year ?eventLabel

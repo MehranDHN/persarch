@@ -1,0 +1,23 @@
+# Present topology (BOT) vs historical sections (CRMba)
+PREFIX bot:   <https://w3id.org/bot#>
+PREFIX crmba: <http://www.cidoc-crm.org/extensions/crmba/>
+PREFIX jame:  <https://example.org/jame-isfahan/>
+PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?spaceLabel ?elementLabel ?sectionOf
+WHERE {
+  jame:mosque bot:hasSpace ?space .
+  OPTIONAL {
+    ?space bot:hasElement|bot:adjacentElement ?el .
+    ?el rdfs:label ?elementLabel .
+    FILTER (LANG(?elementLabel) = "en")
+  }
+  OPTIONAL {
+    ?el crmba:BP1_is_section_of ?whole .
+    ?whole rdfs:label ?sectionOf .
+    FILTER (LANG(?sectionOf) = "en")
+  }
+  ?space rdfs:label ?spaceLabel .
+  FILTER (LANG(?spaceLabel) = "en")
+}
+ORDER BY ?spaceLabel

@@ -1,0 +1,41 @@
+# CONSTRUCT a small neighbourhood for GraphDB Visual Graph / Graph Overview
+# Run this, then open the result as a graph, or start Visual Graph from jame:mosque
+PREFIX crm:   <http://www.cidoc-crm.org/cidoc-crm/>
+PREFIX crmba: <http://www.cidoc-crm.org/extensions/crmba/>
+PREFIX bot:   <https://w3id.org/bot#>
+PREFIX jame:  <https://example.org/jame-isfahan/>
+PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+
+CONSTRUCT {
+  jame:mosque ?p ?o .
+  ?evt ?ep jame:mosque .
+  ?evt rdfs:label ?evtLabel .
+  ?evt jame:commissionedBy ?actor .
+  ?actor rdfs:label ?actorLabel .
+  ?part crmba:BP1_is_section_of jame:mosque .
+  ?part rdfs:label ?partLabel .
+  ?evt crm:P108_has_produced ?part .
+  ?evt crm:P31_has_modified ?part .
+}
+WHERE {
+  {
+    jame:mosque ?p ?o .
+    FILTER (isIRI(?o))
+  } UNION {
+    ?evt jame:hasCampaign|^jame:hasCampaign jame:mosque ;
+         rdfs:label ?evtLabel .
+    OPTIONAL {
+      ?evt jame:commissionedBy ?actor .
+      ?actor rdfs:label ?actorLabel .
+      FILTER (LANG(?actorLabel) = "en")
+    }
+    FILTER (LANG(?evtLabel) = "en")
+    BIND(?evt AS ?epDummy)
+    ?evt ?ep jame:mosque .
+  } UNION {
+    ?part crmba:BP1_is_section_of jame:mosque ;
+          rdfs:label ?partLabel .
+    FILTER (LANG(?partLabel) = "en")
+    OPTIONAL { ?evt crm:P108_has_produced|crm:P31_has_modified ?part }
+  }
+}

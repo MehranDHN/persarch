@@ -1,0 +1,268 @@
+# Minimal CIDOC CRM v7 + CRMba RDFS subset used by the Jameh Isfahan case study.
+# Not a substitute for the official specification. Enough for GraphDB RDFS-Plus
+# reasoning, class hierarchy, and Visual Graph labels.
+# Official namespace: http://www.cidoc-crm.org/cidoc-crm/
+
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix crm:   <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmba: <http://www.cidoc-crm.org/extensions/crmba/> .
+
+<http://www.cidoc-crm.org/cidoc-crm/>
+    a owl:Ontology ;
+    rdfs:label "CIDOC CRM subset for the Jameh Isfahan GraphDB case study"@en ;
+    dct:source <https://cidoc-crm.org/> ;
+    owl:versionInfo "subset-of-7.1.3" .
+
+# --- Classes (hierarchy only) ------------------------------------------------
+
+crm:E1_CRM_Entity a owl:Class ; rdfs:label "E1 CRM Entity"@en .
+
+crm:E2_Temporal_Entity a owl:Class ;
+    rdfs:label "E2 Temporal Entity"@en ;
+    rdfs:subClassOf crm:E1_CRM_Entity .
+
+crm:E4_Period a owl:Class ;
+    rdfs:label "E4 Period"@en ;
+    rdfs:subClassOf crm:E2_Temporal_Entity .
+
+crm:E5_Event a owl:Class ;
+    rdfs:label "E5 Event"@en ;
+    rdfs:subClassOf crm:E4_Period .
+
+crm:E7_Activity a owl:Class ;
+    rdfs:label "E7 Activity"@en ;
+    rdfs:subClassOf crm:E5_Event .
+
+crm:E11_Modification a owl:Class ;
+    rdfs:label "E11 Modification"@en ;
+    rdfs:subClassOf crm:E7_Activity .
+
+crm:E12_Production a owl:Class ;
+    rdfs:label "E12 Production"@en ;
+    rdfs:subClassOf crm:E11_Modification .
+
+crm:E79_Part_Addition a owl:Class ;
+    rdfs:label "E79 Part Addition"@en ;
+    rdfs:subClassOf crm:E11_Modification .
+
+crm:E80_Part_Removal a owl:Class ;
+    rdfs:label "E80 Part Removal"@en ;
+    rdfs:subClassOf crm:E11_Modification .
+
+crm:E77_Persistent_Item a owl:Class ;
+    rdfs:label "E77 Persistent Item"@en ;
+    rdfs:subClassOf crm:E1_CRM_Entity .
+
+crm:E70_Thing a owl:Class ;
+    rdfs:label "E70 Thing"@en ;
+    rdfs:subClassOf crm:E77_Persistent_Item .
+
+crm:E71_Human-Made_Thing a owl:Class ;
+    rdfs:label "E71 Human-Made Thing"@en ;
+    rdfs:subClassOf crm:E70_Thing .
+
+crm:E18_Physical_Thing a owl:Class ;
+    rdfs:label "E18 Physical Thing"@en ;
+    rdfs:subClassOf crm:E70_Thing .
+
+crm:E19_Physical_Object a owl:Class ;
+    rdfs:label "E19 Physical Object"@en ;
+    rdfs:subClassOf crm:E18_Physical_Thing .
+
+crm:E24_Physical_Human-Made_Thing a owl:Class ;
+    rdfs:label "E24 Physical Human-Made Thing"@en ;
+    rdfs:subClassOf crm:E18_Physical_Thing , crm:E71_Human-Made_Thing .
+
+crm:E22_Human-Made_Object a owl:Class ;
+    rdfs:label "E22 Human-Made Object"@en ;
+    rdfs:subClassOf crm:E19_Physical_Object , crm:E24_Physical_Human-Made_Thing .
+
+crm:E26_Physical_Feature a owl:Class ;
+    rdfs:label "E26 Physical Feature"@en ;
+    rdfs:subClassOf crm:E18_Physical_Thing .
+
+crm:E25_Human-Made_Feature a owl:Class ;
+    rdfs:label "E25 Human-Made Feature"@en ;
+    rdfs:subClassOf crm:E24_Physical_Human-Made_Thing , crm:E26_Physical_Feature .
+
+crm:E28_Conceptual_Object a owl:Class ;
+    rdfs:label "E28 Conceptual Object"@en ;
+    rdfs:subClassOf crm:E71_Human-Made_Thing .
+
+crm:E90_Symbolic_Object a owl:Class ;
+    rdfs:label "E90 Symbolic Object"@en ;
+    rdfs:subClassOf crm:E28_Conceptual_Object .
+
+crm:E33_Linguistic_Object a owl:Class ;
+    rdfs:label "E33 Linguistic Object"@en ;
+    rdfs:subClassOf crm:E90_Symbolic_Object .
+
+crm:E34_Inscription a owl:Class ;
+    rdfs:label "E34 Inscription"@en ;
+    rdfs:subClassOf crm:E33_Linguistic_Object .
+
+crm:E39_Actor a owl:Class ;
+    rdfs:label "E39 Actor"@en ;
+    rdfs:subClassOf crm:E77_Persistent_Item .
+
+crm:E21_Person a owl:Class ;
+    rdfs:label "E21 Person"@en ;
+    rdfs:subClassOf crm:E39_Actor .
+
+crm:E74_Group a owl:Class ;
+    rdfs:label "E74 Group"@en ;
+    rdfs:subClassOf crm:E39_Actor .
+
+crm:E41_Appellation a owl:Class ;
+    rdfs:label "E41 Appellation"@en ;
+    rdfs:subClassOf crm:E90_Symbolic_Object .
+
+crm:E52_Time-Span a owl:Class ;
+    rdfs:label "E52 Time-Span"@en ;
+    rdfs:subClassOf crm:E1_CRM_Entity .
+
+crm:E53_Place a owl:Class ;
+    rdfs:label "E53 Place"@en ;
+    rdfs:subClassOf crm:E1_CRM_Entity .
+
+crm:E55_Type a owl:Class ;
+    rdfs:label "E55 Type"@en ;
+    rdfs:subClassOf crm:E28_Conceptual_Object .
+
+crm:E56_Language a owl:Class ;
+    rdfs:label "E56 Language"@en ;
+    rdfs:subClassOf crm:E55_Type .
+
+crm:E57_Material a owl:Class ;
+    rdfs:label "E57 Material"@en ;
+    rdfs:subClassOf crm:E55_Type .
+
+# CRMba
+crmba:B1_Built_Work a owl:Class ;
+    rdfs:label "B1 Built Work"@en ;
+    rdfs:subClassOf crm:E24_Physical_Human-Made_Thing .
+
+crmba:B2_Morphological_Building_Section a owl:Class ;
+    rdfs:label "B2 Morphological Building Section"@en ;
+    rdfs:subClassOf crmba:B1_Built_Work .
+
+crmba:B3_Filled_Morphological_Building_Section a owl:Class ;
+    rdfs:label "B3 Filled Morphological Building Section"@en ;
+    rdfs:subClassOf crmba:B2_Morphological_Building_Section .
+
+crmba:B4_Empty_Morphological_Building_Section a owl:Class ;
+    rdfs:label "B4 Empty Morphological Building Section"@en ;
+    rdfs:subClassOf crmba:B2_Morphological_Building_Section .
+
+# --- Properties --------------------------------------------------------------
+
+crm:P1_is_identified_by a owl:ObjectProperty ;
+    rdfs:label "P1 is identified by"@en ;
+    rdfs:domain crm:E1_CRM_Entity ; rdfs:range crm:E41_Appellation .
+
+crm:P2_has_type a owl:ObjectProperty ;
+    rdfs:label "P2 has type"@en ;
+    rdfs:domain crm:E1_CRM_Entity ; rdfs:range crm:E55_Type .
+
+crm:P3_has_note a owl:DatatypeProperty ;
+    rdfs:label "P3 has note"@en ;
+    rdfs:domain crm:E1_CRM_Entity .
+
+crm:P4_has_time-span a owl:ObjectProperty ;
+    rdfs:label "P4 has time-span"@en ;
+    rdfs:domain crm:E2_Temporal_Entity ; rdfs:range crm:E52_Time-Span .
+
+crm:P7_took_place_at a owl:ObjectProperty ;
+    rdfs:label "P7 took place at"@en ;
+    rdfs:domain crm:E4_Period ; rdfs:range crm:E53_Place .
+
+crm:P14_carried_out_by a owl:ObjectProperty ;
+    rdfs:label "P14 carried out by"@en ;
+    rdfs:domain crm:E7_Activity ; rdfs:range crm:E39_Actor .
+
+crm:P16_used_specific_object a owl:ObjectProperty ;
+    rdfs:label "P16 used specific object"@en ;
+    rdfs:domain crm:E7_Activity ; rdfs:range crm:E70_Thing .
+
+crm:P16i_was_used_for a owl:ObjectProperty ;
+    rdfs:label "P16i was used for"@en ;
+    owl:inverseOf crm:P16_used_specific_object .
+
+crm:P31_has_modified a owl:ObjectProperty ;
+    rdfs:label "P31 has modified"@en ;
+    rdfs:domain crm:E11_Modification ; rdfs:range crm:E24_Physical_Human-Made_Thing .
+
+crm:P45_consists_of a owl:ObjectProperty ;
+    rdfs:label "P45 consists of"@en ;
+    rdfs:domain crm:E18_Physical_Thing ; rdfs:range crm:E57_Material .
+
+crm:P46_is_composed_of a owl:ObjectProperty ;
+    rdfs:label "P46 is composed of"@en ;
+    rdfs:domain crm:E18_Physical_Thing ; rdfs:range crm:E18_Physical_Thing .
+
+crm:P46i_forms_part_of a owl:ObjectProperty ;
+    rdfs:label "P46i forms part of"@en ;
+    owl:inverseOf crm:P46_is_composed_of .
+
+crm:P53_has_former_or_current_location a owl:ObjectProperty ;
+    rdfs:label "P53 has former or current location"@en ;
+    rdfs:domain crm:E18_Physical_Thing ; rdfs:range crm:E53_Place .
+
+crm:P72_has_language a owl:ObjectProperty ;
+    rdfs:label "P72 has language"@en ;
+    rdfs:domain crm:E33_Linguistic_Object ; rdfs:range crm:E56_Language .
+
+crm:P82_at_some_time_within a owl:DatatypeProperty ;
+    rdfs:label "P82 at some time within"@en ;
+    rdfs:domain crm:E52_Time-Span .
+
+crm:P82a_begin_of_the_begin a owl:DatatypeProperty ;
+    rdfs:label "P82a begin of the begin"@en ;
+    rdfs:domain crm:E52_Time-Span .
+
+crm:P82b_end_of_the_end a owl:DatatypeProperty ;
+    rdfs:label "P82b end of the end"@en ;
+    rdfs:domain crm:E52_Time-Span .
+
+crm:P89_falls_within a owl:ObjectProperty ;
+    rdfs:label "P89 falls within"@en ;
+    rdfs:domain crm:E53_Place ; rdfs:range crm:E53_Place .
+
+crm:P108_has_produced a owl:ObjectProperty ;
+    rdfs:label "P108 has produced"@en ;
+    rdfs:subPropertyOf crm:P31_has_modified ;
+    rdfs:domain crm:E12_Production ; rdfs:range crm:E24_Physical_Human-Made_Thing .
+
+crm:P110_augmented a owl:ObjectProperty ;
+    rdfs:label "P110 augmented"@en ;
+    rdfs:domain crm:E79_Part_Addition ; rdfs:range crm:E24_Physical_Human-Made_Thing .
+
+crm:P111_added a owl:ObjectProperty ;
+    rdfs:label "P111 added"@en ;
+    rdfs:domain crm:E79_Part_Addition ; rdfs:range crm:E18_Physical_Thing .
+
+crm:P113_removed a owl:ObjectProperty ;
+    rdfs:label "P113 removed"@en ;
+    rdfs:domain crm:E80_Part_Removal ; rdfs:range crm:E18_Physical_Thing .
+
+crm:P126_employed a owl:ObjectProperty ;
+    rdfs:label "P126 employed"@en ;
+    rdfs:domain crm:E11_Modification ; rdfs:range crm:E57_Material .
+
+crm:P128_carries a owl:ObjectProperty ;
+    rdfs:label "P128 carries"@en ;
+    rdfs:domain crm:E18_Physical_Thing ; rdfs:range crm:E90_Symbolic_Object .
+
+crm:P131_is_identified_by a owl:ObjectProperty ;
+    rdfs:label "P131 is identified by"@en ;
+    rdfs:subPropertyOf crm:P1_is_identified_by ;
+    rdfs:domain crm:E39_Actor ; rdfs:range crm:E41_Appellation .
+
+crmba:BP1_is_section_of a owl:ObjectProperty ;
+    rdfs:label "BP1 is section of"@en ;
+    rdfs:subPropertyOf crm:P46i_forms_part_of ;
+    rdfs:domain crmba:B2_Morphological_Building_Section ;
+    rdfs:range crmba:B1_Built_Work .

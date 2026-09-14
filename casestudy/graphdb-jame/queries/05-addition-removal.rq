@@ -1,0 +1,29 @@
+# Palimpsest: parts added vs parts later removed
+PREFIX crm:  <http://www.cidoc-crm.org/cidoc-crm/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?partLabel ?addedBy ?addedWhen ?removedBy ?removedWhen
+WHERE {
+  OPTIONAL {
+    ?add crm:P108_has_produced|crm:P111_added ?part .
+    ?add rdfs:label ?addedBy .
+    FILTER (LANG(?addedBy) = "en")
+    OPTIONAL {
+      ?add crm:P4_has_time-span ?ts1 .
+      ?ts1 crm:P82_at_some_time_within|crm:P82a_begin_of_the_begin ?addedWhen .
+    }
+  }
+  OPTIONAL {
+    ?rem crm:P113_removed ?part .
+    ?rem rdfs:label ?removedBy .
+    FILTER (LANG(?removedBy) = "en")
+    OPTIONAL {
+      ?rem crm:P4_has_time-span ?ts2 .
+      ?ts2 crm:P82_at_some_time_within|crm:P82a_begin_of_the_begin ?removedWhen .
+    }
+  }
+  ?part rdfs:label ?partLabel .
+  FILTER (LANG(?partLabel) = "en")
+  FILTER BOUND(?addedBy)
+}
+ORDER BY ?addedWhen

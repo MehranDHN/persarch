@@ -1,0 +1,18 @@
+# Texts carried by fabric
+PREFIX crm:  <http://www.cidoc-crm.org/cidoc-crm/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?carrierLabel ?inscriptionLabel ?scriptLabel ?note
+WHERE {
+  ?carrier crm:P128_carries ?insc ;
+           rdfs:label ?carrierLabel .
+  ?insc a crm:E34_Inscription ;
+        rdfs:label ?inscriptionLabel .
+  FILTER (LANG(?carrierLabel) = "en" && LANG(?inscriptionLabel) = "en")
+  OPTIONAL {
+    ?insc crm:P2_has_type ?script .
+    ?script rdfs:label ?scriptLabel .
+    FILTER (LANG(?scriptLabel) = "en")
+  }
+  OPTIONAL { ?insc crm:P3_has_note ?note }
+}

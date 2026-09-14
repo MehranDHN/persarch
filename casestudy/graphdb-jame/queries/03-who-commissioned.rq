@@ -1,0 +1,19 @@
+# Patrons and craftsmen of each campaign
+PREFIX crm:  <http://www.cidoc-crm.org/cidoc-crm/>
+PREFIX jame: <https://example.org/jame-isfahan/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?eventLabel ?role ?actorLabel
+WHERE {
+  VALUES (?prop ?role) {
+    (jame:commissionedBy "patron")
+    (jame:designedBy     "designer")
+    (jame:executedBy     "workshop/craftsman")
+    (crm:P14_carried_out_by "participant")
+  }
+  ?event ?prop ?actor ;
+         rdfs:label ?eventLabel .
+  ?actor rdfs:label ?actorLabel .
+  FILTER (LANG(?eventLabel) = "en" && LANG(?actorLabel) = "en")
+}
+ORDER BY ?eventLabel ?role
