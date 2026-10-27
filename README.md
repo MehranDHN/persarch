@@ -1,7 +1,7 @@
 # Persian Architecture Ontology – CIDOC CRM, CRMba, CRMarcjaeo and BOT Extensions Case Studies
 
 **Extending the Building Topology Ontology (BOT) for Persian / Iranian Islamic Architecture**  
-Focus: Masjid-i Jāmiʿ of Isfahan · Sheikh Lotfollah Mosque · Naqsh-e Jahan Square Ensemble
+Focus: Masjid-i Jāmiʿ of Isfahan · Sheikh Lotfollah Mosque · Naqsh-e Jahan Square Ensemble · Ghiyathiyya Madrasa (Khargerd) · Ribat-i Sharaf Caravanserai
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Ontology](https://img.shields.io/badge/Ontology-OWL%20%2F%20Turtle-blue)](https://www.w3.org/OWL/)
@@ -34,6 +34,8 @@ The work follows a deliberate iterative strategy: start from BOT’s core classe
 | **Masjid-i Jāmiʿ (Friday / Great Mosque)** | Large multi-period `bot:Building` | Prototype four-iwan plan. Continuous construction from 8th–19th centuries. Eric Schroeder 1931 numbered plan | Hierarchical spaces, multi-phase complexity, numbered spatial inventory |
 | **Sheikh Lotfollah Mosque** | Compact Safavid `bot:Building` | 1602/03–1618/19. Architect: Muhammad Reza Isfahani. Single rotated dome chamber, no courtyard, no minarets | Precise spatial sequence, qibla orientation, rich surface decoration |
 | **Shah Mosque (Imam Mosque)** & **Ali Qapu Palace** | Additional buildings on the same Site | Public congregational mosque vs. royal pavilion | Typological contrast within one urban setting |
+| **Ghiyathiyya Madrasa (Ghiasieh School), Khargerd** | Timurid `persarch:Madrasa` | 1438–1444. Architects Qavam al-Din and Ghiyath al-Din Shirazi. Four-iwan, two-storey plan; 32 hujras; dated badgir | `bot:Zone` grouping, `containsZone` / `adjacentZone` / `intersectsZone`, element mereology |
+| **Ribat-i Sharaf** | Seljuk `persarch:Caravanserai` | 1114–15, restored 1154–55. Two four-iwan courts (public / royal) on the Nishapur–Sarakhs road | Dual-court containment, functional zones, a connecting corridor that `intersectsZone` both suites |
 
 ---
 
@@ -107,6 +109,9 @@ classDiagram
     class persarch_Shabestan
     class persarch_PishtaqSpace
     class persarch_Hujra
+    class persarch_Hashti
+    class persarch_LectureHall
+    class persarch_Stable
 
     bot_Space <|-- persarch_Sahn
     bot_Space <|-- persarch_Iwan
@@ -114,10 +119,14 @@ classDiagram
     bot_Space <|-- persarch_Shabestan
     bot_Space <|-- persarch_PishtaqSpace
     bot_Space <|-- persarch_Hujra
+    bot_Space <|-- persarch_Hashti
+    bot_Space <|-- persarch_LectureHall
+    bot_Space <|-- persarch_Stable
 
     class persarch_Mihrab
     class persarch_Minaret
     class persarch_Dome
+    class persarch_Badgir
     class persarch_SurfaceDecoration
     class persarch_Inscription
     class persarch_TilePanel
@@ -126,6 +135,7 @@ classDiagram
     bot_Element <|-- persarch_Mihrab
     bot_Element <|-- persarch_Minaret
     bot_Element <|-- persarch_Dome
+    bot_Element <|-- persarch_Badgir
     bot_Element <|-- persarch_SurfaceDecoration
     persarch_SurfaceDecoration <|-- persarch_Inscription
     persarch_SurfaceDecoration <|-- persarch_TilePanel
@@ -177,6 +187,30 @@ graph TD
 | Surface decorations as Elements | Tile panels, floral patterns, and inscriptions are attached to parent elements (walls, domes, mihrabs) and can carry their own geometry (WKT) and AAT alignments. |
 | Numbered spaces from Schroeder plan | Preserve the original scholarly numbering as stable identifiers while mapping each number to a typed `persarch:` Space. |
 | Site = Naqsh-e Jahan Square | Demonstrates multi-building urban topology while remaining fully BOT-compliant. |
+| Functional extents as bare `bot:Zone` | Residential, instructional, public-service, and royal-suite groupings are zones that are not a Site, Building, Storey, or Space. They use `bot:containsZone` directly. |
+| Vertical shafts as intersecting zones | Stairwells and the Khargerd badgir are `bot:Zone` instances that `bot:intersectsZone` more than one storey — BOT’s own example of that property. |
+
+### 3.3 Using `bot:Zone` beyond Site / Building / Storey / Space
+
+The mosque samples in this repository subclass `bot:Space` and hang those spaces from a building with `bot:hasSpace`. That is correct and sufficient for a room inventory. BOT also defines a parent class, **`bot:Zone`**, for any 3D extent that you need to group, subdivide, or relate topologically.
+
+An instance of `bot:Zone` may:
+
+- contain other zones (`bot:containsZone`, transitive; `bot:hasBuilding`, `bot:hasStorey`, and `bot:hasSpace` are typed sub-properties)
+- share a boundary with another zone without overlapping it (`bot:adjacentZone`, symmetric, disjoint with `intersectsZone`)
+- overlap in 3D with another zone (`bot:intersectsZone`, symmetric; BOT’s canonical example is a stairwell that cuts through storeys)
+
+The same zone may then relate to fabric with three element properties:
+
+| Property | Meaning | Persian-architecture use |
+|----------|---------|--------------------------|
+| `bot:containsElement` | The element lies inside the zone | A howz in a sahn; a minbar in a lecture hall; a well in a caravanserai court |
+| `bot:adjacentElement` | The element shares a boundary with the zone | A mihrab and qibla wall bounding a mosque hall; a hujra door; courtyard façades |
+| `bot:hasSubElement` | An element has a constituent element | A mihrab hosts inscription bands; a pishtaq hosts muqarnas and bastions; a badgir hosts shaft and vents |
+
+`bot:intersectingElement` is available when fabric, rather than a zone, passes through a volume (a windcatcher tower through two storeys). Do not assert both `adjacentZone` and `intersectsZone` on the same pair of zones.
+
+The Ghiyathiyya madrasa and Ribat-i Sharaf samples below instantiate these properties on purpose. They keep the existing `persarch:` space and element subclasses, and they add plain `bot:Zone` individuals wherever a functional or vertical extent is not a room.
 
 ---
 
@@ -498,7 +532,639 @@ This structure is deliberately minimal yet complete. It can be expanded later wi
 
 ---
 
-## 7. Decorative Layer – Patterns, Inscriptions & AAT
+## 7. Case Study – Ghiyathiyya Madrasa (Ghiasieh School), Khargerd
+
+**Historical context**  
+The Ghiyathiyya madrasa (Persian: مدرسه غیاثیه خرگرد), also called the Ghiasieh or Khargerd School, stands in Khargerd (Khargird), Khaf County, Razavi Khorasan. It was built in 841–848 AH / 1438–1444 CE for the Timurid vizier **Ghiyath al-Din Pir Ahmad Khvafi**, under Shah Rukh. Construction was begun by **Qavam al-Din Shirazi** and completed after his death by **Ghiyath al-Din Shirazi**. It is one of the few substantially complete Timurid madrasas in Greater Khorasan (Iran National Heritage List no. 126, 1932). ArchNet site record: [Madrasa-i Ghiyathiyya](https://www.archnet.org/sites/4726).
+
+**Why this building is a BOT `Zone` sample**  
+The Friday Mosque samples show inheritance from `bot:Space`. Khargerd is the place to show `bot:Zone` itself:
+
+- the building contains two **storeys** and several **functional zones** that are not rooms
+- four iwans and thirty-two **hujras** are **adjacent** to the sahn (they share façades, they do not overlap it)
+- **stairwells** at the bevelled courtyard corners and the **badgir shaft** on the south-west iwan **intersect** both storeys
+- a **prayer zone** overlaps the mosque hall and the north-west iwan
+- the mosque mihrab, the entrance pishtaq, and the badgir illustrate `containsElement`, `adjacentElement`, and `hasSubElement`
+
+**Architectural facts used in the graph**
+
+| Feature | Value |
+|---------|--------|
+| Exterior | Rectangle ≈ 42 × 56 m |
+| Courtyard | Square ≈ 28 m; proportion of court to the two perimeter sides 2 : 3 : 4 |
+| Plan | Four-iwan, bilateral symmetry on a north-east–south-west axis |
+| Entrance | Massive north-east pishtaq with cylindrical corner bastions, then a square domed hashti (vestibule) |
+| Specialised halls | North-west domed mosque; south-east domed lecture hall |
+| Residential fabric | 32 student chambers (`persarch:Hujra`) and 8 classrooms, on two floors, reached by small flanking iwans |
+| Climatic device | Dated **badgir** (windcatcher) on the south-west iwan — an early dated example on a public monument rather than a house |
+| Corners | Square domed rooms with semi-octagonal alcoves; bevelled court corners open onto stairs |
+
+### 7.1 Zone hierarchy
+
+```mermaid
+graph TD
+    M["persarch:Madrasa / bot:Building<br/>Ghiyathiyya, Khargerd"]
+
+    M -->|bot:hasStorey| GS["bot:Storey<br/>Ground storey"]
+    M -->|bot:hasStorey| US["bot:Storey<br/>Upper storey"]
+
+    M -->|bot:containsZone| RZ["bot:Zone<br/>Residential zone"]
+    M -->|bot:containsZone| IZ["bot:Zone<br/>Instructional zone"]
+    M -->|bot:containsZone| PZ["bot:Zone<br/>Prayer zone"]
+
+    GS -->|bot:hasSpace| Sahn["persarch:Sahn<br/>Courtyard ~28 m"]
+    GS -->|bot:hasSpace| Hashti["persarch:Hashti<br/>Domed vestibule"]
+    GS -->|bot:hasSpace| Mosque["persarch:DomeChamber<br/>NW mosque hall"]
+    GS -->|bot:hasSpace| Lecture["persarch:LectureHall<br/>SE lecture hall"]
+    GS -->|bot:hasSpace| IwanSW["persarch:Iwan<br/>SW iwan + badgir"]
+    GS -->|bot:hasSpace| Hujra["persarch:Hujra<br/>Student cells (×32)"]
+
+    RZ -->|bot:containsZone| Hujra
+    IZ -->|bot:containsZone| Lecture
+    IZ -->|bot:containsZone| Sahn
+    PZ -->|bot:containsZone| Mosque
+
+    Stair["bot:Zone<br/>Corner stairwell"]
+    Shaft["bot:Zone<br/>Badgir shaft"]
+    Stair -.->|bot:intersectsZone| GS
+    Stair -.->|bot:intersectsZone| US
+    Shaft -.->|bot:intersectsZone| GS
+    Shaft -.->|bot:intersectsZone| US
+    PZ -.->|bot:intersectsZone| IwanNW["persarch:Iwan<br/>NW courtyard iwan"]
+
+    style M fill:#fff8e1,stroke:#f9a825
+    style Sahn fill:#bbdefb,stroke:#1565c0
+    style RZ fill:#e8f5e9,stroke:#2e7d32
+    style IZ fill:#fff3e0,stroke:#e65100
+    style PZ fill:#f3e5f5,stroke:#6a1b9a
+    style Stair fill:#eceff1,stroke:#546e7a,stroke-dasharray: 5 5
+    style Shaft fill:#eceff1,stroke:#546e7a,stroke-dasharray: 5 5
+```
+
+`bot:hasStorey` and `bot:hasSpace` remain the typed shortcuts. Functional groupings and vertical shafts use the parent property `bot:containsZone` / `bot:intersectsZone` because they are not storeys or rooms.
+
+### 7.2 Adjacency around the sahn
+
+```mermaid
+graph LR
+    Sahn["persarch:Sahn"]
+    Sahn ---|bot:adjacentZone| NE["NE / entrance iwan"]
+    Sahn ---|bot:adjacentZone| SW["SW iwan"]
+    Sahn ---|bot:adjacentZone| NW["NW iwan"]
+    Sahn ---|bot:adjacentZone| SE["SE iwan"]
+    Sahn ---|bot:adjacentZone| H1["Hujra G-04"]
+    Sahn ---|bot:adjacentZone| H2["Hujra G-05"]
+    H1 ---|bot:adjacentZone| H2
+    NW ---|bot:adjacentZone| Mosque["Mosque hall"]
+    SE ---|bot:adjacentZone| Lecture["Lecture hall"]
+    NE ---|bot:adjacentZone| Hashti["Hashti"]
+
+    style Sahn fill:#bbdefb,stroke:#1565c0
+```
+
+These pairs share an interface (an arch, a door, a courtyard façade) and do **not** overlap in volume, so `bot:adjacentZone` is the right property. The prayer zone, by contrast, *does* overlap the north-west iwan, so that pair uses `bot:intersectsZone`.
+
+### 7.3 Sample instance data
+
+Reusable file: [`data/ghiyathiyya-khargerd.ttl`](data/ghiyathiyya-khargerd.ttl).
+
+```turtle
+@prefix bot:      <https://w3id.org/bot#> .
+@prefix persarch: <https://w3id.org/persian-architecture#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix geo:      <http://www.opengis.net/ont/geosparql#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+
+#################################################################
+# Building, storeys, functional zones  (containsZone)
+#################################################################
+
+:Ghiyathiyya_Madrasa a persarch:Madrasa , bot:Building ;
+    rdfs:label "Ghiyathiyya Madrasa (Ghiasieh School), Khargerd"@en ;
+    rdfs:label "مدرسه غیاثیه خرگرد"@fa ;
+    dcterms:description "Timurid four-iwan madrasa, 1438–1444. Exterior ≈ 42 × 56 m; courtyard ≈ 28 m square."@en ;
+    dcterms:source <https://www.archnet.org/sites/4726> ;
+    bot:hasStorey :Khargerd_Ground_Storey , :Khargerd_Upper_Storey ;
+    bot:containsZone :Khargerd_Residential_Zone ,
+                     :Khargerd_Instructional_Zone ,
+                     :Khargerd_Prayer_Zone .
+
+:Khargerd_Ground_Storey a bot:Storey ;
+    rdfs:label "Ground storey – Ghiyathiyya"@en ;
+    bot:hasSpace :Khargerd_Sahn ,
+                 :Khargerd_Hashti ,
+                 :Khargerd_NE_Iwan ,
+                 :Khargerd_SW_Iwan ,
+                 :Khargerd_NW_Iwan ,
+                 :Khargerd_SE_Iwan ,
+                 :Khargerd_Mosque_Hall ,
+                 :Khargerd_Lecture_Hall ,
+                 :Khargerd_Hujra_G04 ,
+                 :Khargerd_Hujra_G05 .
+
+:Khargerd_Upper_Storey a bot:Storey ;
+    rdfs:label "Upper storey – Ghiyathiyya"@en ;
+    bot:hasSpace :Khargerd_Hujra_U04 , :Khargerd_Hujra_U05 .
+
+# Functional zones are bare bot:Zone individuals — not Site/Building/Storey/Space.
+:Khargerd_Residential_Zone a bot:Zone ;
+    rdfs:label "Residential zone (student cells)"@en ;
+    bot:containsZone :Khargerd_Hujra_G04 , :Khargerd_Hujra_G05 ,
+                     :Khargerd_Hujra_U04 , :Khargerd_Hujra_U05 .
+
+:Khargerd_Instructional_Zone a bot:Zone ;
+    rdfs:label "Instructional zone"@en ;
+    bot:containsZone :Khargerd_Lecture_Hall , :Khargerd_Sahn , :Khargerd_SE_Iwan .
+
+:Khargerd_Prayer_Zone a bot:Zone ;
+    rdfs:label "Prayer zone"@en ;
+    rdfs:comment "Covers the mosque hall and overlaps the NW iwan when that iwan is used for prayer."@en ;
+    bot:containsZone :Khargerd_Mosque_Hall ;
+    bot:intersectsZone :Khargerd_NW_Iwan .
+
+#################################################################
+# Principal spaces and adjacentZone
+#################################################################
+
+:Khargerd_Sahn a persarch:Sahn , bot:Space ;
+    rdfs:label "Central courtyard (sahn)"@en ;
+    bot:adjacentZone :Khargerd_NE_Iwan , :Khargerd_SW_Iwan ,
+                     :Khargerd_NW_Iwan , :Khargerd_SE_Iwan ,
+                     :Khargerd_Hujra_G04 , :Khargerd_Hujra_G05 ;
+    bot:containsElement :Khargerd_Howz ;
+    bot:adjacentElement :Khargerd_SW_Iwan_Facade .
+
+:Khargerd_Hashti a persarch:Hashti , bot:Space ;
+    rdfs:label "Entrance hashti (domed vestibule)"@en ;
+    bot:adjacentZone :Khargerd_NE_Iwan ;
+    bot:adjacentElement :Khargerd_Pishtaq .
+
+:Khargerd_NE_Iwan a persarch:Iwan , bot:Space ;
+    rdfs:label "North-east / entrance iwan"@en ;
+    bot:adjacentZone :Khargerd_Sahn , :Khargerd_Hashti .
+
+:Khargerd_SW_Iwan a persarch:Iwan , bot:Space ;
+    rdfs:label "South-west iwan"@en ;
+    bot:adjacentZone :Khargerd_Sahn ;
+    bot:containsElement :Khargerd_Badgir ;
+    bot:adjacentElement :Khargerd_SW_Iwan_Facade .
+
+:Khargerd_NW_Iwan a persarch:Iwan , bot:Space ;
+    rdfs:label "North-west courtyard iwan"@en ;
+    bot:adjacentZone :Khargerd_Sahn , :Khargerd_Mosque_Hall .
+
+:Khargerd_SE_Iwan a persarch:Iwan , bot:Space ;
+    rdfs:label "South-east courtyard iwan"@en ;
+    bot:adjacentZone :Khargerd_Sahn , :Khargerd_Lecture_Hall .
+
+:Khargerd_Mosque_Hall a persarch:DomeChamber , bot:Space ;
+    rdfs:label "North-west mosque hall"@en ;
+    bot:adjacentZone :Khargerd_NW_Iwan ;
+    bot:adjacentElement :Khargerd_Mihrab , :Khargerd_Qibla_Wall ;
+    bot:containsElement :Khargerd_Mosque_Minbar .
+
+:Khargerd_Lecture_Hall a persarch:LectureHall , bot:Space ;
+    rdfs:label "South-east lecture hall"@en ;
+    bot:adjacentZone :Khargerd_SE_Iwan ;
+    bot:containsElement :Khargerd_Lecture_Minbar .
+
+:Khargerd_Hujra_G04 a persarch:Hujra , bot:Space ;
+    rdfs:label "Student cell G-04"@en ;
+    bot:adjacentZone :Khargerd_Sahn , :Khargerd_Hujra_G05 ;
+    bot:adjacentElement :Khargerd_Hujra_G04_Door , :Khargerd_Hujra_G04_Window .
+
+:Khargerd_Hujra_G05 a persarch:Hujra , bot:Space ;
+    rdfs:label "Student cell G-05"@en ;
+    bot:adjacentZone :Khargerd_Sahn , :Khargerd_Hujra_G04 .
+
+:Khargerd_Hujra_U04 a persarch:Hujra , bot:Space ;
+    rdfs:label "Student cell U-04"@en .
+
+:Khargerd_Hujra_U05 a persarch:Hujra , bot:Space ;
+    rdfs:label "Student cell U-05"@en .
+
+#################################################################
+# intersectsZone — stairwell and badgir shaft cut both storeys
+#################################################################
+
+:Khargerd_Stair_SW a bot:Zone ;
+    rdfs:label "South-west corner stairwell"@en ;
+    rdfs:comment "BOT canonical pattern: a stairwell intersects different storeys."@en ;
+    bot:intersectsZone :Khargerd_Ground_Storey , :Khargerd_Upper_Storey .
+
+:Khargerd_Badgir_Shaft a bot:Zone ;
+    rdfs:label "Badgir shaft volume"@en ;
+    bot:intersectsZone :Khargerd_Ground_Storey , :Khargerd_Upper_Storey , :Khargerd_SW_Iwan .
+
+#################################################################
+# Elements: containsElement, adjacentElement, hasSubElement
+#################################################################
+
+:Khargerd_Howz a bot:Element ;
+    rdfs:label "Courtyard howz (pool)"@en .
+
+:Khargerd_Mosque_Minbar a bot:Element ;
+    rdfs:label "Minbar of the mosque hall"@en .
+
+:Khargerd_Lecture_Minbar a bot:Element ;
+    rdfs:label "Teaching minbar / seat of the lecture hall"@en .
+
+:Khargerd_Qibla_Wall a bot:Element ;
+    rdfs:label "Qibla wall of the mosque hall"@en ;
+    bot:hasSubElement :Khargerd_Mihrab .
+
+:Khargerd_Mihrab a persarch:Mihrab , bot:Element ;
+    rdfs:label "Mihrab of the Ghiyathiyya mosque hall"@en ;
+    bot:hasSubElement :Khargerd_Mihrab_Niche ,
+                      :Khargerd_Mihrab_Inscription ,
+                      :Khargerd_Mihrab_Spandrel_Tiles .
+
+:Khargerd_Mihrab_Niche a bot:Element ;
+    rdfs:label "Mihrab niche"@en .
+
+:Khargerd_Mihrab_Inscription a persarch:Inscription , bot:Element ;
+    rdfs:label "Inscription band of the mihrab"@en .
+
+:Khargerd_Mihrab_Spandrel_Tiles a persarch:TilePanel , bot:Element ;
+    rdfs:label "Tile spandrels of the mihrab"@en .
+
+:Khargerd_Pishtaq a bot:Element ;
+    rdfs:label "North-east entrance pishtaq"@en ;
+    rdfs:comment "Façade element. The hashti is the Space behind it; bot:Space and bot:Element are disjoint."@en ;
+    bot:hasSubElement :Khargerd_Pishtaq_Muqarnas ,
+                      :Khargerd_Pishtaq_Inscription ,
+                      :Khargerd_Bastion_N ,
+                      :Khargerd_Bastion_E .
+
+:Khargerd_Pishtaq_Muqarnas a bot:Element ;
+    rdfs:label "Muqarnas of the entrance pishtaq"@en .
+
+:Khargerd_Pishtaq_Inscription a persarch:Inscription , bot:Element ;
+    rdfs:label "Foundation inscription of the pishtaq"@en .
+
+:Khargerd_Bastion_N a bot:Element ;
+    rdfs:label "Northern cylindrical bastion of the pishtaq"@en .
+
+:Khargerd_Bastion_E a bot:Element ;
+    rdfs:label "Eastern cylindrical bastion of the pishtaq"@en .
+
+:Khargerd_SW_Iwan_Facade a bot:Element ;
+    rdfs:label "Courtyard façade of the south-west iwan"@en ;
+    bot:hasSubElement :Khargerd_SW_Iwan_Tile_Panel .
+
+:Khargerd_SW_Iwan_Tile_Panel a persarch:TilePanel , bot:Element ;
+    rdfs:label "Tile panel on the south-west iwan façade"@en .
+
+:Khargerd_Badgir a persarch:Badgir , bot:Element ;
+    rdfs:label "Windcatcher of the south-west iwan"@en ;
+    rdfs:comment "Fabric of the tower. The air volume is :Khargerd_Badgir_Shaft (a Zone). The tower intersects both storeys as an Element."@en ;
+    bot:hasSubElement :Khargerd_Badgir_Tower ,
+                      :Khargerd_Badgir_Vents .
+
+:Khargerd_Badgir_Tower a bot:Element ;
+    rdfs:label "Masonry tower of the badgir"@en .
+
+:Khargerd_Badgir_Vents a bot:Element ;
+    rdfs:label "Intake vents of the badgir"@en .
+
+:Khargerd_Ground_Storey bot:intersectingElement :Khargerd_Badgir .
+:Khargerd_Upper_Storey  bot:intersectingElement :Khargerd_Badgir .
+
+:Khargerd_Hujra_G04_Door a bot:Element ;
+    rdfs:label "Door of student cell G-04"@en .
+
+:Khargerd_Hujra_G04_Window a bot:Element ;
+    rdfs:label "Window of student cell G-04"@en .
+```
+
+The badgir is recorded twice on purpose, matching BOT’s two layers:
+
+- **Zone** `:Khargerd_Badgir_Shaft` — the air volume, related with `bot:intersectsZone`
+- **Element** `:Khargerd_Badgir` — the masonry tower, related with `bot:intersectingElement` and decomposed with `bot:hasSubElement`
+
+### 7.4 Competency SPARQL
+
+```sparql
+PREFIX bot: <https://w3id.org/bot#>
+PREFIX :    <https://w3id.org/persian-architecture/data/khargerd#>
+
+# Transitive containment: every zone inside the madrasa
+SELECT ?zone WHERE { :Ghiyathiyya_Madrasa bot:containsZone ?zone }
+
+# Courtyard neighbours (iwans and hujras)
+SELECT ?neighbour WHERE { :Khargerd_Sahn bot:adjacentZone ?neighbour }
+
+# Vertical shafts that cut both storeys
+SELECT ?shaft WHERE {
+  ?shaft bot:intersectsZone :Khargerd_Ground_Storey ;
+         bot:intersectsZone :Khargerd_Upper_Storey .
+}
+
+# Element mereology of the mihrab
+SELECT ?part WHERE { :Khargerd_Mihrab bot:hasSubElement ?part }
+```
+
+Because `bot:containsZone` is transitive, and `bot:hasStorey` / `bot:hasSpace` are sub-properties of it, the first query also returns storeys, hujras, the lecture hall, and the mosque hall once RDFS-Plus (or equivalent) reasoning is enabled — the same ruleset used in the GraphDB Jāmeʿ case study.
+
+---
+
+## 8. Case Study – Ribat-i Sharaf Caravanserai
+
+**Historical context**  
+Ribat-i Sharaf (Persian: رباط شرف) is a Seljuk ribat / caravanserai on the Nishapur–Sarakhs road in Razavi Khorasan (approx. 36.27° N, 60.66° E). It was founded in 508 AH / 1114–15 for **Sharaf al-Din Abu Tahir**, governor of the region and later vizier of Sultan Sanjar, and restored in 549 AH / 1154–55 after the Ghuzz invasion. From the outside it is a fortified rectangle with corner towers; inside it is two four-iwan courtyards on one axis. ArchNet: [Ribat-i Sharaf](https://www.archnet.org/sites/3873).
+
+**Why this building is a BOT `Zone` sample**  
+A single-court mosque already shows `hasSpace`. A two-court caravanserai shows **subdivision of a building into functional zones** that are not storeys:
+
+- the **public-service zone** contains the outer rectangular court, stables, travellers’ rooms, and the outer mosque
+- the **royal-suite zone** contains the inner square court, residential suites, kitchen, and the inner mosque
+- a **connecting corridor** (the iwan between the two courts) **intersects both functional zones** — the volume that public and private circulation share
+- a **processional axis** from the entrance pishtaq to the inner dome likewise intersects both courts
+- rooms around each court are **adjacent** to that court; the two courts are **not** adjacent to each other (the corridor sits between them)
+- towers, pishtaq, mihrabs, and a courtyard well cover `containsElement`, `adjacentElement`, and `hasSubElement`
+
+**Architectural facts used in the graph**
+
+| Feature | Value |
+|---------|--------|
+| Outer (public) court | Rectangle ≈ 32.4 × 16.5 m; four-iwan; mainly stabling and travellers |
+| Inner (royal) court | Square ≈ 31.8 × 31.3 m; four-iwan; residential suites, kitchen, gatherings |
+| Axis | South-east pishtaq → outer court → connecting iwan → inner court → inner dome hall |
+| Mosques | One mosque off the outer court, one off the inner court |
+| Envelope | Fortified rectangle; corner towers |
+
+### 8.1 Public and royal zones, with an intersecting corridor
+
+```mermaid
+graph TD
+    C["persarch:Caravanserai / bot:Building<br/>Ribat-i Sharaf"]
+
+    C -->|bot:containsZone| Pub["bot:Zone<br/>Public-service zone"]
+    C -->|bot:containsZone| Roy["bot:Zone<br/>Royal-suite zone"]
+    C -->|bot:containsZone| Axis["bot:Zone<br/>Processional axis"]
+    C -->|bot:hasSpace| Corr["bot:Space<br/>Connecting corridor"]
+
+    Pub -->|bot:containsZone| Outer["persarch:Sahn<br/>Outer court 32.4 × 16.5 m"]
+    Pub -->|bot:containsZone| Stables["persarch:Stable"]
+    Pub -->|bot:containsZone| Rooms["bot:Space<br/>Travellers' rooms"]
+    Pub -->|bot:containsZone| MosqO["persarch:DomeChamber<br/>Outer mosque"]
+
+    Roy -->|bot:containsZone| Inner["persarch:Sahn<br/>Inner court 31.8 × 31.3 m"]
+    Roy -->|bot:containsZone| Suites["bot:Space<br/>Royal suites"]
+    Roy -->|bot:containsZone| Kitchen["bot:Space<br/>Kitchen"]
+    Roy -->|bot:containsZone| MosqI["persarch:DomeChamber<br/>Inner mosque"]
+
+    Corr -.->|bot:intersectsZone| Pub
+    Corr -.->|bot:intersectsZone| Roy
+    Axis -.->|bot:intersectsZone| Outer
+    Axis -.->|bot:intersectsZone| Inner
+    Axis -.->|bot:intersectsZone| Corr
+
+    Outer ---|bot:adjacentZone| Corr
+    Inner ---|bot:adjacentZone| Corr
+
+    style C fill:#efebe9,stroke:#4e342e
+    style Pub fill:#fff3e0,stroke:#e65100
+    style Roy fill:#e8eaf6,stroke:#3949ab
+    style Corr fill:#eceff1,stroke:#546e7a,stroke-dasharray: 5 5
+    style Axis fill:#eceff1,stroke:#546e7a,stroke-dasharray: 5 5
+```
+
+The corridor is **adjacent** to each courtyard (they share an iwan arch) and **intersects** each functional zone (part of its volume belongs to public circulation and part to royal circulation). That is exactly the distinction BOT draws between `adjacentZone` and `intersectsZone`.
+
+### 8.2 Sample instance data
+
+Reusable file: [`data/ribat-i-sharaf.ttl`](data/ribat-i-sharaf.ttl).
+
+```turtle
+@prefix bot:      <https://w3id.org/bot#> .
+@prefix persarch: <https://w3id.org/persian-architecture#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms:  <http://purl.org/dc/terms/> .
+
+#################################################################
+# Building and the two functional zones  (containsZone)
+#################################################################
+
+:Ribat_i_Sharaf a persarch:Caravanserai , bot:Building ;
+    rdfs:label "Ribat-i Sharaf"@en ;
+    rdfs:label "رباط شرف"@fa ;
+    dcterms:description "Seljuk two-court ribat/caravanserai on the Nishapur–Sarakhs road. Founded 1114–15; restored 1154–55."@en ;
+    dcterms:source <https://www.archnet.org/sites/3873> ;
+    bot:hasStorey :Ribat_Ground_Storey ;
+    bot:containsZone :Ribat_Public_Zone , :Ribat_Royal_Zone ,
+                     :Ribat_Processional_Axis .
+
+:Ribat_Ground_Storey a bot:Storey ;
+    rdfs:label "Ground storey – Ribat-i Sharaf"@en ;
+    bot:hasSpace :Ribat_Outer_Court ,
+                 :Ribat_Inner_Court ,
+                 :Ribat_Connecting_Corridor ,
+                 :Ribat_Entrance_Iwan ,
+                 :Ribat_Outer_Mosque ,
+                 :Ribat_Inner_Mosque ,
+                 :Ribat_Stables_SW ,
+                 :Ribat_Traveller_Room_01 ,
+                 :Ribat_Royal_Suite_01 ,
+                 :Ribat_Kitchen ,
+                 :Ribat_Inner_Dome_Hall .
+
+:Ribat_Public_Zone a bot:Zone ;
+    rdfs:label "Public-service zone"@en ;
+    rdfs:comment "Outer court, stabling, travellers' rooms, outer mosque."@en ;
+    bot:containsZone :Ribat_Outer_Court ,
+                     :Ribat_Stables_SW ,
+                     :Ribat_Traveller_Room_01 ,
+                     :Ribat_Outer_Mosque ,
+                     :Ribat_Entrance_Iwan .
+
+:Ribat_Royal_Zone a bot:Zone ;
+    rdfs:label "Royal-suite zone"@en ;
+    rdfs:comment "Inner court, residential suites, kitchen, inner mosque, inner dome hall."@en ;
+    bot:containsZone :Ribat_Inner_Court ,
+                     :Ribat_Royal_Suite_01 ,
+                     :Ribat_Kitchen ,
+                     :Ribat_Inner_Mosque ,
+                     :Ribat_Inner_Dome_Hall .
+
+#################################################################
+# Courts, corridor, axis  (adjacentZone / intersectsZone)
+#################################################################
+
+:Ribat_Outer_Court a persarch:Sahn , bot:Space ;
+    rdfs:label "Outer courtyard (public / stabling)"@en ;
+    rdfs:comment "Rectangle ≈ 32.4 × 16.5 m."@en ;
+    bot:adjacentZone :Ribat_Entrance_Iwan ,
+                     :Ribat_Connecting_Corridor ,
+                     :Ribat_Stables_SW ,
+                     :Ribat_Traveller_Room_01 ,
+                     :Ribat_Outer_Mosque ;
+    bot:containsElement :Ribat_Outer_Well ;
+    bot:adjacentElement :Ribat_Outer_Court_Pavement .
+
+:Ribat_Inner_Court a persarch:Sahn , bot:Space ;
+    rdfs:label "Inner courtyard (royal)"@en ;
+    rdfs:comment "Square ≈ 31.8 × 31.3 m."@en ;
+    bot:adjacentZone :Ribat_Connecting_Corridor ,
+                     :Ribat_Royal_Suite_01 ,
+                     :Ribat_Kitchen ,
+                     :Ribat_Inner_Mosque ,
+                     :Ribat_Inner_Dome_Hall ;
+    bot:containsElement :Ribat_Inner_Howz .
+
+:Ribat_Connecting_Corridor a bot:Space ;
+    rdfs:label "Connecting iwan / corridor between the two courts"@en ;
+    rdfs:comment "Shares an arch with each court (adjacentZone) and overlaps both functional zones (intersectsZone)."@en ;
+    bot:adjacentZone :Ribat_Outer_Court , :Ribat_Inner_Court ;
+    bot:intersectsZone :Ribat_Public_Zone , :Ribat_Royal_Zone ;
+    bot:adjacentElement :Ribat_Corridor_Arch_Outer , :Ribat_Corridor_Arch_Inner .
+
+:Ribat_Processional_Axis a bot:Zone ;
+    rdfs:label "Processional axis from pishtaq to inner dome"@en ;
+    bot:intersectsZone :Ribat_Entrance_Iwan ,
+                       :Ribat_Outer_Court ,
+                       :Ribat_Connecting_Corridor ,
+                       :Ribat_Inner_Court ,
+                       :Ribat_Inner_Dome_Hall .
+
+:Ribat_Entrance_Iwan a persarch:Iwan , bot:Space ;
+    rdfs:label "South-east entrance iwan"@en ;
+    bot:adjacentZone :Ribat_Outer_Court ;
+    bot:adjacentElement :Ribat_Pishtaq .
+
+:Ribat_Outer_Mosque a persarch:DomeChamber , bot:Space ;
+    rdfs:label "Mosque of the outer court"@en ;
+    bot:adjacentZone :Ribat_Outer_Court ;
+    bot:adjacentElement :Ribat_Outer_Mihrab .
+
+:Ribat_Inner_Mosque a persarch:DomeChamber , bot:Space ;
+    rdfs:label "Mosque of the inner court"@en ;
+    bot:adjacentZone :Ribat_Inner_Court ;
+    bot:adjacentElement :Ribat_Inner_Mihrab .
+
+:Ribat_Inner_Dome_Hall a persarch:DomeChamber , bot:Space ;
+    rdfs:label "Inner dome hall (terminus of the axis)"@en ;
+    bot:adjacentZone :Ribat_Inner_Court .
+
+:Ribat_Stables_SW a persarch:Stable , bot:Space ;
+    rdfs:label "South-west stables of the outer court"@en ;
+    bot:adjacentZone :Ribat_Outer_Court , :Ribat_Traveller_Room_01 ;
+    bot:containsElement :Ribat_Manger_01 ;
+    bot:adjacentElement :Ribat_Stable_Door .
+
+:Ribat_Traveller_Room_01 a bot:Space ;
+    rdfs:label "Travellers' room 01"@en ;
+    bot:adjacentZone :Ribat_Outer_Court , :Ribat_Stables_SW .
+
+:Ribat_Royal_Suite_01 a bot:Space ;
+    rdfs:label "Royal suite 01"@en ;
+    bot:adjacentZone :Ribat_Inner_Court .
+
+:Ribat_Kitchen a bot:Space ;
+    rdfs:label "Kitchen of the inner court"@en ;
+    bot:adjacentZone :Ribat_Inner_Court .
+
+#################################################################
+# Elements: containsElement, adjacentElement, hasSubElement
+#################################################################
+
+:Ribat_Outer_Well a bot:Element ;
+    rdfs:label "Well in the outer courtyard"@en .
+
+:Ribat_Inner_Howz a bot:Element ;
+    rdfs:label "Howz in the inner courtyard"@en .
+
+:Ribat_Manger_01 a bot:Element ;
+    rdfs:label "Manger in the south-west stables"@en .
+
+:Ribat_Outer_Court_Pavement a bot:Element ;
+    rdfs:label "Pavement / floor of the outer court"@en .
+
+:Ribat_Stable_Door a bot:Element ;
+    rdfs:label "Door between outer court and stables"@en .
+
+:Ribat_Corridor_Arch_Outer a bot:Element ;
+    rdfs:label "Arch from outer court into the connecting corridor"@en .
+
+:Ribat_Corridor_Arch_Inner a bot:Element ;
+    rdfs:label "Arch from inner court into the connecting corridor"@en .
+
+:Ribat_Pishtaq a bot:Element ;
+    rdfs:label "South-east entrance pishtaq"@en ;
+    bot:hasSubElement :Ribat_Pishtaq_Frame ,
+                      :Ribat_Pishtaq_Inscription ,
+                      :Ribat_Pishtaq_Muqarnas .
+
+:Ribat_Pishtaq_Frame a bot:Element ;
+    rdfs:label "Brick frame of the pishtaq"@en .
+
+:Ribat_Pishtaq_Inscription a persarch:Inscription , bot:Element ;
+    rdfs:label "Foundation / restoration inscription of the pishtaq"@en .
+
+:Ribat_Pishtaq_Muqarnas a bot:Element ;
+    rdfs:label "Muqarnas of the entrance pishtaq"@en .
+
+:Ribat_Outer_Mihrab a persarch:Mihrab , bot:Element ;
+    rdfs:label "Mihrab of the outer mosque"@en ;
+    bot:hasSubElement :Ribat_Outer_Mihrab_Niche ,
+                      :Ribat_Outer_Mihrab_Inscription .
+
+:Ribat_Outer_Mihrab_Niche a bot:Element ;
+    rdfs:label "Niche of the outer mihrab"@en .
+
+:Ribat_Outer_Mihrab_Inscription a persarch:Inscription , bot:Element ;
+    rdfs:label "Inscription of the outer mihrab"@en .
+
+:Ribat_Inner_Mihrab a persarch:Mihrab , bot:Element ;
+    rdfs:label "Mihrab of the inner mosque"@en ;
+    bot:hasSubElement :Ribat_Inner_Mihrab_Niche .
+
+:Ribat_Inner_Mihrab_Niche a bot:Element ;
+    rdfs:label "Niche of the inner mihrab"@en .
+
+:Ribat_Tower_SE a bot:Element ;
+    rdfs:label "South-east corner tower"@en ;
+    bot:hasSubElement :Ribat_Tower_SE_Base , :Ribat_Tower_SE_Shaft .
+
+:Ribat_Tower_SE_Base a bot:Element ;
+    rdfs:label "Base of the south-east tower"@en .
+
+:Ribat_Tower_SE_Shaft a bot:Element ;
+    rdfs:label "Shaft of the south-east tower"@en .
+
+:Ribat_i_Sharaf bot:adjacentElement :Ribat_Pishtaq , :Ribat_Tower_SE .
+:Ribat_Ground_Storey bot:containsElement :Ribat_Outer_Well , :Ribat_Inner_Howz .
+```
+
+The two courts never receive `bot:adjacentZone` to each other. They share no common interface; the connecting corridor does. They also never receive `bot:intersectsZone` to each other: their volumes do not overlap. The corridor is the zone that overlaps the two *functional* groupings. Enable RDFS-Plus (or equivalent) so that `bot:containsZone` transitivity and the `hasSpace` / `hasStorey` sub-properties fire.
+
+### 8.3 Competency SPARQL
+
+```sparql
+PREFIX bot: <https://w3id.org/bot#>
+PREFIX :    <https://w3id.org/persian-architecture/data/ribat-sharaf#>
+
+# Spaces of the public-service zone (via transitive containsZone)
+SELECT ?space WHERE { :Ribat_Public_Zone bot:containsZone ?space }
+
+# What shares a boundary with the outer court?
+SELECT ?adj WHERE { :Ribat_Outer_Court bot:adjacentZone ?adj }
+
+# Zones whose 3D extent overlaps both functional suites
+SELECT ?z WHERE {
+  ?z bot:intersectsZone :Ribat_Public_Zone ;
+     bot:intersectsZone :Ribat_Royal_Zone .
+}
+
+# Sub-elements of the entrance pishtaq
+SELECT ?part WHERE { :Ribat_Pishtaq bot:hasSubElement ?part }
+```
+
+---
+
+## 9. Decorative Layer – Patterns, Inscriptions & AAT
 
 Surface decorations are modelled as subclasses of `bot:Element` so they can be attached to parent elements and carry their own geometry and controlled vocabulary links.
 
@@ -514,7 +1180,7 @@ Surface decorations are modelled as subclasses of `bot:Element` so they can be a
 
 ---
 
-## 8. Repository Structure (Recommended)
+## 10. Repository Structure (Recommended)
 
 ```
 persian-architecture-bot-case-studies/
@@ -527,7 +1193,9 @@ persian-architecture-bot-case-studies/
 │   ├── masjid-i-jami.ttl          # Schroeder-numbered spaces
 │   ├── sheikh-lotfollah.ttl
 │   ├── shah-mosque.ttl
-│   └── ali-qapu.ttl
+│   ├── ali-qapu.ttl
+│   ├── ghiyathiyya-khargerd.ttl   # bot:Zone, intersectsZone, element mereology
+│   └── ribat-i-sharaf.ttl         # dual-court caravanserai, functional zones
 ├── queries/
 │   └── competency-questions.rq
 ├── docs/
@@ -541,7 +1209,7 @@ persian-architecture-bot-case-studies/
 
 
 
-## 9. Why the event-centric core is correct
+## 11. Why the event-centric core is correct
 
 CRM does not treat a monument as a bag of attributes. It treats change as first-class. That matches the mosque:
 
@@ -705,7 +1373,7 @@ Identity of the mosque survives; identity of the removed fabric also survives as
 
 
 
-## 10. What CRMba actually is
+## 12. What CRMba actually is
 
 CRMba is a **CIDOC CRM family extension for buildings archaeology** — the study of standing buildings as stratified objects, not as single dated artefacts. It was written by Paola Ronzino (PhD, PIN / ARIADNE, 2015) with Niccolucci, Felicetti and Doerr, and last issued as **version 1.4 (December 2016)**, declared compatible with CRM 6.2.2.
 
@@ -961,7 +1629,7 @@ Ask only this:
 Keep those three sentences on three property families. The graph stays queryable; the scopes stay honest.
 
 
-# 11. What is CRMarchaeo?
+## 13. What is CRMarchaeo?
 
 **CRMarchaeo** is a CIDOC CRM + CRMsci extension for the *archaeological excavation process* and for the *stratified deposits* that excavation observes: how layers and interfaces formed, how they physically and stratigraphically relate, how digging removed them, and how finds sit in them. Current stable version is **2.1 / 2.1.1 (2024)**, aligned to CRM 7.1.2 — unlike CRMba, this one is maintained.
 
@@ -1109,41 +1777,48 @@ CRMarchaeo is the only one of the three that is allowed to destroy evidence in i
 
 
 
-## 12. Competency Questions
+## 14. Competency Questions
 
 1. Which buildings are contained in the Naqsh-e Jahan Site?  
 2. List all spaces of type `persarch:Iwan` in the Masjid-i Jāmiʿ together with their Schroeder numbers.  
 3. What is the spatial sequence from the portal of Sheikh Lotfollah Mosque to its dome chamber?  
 4. Which spaces are adjacent to the South Iwan of the Friday Mosque?  
 5. Retrieve geometries (WKT) of selected spaces.  
-6. Find all buildings that have a Ground Storey containing a `persarch:DomeChamber`.
+6. Find all buildings that have a Ground Storey containing a `persarch:DomeChamber`.  
+7. Which `bot:Zone` individuals are contained in the Ghiyathiyya madrasa, including functional zones that are not a `bot:Space`?  
+8. Which zones are `bot:adjacentZone` to the Khargerd sahn, and which zones `bot:intersectsZone` both of its storeys?  
+9. Which sub-elements does the Khargerd mosque mihrab (or the Ribat-i Sharaf pishtaq) have via `bot:hasSubElement`?  
+10. Which spaces belong to the public-service zone of Ribat-i Sharaf, and which single space `bot:intersectsZone` both the public-service and royal-suite zones?
 
 ---
 
-## 13. Data Sources & Scholarly Grounding
+## 15. Data Sources & Scholarly Grounding
 
 - Eric Schroeder, Plan of Masjid-i Jāmiʿ of Isfahan, 1931 (American Institute for Persian Art and Archaeology). Smithsonian Institution, Ernst Herzfeld Papers, D-704.  
 - ArchNet media: https://www.archnet.org/sites/1621?media_content_id=62965  
 - UNESCO World Heritage documentation for Naqsh-e Jahan Square (Reference 115).  
-- BOT specification: https://w3c-lbd-cg.github.io/bot/  
+- ArchNet, Madrasa-i Ghiyathiyya (Khargird): https://www.archnet.org/sites/4726  
+- ArchNet, Ribat-i Sharaf: https://www.archnet.org/sites/3873  
+- BOT specification: https://w3c-lbd-cg.github.io/bot/ (especially `bot:Zone`, `containsZone`, `adjacentZone`, `intersectsZone`, and the element properties)  
 - Getty Art & Architecture Thesaurus (AAT).
 
 ---
 
-## 14. Next Steps & Enrichment Path
+## 16. Next Steps & Enrichment Path
 
-1. Formalise the full `persarch.ttl` ontology module.  
+1. Formalise the full `persarch.ttl` ontology module, including `Hashti`, `LectureHall`, `Stable`, and `Badgir`.  
 2. Expand the instance data with more Schroeder-numbered spaces and complete sequences for Sheikh Lotfollah.  
-3. Add real geometric data (vector plan + surveyed WKT).  
-4. Link historic photographs, plans, and IIIF manifests.  
-5. Introduce decorative elements, inscriptions, and AAT alignments.  
-6. Create SPARQL query library and NotebookLM-friendly documentation.
+3. Complete the remaining hujras at Khargerd (32 cells, 8 classrooms) and the remaining bays of both Ribat-i Sharaf courts.  
+4. Add real geometric data (vector plan + surveyed WKT).  
+5. Link historic photographs, plans, and IIIF manifests.  
+6. Introduce decorative elements, inscriptions, and AAT alignments.  
+7. Create SPARQL query library and NotebookLM-friendly documentation.
 
 After this foundational version is stable we can discuss concrete strategies for enriching the model with high-resolution plans, images, slides, and measured drawings.
 
 ---
 
-## 15. License
+## 17. License
 
 This repository is released under the **GNU General Public License v3.0**.
 
@@ -1158,7 +1833,7 @@ Either choice is valid; the important point is to state it clearly in the reposi
 
 ---
 
-## 16. Citation
+## 18. Citation
 
 If you use this work, please cite the repository and acknowledge the underlying scholarly sources (especially Schroeder’s 1931 plan and the UNESCO documentation of Naqsh-e Jahan Square).
 
