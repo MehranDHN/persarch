@@ -1,0 +1,171 @@
+# Shared CRM application profile for persarch case studies.
+# Roles (P14 sub-properties), E55 types, E57 materials, AAT/Wikidata alignments.
+# Load before the Khargerd and Ribat instance files.
+#
+# External IDs use skos:exactMatch, not owl:sameAs.
+
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+@prefix crm:      <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix aat:      <http://vocab.getty.edu/aat/> .
+@prefix wd:       <http://www.wikidata.org/entity/> .
+@prefix persarch: <https://w3id.org/persian-architecture#> .
+
+#################################################################
+# Role properties — sub-properties of crm:P14_carried_out_by
+#################################################################
+
+persarch:commissionedBy a owl:ObjectProperty ;
+    rdfs:label "commissioned by"@en ;
+    rdfs:subPropertyOf crm:P14_carried_out_by ;
+    rdfs:domain crm:E7_Activity ;
+    rdfs:range crm:E39_Actor .
+
+persarch:designedBy a owl:ObjectProperty ;
+    rdfs:label "designed by"@en ;
+    rdfs:comment "Architect or designer of a production / modification."@en ;
+    rdfs:subPropertyOf crm:P14_carried_out_by ;
+    rdfs:domain crm:E7_Activity ;
+    rdfs:range crm:E39_Actor .
+
+persarch:calligraphedBy a owl:ObjectProperty ;
+    rdfs:label "calligraphed by"@en ;
+    rdfs:comment "Calligrapher or inscription workshop responsible for a text on fabric."@en ;
+    rdfs:subPropertyOf crm:P14_carried_out_by ;
+    rdfs:domain crm:E7_Activity ;
+    rdfs:range crm:E39_Actor .
+
+persarch:executedBy a owl:ObjectProperty ;
+    rdfs:label "executed by"@en ;
+    rdfs:comment "Workshop or craftsmen who carried out the fabric of a campaign."@en ;
+    rdfs:subPropertyOf crm:P14_carried_out_by ;
+    rdfs:domain crm:E7_Activity ;
+    rdfs:range crm:E39_Actor .
+
+persarch:hasScriptStyle a owl:ObjectProperty ;
+    rdfs:label "has script style"@en ;
+    rdfs:subPropertyOf crm:P2_has_type ;
+    rdfs:range crm:E55_Type .
+
+persarch:hasMotifType a owl:ObjectProperty ;
+    rdfs:label "has motif type"@en ;
+    rdfs:subPropertyOf crm:P2_has_type ;
+    rdfs:range crm:E55_Type .
+
+#################################################################
+# Occupation / role types
+#################################################################
+
+persarch:role_patron a crm:E55_Type ;
+    rdfs:label "patron"@en .
+
+persarch:role_architect a crm:E55_Type ;
+    rdfs:label "architect"@en ;
+    skos:exactMatch aat:300025103 .
+
+persarch:role_calligrapher a crm:E55_Type ;
+    rdfs:label "calligrapher"@en ;
+    skos:exactMatch aat:300025166 .
+
+persarch:role_workshop a crm:E55_Type ;
+    rdfs:label "craft workshop"@en .
+
+#################################################################
+# Building types and plan
+#################################################################
+
+persarch:type_madrasa a crm:E55_Type ;
+    rdfs:label "madrasa (building)"@en ;
+    rdfs:label "مدرسه"@fa ;
+    skos:exactMatch aat:300006563 , wd:Q132834 .
+
+persarch:type_caravanserai a crm:E55_Type ;
+    rdfs:label "caravanserai"@en ;
+    rdfs:label "کاروانسرا"@fa ;
+    skos:exactMatch aat:300007148 , wd:Q186401 .
+
+persarch:type_mosque a crm:E55_Type ;
+    rdfs:label "mosque (building)"@en ;
+    rdfs:label "مسجد"@fa ;
+    skos:exactMatch aat:300007544 , wd:Q32815 .
+
+persarch:type_four_iwan_plan a crm:E55_Type ;
+    rdfs:label "four-iwan plan"@en ;
+    rdfs:label "طرح چهارایوانی"@fa .
+
+persarch:type_iwan a crm:E55_Type ;
+    rdfs:label "iwan"@en ;
+    rdfs:label "ایوان"@fa ;
+    skos:exactMatch wd:Q209669 .
+
+persarch:type_mihrab a crm:E55_Type ;
+    rdfs:label "mihrab"@en ;
+    rdfs:label "محراب"@fa ;
+    skos:exactMatch wd:Q189451 .
+
+persarch:type_inscription a crm:E55_Type ;
+    rdfs:label "inscription"@en ;
+    rdfs:label "کتیبه"@fa ;
+    skos:exactMatch aat:300028704 , wd:Q1640824 .
+
+persarch:type_muqarnas a crm:E55_Type ;
+    rdfs:label "muqarnas"@en ;
+    rdfs:label "مقرنس"@fa ;
+    skos:exactMatch wd:Q837669 .
+
+#################################################################
+# Dynastic styles
+#################################################################
+
+persarch:style_timurid a crm:E55_Type ;
+    rdfs:label "Timurid"@en ;
+    rdfs:label "تیموری"@fa ;
+    skos:exactMatch aat:300021796 , wd:Q484246 .
+
+persarch:style_seljuk a crm:E55_Type ;
+    rdfs:label "Seljuk"@en ;
+    rdfs:label "سلجوقی"@fa ;
+    skos:exactMatch aat:300021736 .
+
+persarch:style_great_seljuk a crm:E55_Type ;
+    rdfs:label "Great Seljuk"@en ;
+    skos:exactMatch aat:300021741 .
+
+#################################################################
+# Materials
+#################################################################
+
+persarch:mat_brick a crm:E57_Material ;
+    rdfs:label "baked brick"@en ;
+    rdfs:label "آجر"@fa ;
+    skos:exactMatch aat:300010463 , wd:Q40089 .
+
+persarch:mat_glazed_tile a crm:E57_Material ;
+    rdfs:label "glazed mosaic tile"@en ;
+    rdfs:label "کاشی معرق"@fa ;
+    skos:exactMatch aat:300010910 .
+
+persarch:mat_stucco a crm:E57_Material ;
+    rdfs:label "stucco"@en ;
+    rdfs:label "گچ‌بری"@fa ;
+    skos:exactMatch aat:300014966 .
+
+#################################################################
+# Script styles and motifs
+#################################################################
+
+persarch:script_thuluth a crm:E55_Type ;
+    rdfs:label "Thuluth"@en ;
+    rdfs:label "ثلث"@fa ;
+    skos:exactMatch wd:Q1999548 .
+
+persarch:script_kufic a crm:E55_Type ;
+    rdfs:label "Kufic"@en ;
+    rdfs:label "کوفی"@fa ;
+    skos:exactMatch wd:Q185425 .
+
+persarch:motif_arabesque a crm:E55_Type ;
+    rdfs:label "arabesque"@en ;
+    skos:exactMatch aat:300010206 .

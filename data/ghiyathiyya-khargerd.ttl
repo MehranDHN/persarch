@@ -10,8 +10,12 @@
 @prefix owl:      <http://www.w3.org/2002/07/owl#> .
 @prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
 @prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+@prefix crm:      <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmba:    <http://www.cidoc-crm.org/extensions/crmba/> .
 @prefix bot:      <https://w3id.org/bot#> .
 @prefix persarch: <https://w3id.org/persian-architecture#> .
+@prefix wd:       <http://www.wikidata.org/entity/> .
 @prefix :         <https://w3id.org/persian-architecture/data/khargerd#> .
 
 #################################################################
@@ -66,11 +70,17 @@ persarch:TilePanel a owl:Class ;
 # Building, storeys, functional zones  (containsZone)
 #################################################################
 
-:Ghiyathiyya_Madrasa a persarch:Madrasa , bot:Building ;
+:Ghiyathiyya_Madrasa a persarch:Madrasa , bot:Building , crmba:B1_Built_Work ;
     rdfs:label "Ghiyathiyya Madrasa (Ghiasieh School), Khargerd"@en ;
     rdfs:label "مدرسه غیاثیه خرگرد"@fa ;
     dcterms:description "Timurid four-iwan madrasa, 1438–1444. Exterior ≈ 42 × 56 m; courtyard ≈ 28 m square. Architects Qavam al-Din and Ghiyath al-Din Shirazi, for Ghiyath al-Din Pir Ahmad Khvafi."@en ;
     dcterms:source <https://www.archnet.org/sites/4726> ;
+    crm:P2_has_type persarch:type_madrasa ,
+                    persarch:type_four_iwan_plan ,
+                    persarch:style_timurid ;
+    crm:P45_consists_of persarch:mat_brick , persarch:mat_glazed_tile ;
+    crm:P53_has_former_or_current_location :place_khargerd ;
+    skos:exactMatch wd:Q5854526 ;
     bot:hasStorey :Khargerd_Ground_Storey , :Khargerd_Upper_Storey ;
     bot:containsZone :Khargerd_Residential_Zone ,
                      :Khargerd_Instructional_Zone ,
@@ -262,3 +272,72 @@ persarch:TilePanel a owl:Class ;
 
 :Khargerd_Hujra_G04_Window a bot:Element ;
     rdfs:label "Window of student cell G-04"@en .
+
+#################################################################
+# CRM: agents, time-span, materials, inscriptions
+#################################################################
+
+:place_khargerd a crm:E53_Place ;
+    rdfs:label "Khargerd (Khargird), Khaf County"@en .
+
+:actor_pir_ahmad a crm:E21_Person ;
+    rdfs:label "Ghiyath al-Din Pir Ahmad Khvafi"@en ;
+    rdfs:label "غیاث‌الدین پیر احمد خوافی"@fa ;
+    crm:P2_has_type persarch:role_patron ;
+    crm:P3_has_note "Timurid vizier of Shah Rukh; patron of the madrasa in his home district."@en .
+
+:actor_qavam a crm:E21_Person ;
+    rdfs:label "Qavam al-Din ibn Zayn al-Din Shirazi"@en ;
+    rdfs:label "قوام‌الدین شیرازی"@fa ;
+    crm:P2_has_type persarch:role_architect ;
+    skos:exactMatch wd:Q5722389 ;
+    crm:P3_has_note "Began the madrasa; died 21 February 1438 before completion."@en .
+
+:actor_ghiyath_shirazi a crm:E21_Person ;
+    rdfs:label "Ghiyath al-Din Shirazi"@en ;
+    rdfs:label "غیاث‌الدین شیرازی"@fa ;
+    crm:P2_has_type persarch:role_architect ;
+    crm:P3_has_note "Completed the madrasa after Qavam al-Din's death; named in the building inscription."@en .
+
+:group_khargerd_calligraphers a crm:E74_Group ;
+    rdfs:label "Calligraphers of the Ghiyathiyya inscription campaign"@en ;
+    crm:P2_has_type persarch:role_calligrapher .
+
+:group_khargerd_tile_workshop a crm:E74_Group ;
+    rdfs:label "Timurid tile workshop of the Ghiyathiyya campaign"@en ;
+    crm:P2_has_type persarch:role_workshop .
+
+:ts_ghiyathiyya a crm:E52_Time-Span ;
+    rdfs:label "841–848 AH / 1438–1444 CE"@en ;
+    crm:P82a_begin_of_the_begin "1438"^^xsd:gYear ;
+    crm:P82b_end_of_the_end "1444"^^xsd:gYear .
+
+:evt_ghiyathiyya_construction a crm:E12_Production ;
+    rdfs:label "Construction of the Ghiyathiyya madrasa"@en ;
+    crm:P4_has_time-span :ts_ghiyathiyya ;
+    crm:P7_took_place_at :place_khargerd ;
+    persarch:commissionedBy :actor_pir_ahmad ;
+    persarch:designedBy :actor_qavam , :actor_ghiyath_shirazi ;
+    persarch:calligraphedBy :group_khargerd_calligraphers ;
+    persarch:executedBy :group_khargerd_tile_workshop ;
+    crm:P108_has_produced :Ghiyathiyya_Madrasa , :Khargerd_Mihrab ,
+                          :Khargerd_Pishtaq_Inscription ;
+    crm:P31_has_modified :Ghiyathiyya_Madrasa ;
+    crm:P126_employed persarch:mat_brick , persarch:mat_glazed_tile .
+
+:Khargerd_Mihrab
+    crm:P2_has_type persarch:type_mihrab ;
+    crm:P45_consists_of persarch:mat_glazed_tile , persarch:mat_stucco ;
+    crm:P128_carries :Khargerd_Mihrab_Inscription .
+
+:Khargerd_Mihrab_Inscription a crm:E34_Inscription ;
+    persarch:hasScriptStyle persarch:script_thuluth ;
+    crm:P2_has_type persarch:type_inscription .
+
+:Khargerd_Pishtaq_Inscription a crm:E34_Inscription ;
+    persarch:hasScriptStyle persarch:script_thuluth ;
+    crm:P2_has_type persarch:type_inscription .
+
+:Khargerd_SW_Iwan_Tile_Panel
+    persarch:hasMotifType persarch:motif_arabesque ;
+    crm:P45_consists_of persarch:mat_glazed_tile .

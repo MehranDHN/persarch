@@ -10,8 +10,12 @@
 @prefix owl:      <http://www.w3.org/2002/07/owl#> .
 @prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
 @prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+@prefix crm:      <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmba:    <http://www.cidoc-crm.org/extensions/crmba/> .
 @prefix bot:      <https://w3id.org/bot#> .
 @prefix persarch: <https://w3id.org/persian-architecture#> .
+@prefix wd:       <http://www.wikidata.org/entity/> .
 @prefix :         <https://w3id.org/persian-architecture/data/ribat-sharaf#> .
 
 #################################################################
@@ -50,11 +54,18 @@ persarch:Inscription a owl:Class ;
 # Building and the two functional zones  (containsZone)
 #################################################################
 
-:Ribat_i_Sharaf a persarch:Caravanserai , bot:Building ;
+:Ribat_i_Sharaf a persarch:Caravanserai , bot:Building , crmba:B1_Built_Work ;
     rdfs:label "Ribat-i Sharaf"@en ;
     rdfs:label "رباط شرف"@fa ;
     dcterms:description "Seljuk two-court ribat/caravanserai on the Nishapur–Sarakhs road. Founded 1114–15; restored 1154–55."@en ;
     dcterms:source <https://www.archnet.org/sites/3873> ;
+    crm:P2_has_type persarch:type_caravanserai ,
+                    persarch:type_four_iwan_plan ,
+                    persarch:style_seljuk ,
+                    persarch:style_great_seljuk ;
+    crm:P45_consists_of persarch:mat_brick ;
+    crm:P53_has_former_or_current_location :place_ribat ;
+    skos:exactMatch wd:Q2577338 ;
     bot:hasStorey :Ribat_Ground_Storey ;
     bot:containsZone :Ribat_Public_Zone , :Ribat_Royal_Zone ,
                      :Ribat_Processional_Axis .
@@ -238,3 +249,79 @@ persarch:Inscription a owl:Class ;
 
 :Ribat_i_Sharaf bot:adjacentElement :Ribat_Pishtaq , :Ribat_Tower_SE .
 :Ribat_Ground_Storey bot:containsElement :Ribat_Outer_Well , :Ribat_Inner_Howz .
+
+#################################################################
+# CRM: foundation, restoration, agents, materials, Kufic
+#################################################################
+
+:place_ribat a crm:E53_Place ;
+    rdfs:label "Site of Ribat-i Sharaf, Sarakhs–Nishapur road"@en .
+
+:actor_sharaf_al_din a crm:E21_Person ;
+    rdfs:label "Sharaf al-Din Abu Tahir"@en ;
+    rdfs:label "شرف‌الدین ابو طاهر"@fa ;
+    crm:P2_has_type persarch:role_patron ;
+    crm:P3_has_note "Governor of Khurasan, later vizier of Sultan Sanjar; founder of the ribat, 508 AH / 1114–15."@en .
+
+:actor_katib_ali a crm:E21_Person ;
+    rdfs:label "Katib Ali al-Mansur Asad b. Muhammad al-Sarahsi"@en ;
+    rdfs:label "کاتب علی المنصور اسعد بن محمد سرخسی"@fa ;
+    crm:P2_has_type persarch:role_architect ;
+    crm:P3_has_note "Architect named in the foundation record of Ribat-i Sharaf."@en .
+
+:actor_turkan_khatun a crm:E21_Person ;
+    rdfs:label "Turkan Khatun (Terken bint al-Kaghan)"@en ;
+    rdfs:label "ترکان خاتون"@fa ;
+    crm:P2_has_type persarch:role_patron ;
+    crm:P3_has_note "Wife of Sultan Sanjar; restored the ribat in 549 AH / 1154–55 after Ghuzz damage."@en .
+
+:group_seljuk_masons a crm:E74_Group ;
+    rdfs:label "Seljuk brick masons of the Ribat-i Sharaf foundation"@en ;
+    crm:P2_has_type persarch:role_workshop .
+
+:group_stucco_workshop a crm:E74_Group ;
+    rdfs:label "Stucco and inscription workshop of the 1154–55 restoration"@en ;
+    crm:P2_has_type persarch:role_calligrapher , persarch:role_workshop .
+
+:ts_foundation a crm:E52_Time-Span ;
+    rdfs:label "508 AH / 1114–1115 CE"@en ;
+    crm:P82a_begin_of_the_begin "1114"^^xsd:gYear ;
+    crm:P82b_end_of_the_end "1115"^^xsd:gYear .
+
+:ts_restoration a crm:E52_Time-Span ;
+    rdfs:label "549 AH / 1154–1155 CE"@en ;
+    crm:P82a_begin_of_the_begin "1154"^^xsd:gYear ;
+    crm:P82b_end_of_the_end "1155"^^xsd:gYear .
+
+:evt_ribat_foundation a crm:E12_Production ;
+    rdfs:label "Foundation of Ribat-i Sharaf"@en ;
+    crm:P4_has_time-span :ts_foundation ;
+    crm:P7_took_place_at :place_ribat ;
+    persarch:commissionedBy :actor_sharaf_al_din ;
+    persarch:designedBy :actor_katib_ali ;
+    persarch:executedBy :group_seljuk_masons ;
+    crm:P108_has_produced :Ribat_i_Sharaf , :Ribat_Pishtaq , :Ribat_Outer_Mihrab ;
+    crm:P126_employed persarch:mat_brick .
+
+:evt_ribat_restoration a crm:E11_Modification ;
+    rdfs:label "Restoration of Ribat-i Sharaf after the Ghuzz invasion"@en ;
+    crm:P4_has_time-span :ts_restoration ;
+    crm:P7_took_place_at :place_ribat ;
+    persarch:commissionedBy :actor_turkan_khatun ;
+    persarch:calligraphedBy :group_stucco_workshop ;
+    persarch:executedBy :group_stucco_workshop ;
+    crm:P31_has_modified :Ribat_i_Sharaf ;
+    crm:P108_has_produced :Ribat_Pishtaq_Inscription ;
+    crm:P126_employed persarch:mat_stucco .
+
+:Ribat_Pishtaq
+    crm:P45_consists_of persarch:mat_brick , persarch:mat_stucco ;
+    crm:P128_carries :Ribat_Pishtaq_Inscription .
+
+:Ribat_Pishtaq_Inscription a crm:E34_Inscription ;
+    persarch:hasScriptStyle persarch:script_kufic ;
+    crm:P2_has_type persarch:type_inscription .
+
+:Ribat_Outer_Mihrab
+    crm:P2_has_type persarch:type_mihrab ;
+    crm:P45_consists_of persarch:mat_brick , persarch:mat_stucco .
