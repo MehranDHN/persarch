@@ -1,0 +1,240 @@
+# Ribat-i Sharaf caravanserai
+# BOT zone topology sample: containsZone, adjacentZone, intersectsZone
+# plus containsElement, adjacentElement, hasSubElement.
+#
+# Load together with the BOT ontology (https://w3id.org/bot#).
+# New persarch classes are declared here until persarch.ttl is formalised.
+
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix bot:      <https://w3id.org/bot#> .
+@prefix persarch: <https://w3id.org/persian-architecture#> .
+@prefix :         <https://w3id.org/persian-architecture/data/ribat-sharaf#> .
+
+#################################################################
+# Local class stubs (subclassing BOT)
+#################################################################
+
+persarch:Caravanserai a owl:Class ;
+    rdfs:label "Caravanserai"@en ;
+    rdfs:subClassOf bot:Building .
+
+persarch:Sahn a owl:Class ;
+    rdfs:label "Sahn (courtyard)"@en ;
+    rdfs:subClassOf bot:Space .
+
+persarch:Iwan a owl:Class ;
+    rdfs:label "Iwan"@en ;
+    rdfs:subClassOf bot:Space .
+
+persarch:DomeChamber a owl:Class ;
+    rdfs:label "Dome chamber"@en ;
+    rdfs:subClassOf bot:Space .
+
+persarch:Stable a owl:Class ;
+    rdfs:label "Stable"@en ;
+    rdfs:subClassOf bot:Space .
+
+persarch:Mihrab a owl:Class ;
+    rdfs:label "Mihrab"@en ;
+    rdfs:subClassOf bot:Element .
+
+persarch:Inscription a owl:Class ;
+    rdfs:label "Inscription"@en ;
+    rdfs:subClassOf bot:Element .
+
+#################################################################
+# Building and the two functional zones  (containsZone)
+#################################################################
+
+:Ribat_i_Sharaf a persarch:Caravanserai , bot:Building ;
+    rdfs:label "Ribat-i Sharaf"@en ;
+    rdfs:label "رباط شرف"@fa ;
+    dcterms:description "Seljuk two-court ribat/caravanserai on the Nishapur–Sarakhs road. Founded 1114–15; restored 1154–55."@en ;
+    dcterms:source <https://www.archnet.org/sites/3873> ;
+    bot:hasStorey :Ribat_Ground_Storey ;
+    bot:containsZone :Ribat_Public_Zone , :Ribat_Royal_Zone ,
+                     :Ribat_Processional_Axis .
+
+:Ribat_Ground_Storey a bot:Storey ;
+    rdfs:label "Ground storey – Ribat-i Sharaf"@en ;
+    bot:hasSpace :Ribat_Outer_Court ,
+                 :Ribat_Inner_Court ,
+                 :Ribat_Connecting_Corridor ,
+                 :Ribat_Entrance_Iwan ,
+                 :Ribat_Outer_Mosque ,
+                 :Ribat_Inner_Mosque ,
+                 :Ribat_Stables_SW ,
+                 :Ribat_Traveller_Room_01 ,
+                 :Ribat_Royal_Suite_01 ,
+                 :Ribat_Kitchen ,
+                 :Ribat_Inner_Dome_Hall .
+
+:Ribat_Public_Zone a bot:Zone ;
+    rdfs:label "Public-service zone"@en ;
+    rdfs:comment "Outer court, stabling, travellers' rooms, outer mosque."@en ;
+    bot:containsZone :Ribat_Outer_Court ,
+                     :Ribat_Stables_SW ,
+                     :Ribat_Traveller_Room_01 ,
+                     :Ribat_Outer_Mosque ,
+                     :Ribat_Entrance_Iwan .
+
+:Ribat_Royal_Zone a bot:Zone ;
+    rdfs:label "Royal-suite zone"@en ;
+    rdfs:comment "Inner court, residential suites, kitchen, inner mosque, inner dome hall."@en ;
+    bot:containsZone :Ribat_Inner_Court ,
+                     :Ribat_Royal_Suite_01 ,
+                     :Ribat_Kitchen ,
+                     :Ribat_Inner_Mosque ,
+                     :Ribat_Inner_Dome_Hall .
+
+#################################################################
+# Courts, corridor, axis  (adjacentZone / intersectsZone)
+#################################################################
+
+:Ribat_Outer_Court a persarch:Sahn , bot:Space ;
+    rdfs:label "Outer courtyard (public / stabling)"@en ;
+    rdfs:comment "Rectangle ≈ 32.4 × 16.5 m."@en ;
+    bot:adjacentZone :Ribat_Entrance_Iwan ,
+                     :Ribat_Connecting_Corridor ,
+                     :Ribat_Stables_SW ,
+                     :Ribat_Traveller_Room_01 ,
+                     :Ribat_Outer_Mosque ;
+    bot:containsElement :Ribat_Outer_Well ;
+    bot:adjacentElement :Ribat_Outer_Court_Pavement .
+
+:Ribat_Inner_Court a persarch:Sahn , bot:Space ;
+    rdfs:label "Inner courtyard (royal)"@en ;
+    rdfs:comment "Square ≈ 31.8 × 31.3 m."@en ;
+    bot:adjacentZone :Ribat_Connecting_Corridor ,
+                     :Ribat_Royal_Suite_01 ,
+                     :Ribat_Kitchen ,
+                     :Ribat_Inner_Mosque ,
+                     :Ribat_Inner_Dome_Hall ;
+    bot:containsElement :Ribat_Inner_Howz .
+
+:Ribat_Connecting_Corridor a bot:Space ;
+    rdfs:label "Connecting iwan / corridor between the two courts"@en ;
+    rdfs:comment "Shares an arch with each court (adjacentZone) and overlaps both functional zones (intersectsZone)."@en ;
+    bot:adjacentZone :Ribat_Outer_Court , :Ribat_Inner_Court ;
+    bot:intersectsZone :Ribat_Public_Zone , :Ribat_Royal_Zone ;
+    bot:adjacentElement :Ribat_Corridor_Arch_Outer , :Ribat_Corridor_Arch_Inner .
+
+:Ribat_Processional_Axis a bot:Zone ;
+    rdfs:label "Processional axis from pishtaq to inner dome"@en ;
+    bot:intersectsZone :Ribat_Entrance_Iwan ,
+                       :Ribat_Outer_Court ,
+                       :Ribat_Connecting_Corridor ,
+                       :Ribat_Inner_Court ,
+                       :Ribat_Inner_Dome_Hall .
+
+:Ribat_Entrance_Iwan a persarch:Iwan , bot:Space ;
+    rdfs:label "South-east entrance iwan"@en ;
+    bot:adjacentZone :Ribat_Outer_Court ;
+    bot:adjacentElement :Ribat_Pishtaq .
+
+:Ribat_Outer_Mosque a persarch:DomeChamber , bot:Space ;
+    rdfs:label "Mosque of the outer court"@en ;
+    bot:adjacentZone :Ribat_Outer_Court ;
+    bot:adjacentElement :Ribat_Outer_Mihrab .
+
+:Ribat_Inner_Mosque a persarch:DomeChamber , bot:Space ;
+    rdfs:label "Mosque of the inner court"@en ;
+    bot:adjacentZone :Ribat_Inner_Court ;
+    bot:adjacentElement :Ribat_Inner_Mihrab .
+
+:Ribat_Inner_Dome_Hall a persarch:DomeChamber , bot:Space ;
+    rdfs:label "Inner dome hall (terminus of the axis)"@en ;
+    bot:adjacentZone :Ribat_Inner_Court .
+
+:Ribat_Stables_SW a persarch:Stable , bot:Space ;
+    rdfs:label "South-west stables of the outer court"@en ;
+    bot:adjacentZone :Ribat_Outer_Court , :Ribat_Traveller_Room_01 ;
+    bot:containsElement :Ribat_Manger_01 ;
+    bot:adjacentElement :Ribat_Stable_Door .
+
+:Ribat_Traveller_Room_01 a bot:Space ;
+    rdfs:label "Travellers' room 01"@en ;
+    bot:adjacentZone :Ribat_Outer_Court , :Ribat_Stables_SW .
+
+:Ribat_Royal_Suite_01 a bot:Space ;
+    rdfs:label "Royal suite 01"@en ;
+    bot:adjacentZone :Ribat_Inner_Court .
+
+:Ribat_Kitchen a bot:Space ;
+    rdfs:label "Kitchen of the inner court"@en ;
+    bot:adjacentZone :Ribat_Inner_Court .
+
+#################################################################
+# Elements: containsElement, adjacentElement, hasSubElement
+#################################################################
+
+:Ribat_Outer_Well a bot:Element ;
+    rdfs:label "Well in the outer courtyard"@en .
+
+:Ribat_Inner_Howz a bot:Element ;
+    rdfs:label "Howz in the inner courtyard"@en .
+
+:Ribat_Manger_01 a bot:Element ;
+    rdfs:label "Manger in the south-west stables"@en .
+
+:Ribat_Outer_Court_Pavement a bot:Element ;
+    rdfs:label "Pavement / floor of the outer court"@en .
+
+:Ribat_Stable_Door a bot:Element ;
+    rdfs:label "Door between outer court and stables"@en .
+
+:Ribat_Corridor_Arch_Outer a bot:Element ;
+    rdfs:label "Arch from outer court into the connecting corridor"@en .
+
+:Ribat_Corridor_Arch_Inner a bot:Element ;
+    rdfs:label "Arch from inner court into the connecting corridor"@en .
+
+:Ribat_Pishtaq a bot:Element ;
+    rdfs:label "South-east entrance pishtaq"@en ;
+    bot:hasSubElement :Ribat_Pishtaq_Frame ,
+                      :Ribat_Pishtaq_Inscription ,
+                      :Ribat_Pishtaq_Muqarnas .
+
+:Ribat_Pishtaq_Frame a bot:Element ;
+    rdfs:label "Brick frame of the pishtaq"@en .
+
+:Ribat_Pishtaq_Inscription a persarch:Inscription , bot:Element ;
+    rdfs:label "Foundation / restoration inscription of the pishtaq"@en .
+
+:Ribat_Pishtaq_Muqarnas a bot:Element ;
+    rdfs:label "Muqarnas of the entrance pishtaq"@en .
+
+:Ribat_Outer_Mihrab a persarch:Mihrab , bot:Element ;
+    rdfs:label "Mihrab of the outer mosque"@en ;
+    bot:hasSubElement :Ribat_Outer_Mihrab_Niche ,
+                      :Ribat_Outer_Mihrab_Inscription .
+
+:Ribat_Outer_Mihrab_Niche a bot:Element ;
+    rdfs:label "Niche of the outer mihrab"@en .
+
+:Ribat_Outer_Mihrab_Inscription a persarch:Inscription , bot:Element ;
+    rdfs:label "Inscription of the outer mihrab"@en .
+
+:Ribat_Inner_Mihrab a persarch:Mihrab , bot:Element ;
+    rdfs:label "Mihrab of the inner mosque"@en ;
+    bot:hasSubElement :Ribat_Inner_Mihrab_Niche .
+
+:Ribat_Inner_Mihrab_Niche a bot:Element ;
+    rdfs:label "Niche of the inner mihrab"@en .
+
+:Ribat_Tower_SE a bot:Element ;
+    rdfs:label "South-east corner tower"@en ;
+    bot:hasSubElement :Ribat_Tower_SE_Base , :Ribat_Tower_SE_Shaft .
+
+:Ribat_Tower_SE_Base a bot:Element ;
+    rdfs:label "Base of the south-east tower"@en .
+
+:Ribat_Tower_SE_Shaft a bot:Element ;
+    rdfs:label "Shaft of the south-east tower"@en .
+
+:Ribat_i_Sharaf bot:adjacentElement :Ribat_Pishtaq , :Ribat_Tower_SE .
+:Ribat_Ground_Storey bot:containsElement :Ribat_Outer_Well , :Ribat_Inner_Howz .

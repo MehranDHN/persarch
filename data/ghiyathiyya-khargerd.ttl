@@ -1,0 +1,264 @@
+# Ghiyathiyya Madrasa (Ghiasieh School), Khargerd
+# BOT zone topology sample: containsZone, adjacentZone, intersectsZone
+# plus containsElement, adjacentElement, hasSubElement.
+#
+# Load together with the BOT ontology (https://w3id.org/bot#).
+# New persarch classes are declared here until persarch.ttl is formalised.
+
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix bot:      <https://w3id.org/bot#> .
+@prefix persarch: <https://w3id.org/persian-architecture#> .
+@prefix :         <https://w3id.org/persian-architecture/data/khargerd#> .
+
+#################################################################
+# Local class stubs (subclassing BOT)
+#################################################################
+
+persarch:Madrasa a owl:Class ;
+    rdfs:label "Madrasa"@en ;
+    rdfs:subClassOf bot:Building .
+
+persarch:Sahn a owl:Class ;
+    rdfs:label "Sahn (courtyard)"@en ;
+    rdfs:subClassOf bot:Space .
+
+persarch:Iwan a owl:Class ;
+    rdfs:label "Iwan"@en ;
+    rdfs:subClassOf bot:Space .
+
+persarch:DomeChamber a owl:Class ;
+    rdfs:label "Dome chamber"@en ;
+    rdfs:subClassOf bot:Space .
+
+persarch:Hashti a owl:Class ;
+    rdfs:label "Hashti (vestibule)"@en ;
+    rdfs:subClassOf bot:Space .
+
+persarch:LectureHall a owl:Class ;
+    rdfs:label "Lecture hall"@en ;
+    rdfs:subClassOf bot:Space .
+
+persarch:Hujra a owl:Class ;
+    rdfs:label "Hujra (student cell)"@en ;
+    rdfs:subClassOf bot:Space .
+
+persarch:Mihrab a owl:Class ;
+    rdfs:label "Mihrab"@en ;
+    rdfs:subClassOf bot:Element .
+
+persarch:Badgir a owl:Class ;
+    rdfs:label "Badgir (windcatcher)"@en ;
+    rdfs:subClassOf bot:Element .
+
+persarch:Inscription a owl:Class ;
+    rdfs:label "Inscription"@en ;
+    rdfs:subClassOf bot:Element .
+
+persarch:TilePanel a owl:Class ;
+    rdfs:label "Tile panel"@en ;
+    rdfs:subClassOf bot:Element .
+
+#################################################################
+# Building, storeys, functional zones  (containsZone)
+#################################################################
+
+:Ghiyathiyya_Madrasa a persarch:Madrasa , bot:Building ;
+    rdfs:label "Ghiyathiyya Madrasa (Ghiasieh School), Khargerd"@en ;
+    rdfs:label "مدرسه غیاثیه خرگرد"@fa ;
+    dcterms:description "Timurid four-iwan madrasa, 1438–1444. Exterior ≈ 42 × 56 m; courtyard ≈ 28 m square. Architects Qavam al-Din and Ghiyath al-Din Shirazi, for Ghiyath al-Din Pir Ahmad Khvafi."@en ;
+    dcterms:source <https://www.archnet.org/sites/4726> ;
+    bot:hasStorey :Khargerd_Ground_Storey , :Khargerd_Upper_Storey ;
+    bot:containsZone :Khargerd_Residential_Zone ,
+                     :Khargerd_Instructional_Zone ,
+                     :Khargerd_Prayer_Zone .
+
+:Khargerd_Ground_Storey a bot:Storey ;
+    rdfs:label "Ground storey – Ghiyathiyya"@en ;
+    bot:hasSpace :Khargerd_Sahn ,
+                 :Khargerd_Hashti ,
+                 :Khargerd_NE_Iwan ,
+                 :Khargerd_SW_Iwan ,
+                 :Khargerd_NW_Iwan ,
+                 :Khargerd_SE_Iwan ,
+                 :Khargerd_Mosque_Hall ,
+                 :Khargerd_Lecture_Hall ,
+                 :Khargerd_Hujra_G04 ,
+                 :Khargerd_Hujra_G05 .
+
+:Khargerd_Upper_Storey a bot:Storey ;
+    rdfs:label "Upper storey – Ghiyathiyya"@en ;
+    bot:hasSpace :Khargerd_Hujra_U04 , :Khargerd_Hujra_U05 .
+
+# Functional zones are bare bot:Zone individuals — not Site/Building/Storey/Space.
+:Khargerd_Residential_Zone a bot:Zone ;
+    rdfs:label "Residential zone (student cells)"@en ;
+    bot:containsZone :Khargerd_Hujra_G04 , :Khargerd_Hujra_G05 ,
+                     :Khargerd_Hujra_U04 , :Khargerd_Hujra_U05 .
+
+:Khargerd_Instructional_Zone a bot:Zone ;
+    rdfs:label "Instructional zone"@en ;
+    bot:containsZone :Khargerd_Lecture_Hall , :Khargerd_Sahn , :Khargerd_SE_Iwan .
+
+:Khargerd_Prayer_Zone a bot:Zone ;
+    rdfs:label "Prayer zone"@en ;
+    rdfs:comment "Covers the mosque hall and overlaps the NW iwan when that iwan is used for prayer."@en ;
+    bot:containsZone :Khargerd_Mosque_Hall ;
+    bot:intersectsZone :Khargerd_NW_Iwan .
+
+#################################################################
+# Principal spaces and adjacentZone
+#################################################################
+
+:Khargerd_Sahn a persarch:Sahn , bot:Space ;
+    rdfs:label "Central courtyard (sahn)"@en ;
+    bot:adjacentZone :Khargerd_NE_Iwan , :Khargerd_SW_Iwan ,
+                     :Khargerd_NW_Iwan , :Khargerd_SE_Iwan ,
+                     :Khargerd_Hujra_G04 , :Khargerd_Hujra_G05 ;
+    bot:containsElement :Khargerd_Howz ;
+    bot:adjacentElement :Khargerd_SW_Iwan_Facade .
+
+:Khargerd_Hashti a persarch:Hashti , bot:Space ;
+    rdfs:label "Entrance hashti (domed vestibule)"@en ;
+    bot:adjacentZone :Khargerd_NE_Iwan ;
+    bot:adjacentElement :Khargerd_Pishtaq .
+
+:Khargerd_NE_Iwan a persarch:Iwan , bot:Space ;
+    rdfs:label "North-east / entrance iwan"@en ;
+    bot:adjacentZone :Khargerd_Sahn , :Khargerd_Hashti .
+
+:Khargerd_SW_Iwan a persarch:Iwan , bot:Space ;
+    rdfs:label "South-west iwan"@en ;
+    bot:adjacentZone :Khargerd_Sahn ;
+    bot:containsElement :Khargerd_Badgir ;
+    bot:adjacentElement :Khargerd_SW_Iwan_Facade .
+
+:Khargerd_NW_Iwan a persarch:Iwan , bot:Space ;
+    rdfs:label "North-west courtyard iwan"@en ;
+    bot:adjacentZone :Khargerd_Sahn , :Khargerd_Mosque_Hall .
+
+:Khargerd_SE_Iwan a persarch:Iwan , bot:Space ;
+    rdfs:label "South-east courtyard iwan"@en ;
+    bot:adjacentZone :Khargerd_Sahn , :Khargerd_Lecture_Hall .
+
+:Khargerd_Mosque_Hall a persarch:DomeChamber , bot:Space ;
+    rdfs:label "North-west mosque hall"@en ;
+    bot:adjacentZone :Khargerd_NW_Iwan ;
+    bot:adjacentElement :Khargerd_Mihrab , :Khargerd_Qibla_Wall ;
+    bot:containsElement :Khargerd_Mosque_Minbar .
+
+:Khargerd_Lecture_Hall a persarch:LectureHall , bot:Space ;
+    rdfs:label "South-east lecture hall"@en ;
+    bot:adjacentZone :Khargerd_SE_Iwan ;
+    bot:containsElement :Khargerd_Lecture_Minbar .
+
+:Khargerd_Hujra_G04 a persarch:Hujra , bot:Space ;
+    rdfs:label "Student cell G-04"@en ;
+    bot:adjacentZone :Khargerd_Sahn , :Khargerd_Hujra_G05 ;
+    bot:adjacentElement :Khargerd_Hujra_G04_Door , :Khargerd_Hujra_G04_Window .
+
+:Khargerd_Hujra_G05 a persarch:Hujra , bot:Space ;
+    rdfs:label "Student cell G-05"@en ;
+    bot:adjacentZone :Khargerd_Sahn , :Khargerd_Hujra_G04 .
+
+:Khargerd_Hujra_U04 a persarch:Hujra , bot:Space ;
+    rdfs:label "Student cell U-04"@en .
+
+:Khargerd_Hujra_U05 a persarch:Hujra , bot:Space ;
+    rdfs:label "Student cell U-05"@en .
+
+#################################################################
+# intersectsZone — stairwell and badgir shaft cut both storeys
+#################################################################
+
+:Khargerd_Stair_SW a bot:Zone ;
+    rdfs:label "South-west corner stairwell"@en ;
+    rdfs:comment "BOT canonical pattern: a stairwell intersects different storeys."@en ;
+    bot:intersectsZone :Khargerd_Ground_Storey , :Khargerd_Upper_Storey .
+
+:Khargerd_Badgir_Shaft a bot:Zone ;
+    rdfs:label "Badgir shaft volume"@en ;
+    bot:intersectsZone :Khargerd_Ground_Storey , :Khargerd_Upper_Storey , :Khargerd_SW_Iwan .
+
+#################################################################
+# Elements: containsElement, adjacentElement, hasSubElement
+#################################################################
+
+:Khargerd_Howz a bot:Element ;
+    rdfs:label "Courtyard howz (pool)"@en .
+
+:Khargerd_Mosque_Minbar a bot:Element ;
+    rdfs:label "Minbar of the mosque hall"@en .
+
+:Khargerd_Lecture_Minbar a bot:Element ;
+    rdfs:label "Teaching minbar / seat of the lecture hall"@en .
+
+:Khargerd_Qibla_Wall a bot:Element ;
+    rdfs:label "Qibla wall of the mosque hall"@en ;
+    bot:hasSubElement :Khargerd_Mihrab .
+
+:Khargerd_Mihrab a persarch:Mihrab , bot:Element ;
+    rdfs:label "Mihrab of the Ghiyathiyya mosque hall"@en ;
+    bot:hasSubElement :Khargerd_Mihrab_Niche ,
+                      :Khargerd_Mihrab_Inscription ,
+                      :Khargerd_Mihrab_Spandrel_Tiles .
+
+:Khargerd_Mihrab_Niche a bot:Element ;
+    rdfs:label "Mihrab niche"@en .
+
+:Khargerd_Mihrab_Inscription a persarch:Inscription , bot:Element ;
+    rdfs:label "Inscription band of the mihrab"@en .
+
+:Khargerd_Mihrab_Spandrel_Tiles a persarch:TilePanel , bot:Element ;
+    rdfs:label "Tile spandrels of the mihrab"@en .
+
+:Khargerd_Pishtaq a bot:Element ;
+    rdfs:label "North-east entrance pishtaq"@en ;
+    rdfs:comment "Façade element. The hashti is the Space behind it; bot:Space and bot:Element are disjoint."@en ;
+    bot:hasSubElement :Khargerd_Pishtaq_Muqarnas ,
+                      :Khargerd_Pishtaq_Inscription ,
+                      :Khargerd_Bastion_N ,
+                      :Khargerd_Bastion_E .
+
+:Khargerd_Pishtaq_Muqarnas a bot:Element ;
+    rdfs:label "Muqarnas of the entrance pishtaq"@en .
+
+:Khargerd_Pishtaq_Inscription a persarch:Inscription , bot:Element ;
+    rdfs:label "Foundation inscription of the pishtaq"@en .
+
+:Khargerd_Bastion_N a bot:Element ;
+    rdfs:label "Northern cylindrical bastion of the pishtaq"@en .
+
+:Khargerd_Bastion_E a bot:Element ;
+    rdfs:label "Eastern cylindrical bastion of the pishtaq"@en .
+
+:Khargerd_SW_Iwan_Facade a bot:Element ;
+    rdfs:label "Courtyard façade of the south-west iwan"@en ;
+    bot:hasSubElement :Khargerd_SW_Iwan_Tile_Panel .
+
+:Khargerd_SW_Iwan_Tile_Panel a persarch:TilePanel , bot:Element ;
+    rdfs:label "Tile panel on the south-west iwan façade"@en .
+
+:Khargerd_Badgir a persarch:Badgir , bot:Element ;
+    rdfs:label "Windcatcher of the south-west iwan"@en ;
+    rdfs:comment "Fabric of the tower. The air volume is :Khargerd_Badgir_Shaft (a Zone). The tower intersects both storeys as an Element."@en ;
+    bot:hasSubElement :Khargerd_Badgir_Tower ,
+                      :Khargerd_Badgir_Vents .
+
+:Khargerd_Badgir_Tower a bot:Element ;
+    rdfs:label "Masonry tower of the badgir"@en .
+
+:Khargerd_Badgir_Vents a bot:Element ;
+    rdfs:label "Intake vents of the badgir"@en .
+
+:Khargerd_Ground_Storey bot:intersectingElement :Khargerd_Badgir .
+:Khargerd_Upper_Storey  bot:intersectingElement :Khargerd_Badgir .
+
+:Khargerd_Hujra_G04_Door a bot:Element ;
+    rdfs:label "Door of student cell G-04"@en .
+
+:Khargerd_Hujra_G04_Window a bot:Element ;
+    rdfs:label "Window of student cell G-04"@en .
