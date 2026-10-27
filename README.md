@@ -34,8 +34,8 @@ The work follows a deliberate iterative strategy: start from BOT’s core classe
 | **Masjid-i Jāmiʿ (Friday / Great Mosque)** | Large multi-period `bot:Building` | Prototype four-iwan plan. Continuous construction from 8th–19th centuries. Eric Schroeder 1931 numbered plan | Hierarchical spaces, multi-phase complexity, numbered spatial inventory |
 | **Sheikh Lotfollah Mosque** | Compact Safavid `bot:Building` | 1602/03–1618/19. Architect: Muhammad Reza Isfahani. Single rotated dome chamber, no courtyard, no minarets | Precise spatial sequence, qibla orientation, rich surface decoration |
 | **Shah Mosque (Imam Mosque)** & **Ali Qapu Palace** | Additional buildings on the same Site | Public congregational mosque vs. royal pavilion | Typological contrast within one urban setting |
-| **Ghiyathiyya Madrasa (Ghiasieh School), Khargerd** | Timurid `persarch:Madrasa` | 1438–1444. Architects Qavam al-Din and Ghiyath al-Din Shirazi. Four-iwan, two-storey plan; 32 hujras; dated badgir | `bot:Zone` grouping, `containsZone` / `adjacentZone` / `intersectsZone`, element mereology |
-| **Ribat-i Sharaf** | Seljuk `persarch:Caravanserai` | 1114–15, restored 1154–55. Two four-iwan courts (public / royal) on the Nishapur–Sarakhs road | Dual-court containment, functional zones, a connecting corridor that `intersectsZone` both suites |
+| **Ghiyathiyya Madrasa (Ghiasieh School), Khargerd** | Timurid `persarch:Madrasa` | 1438–1444. Architects Qavam al-Din and Ghiyath al-Din Shirazi. Four-iwan, two-storey plan; 32 hujras; dated badgir | `bot:Zone` topology plus CRM agents, time-span, materials, script styles, AAT/Wikidata |
+| **Ribat-i Sharaf** | Seljuk `persarch:Caravanserai` | 1114–15, restored 1154–55. Two four-iwan courts (public / royal) on the Nishapur–Sarakhs road | Dual-court zones; foundation vs restoration campaigns; brick/stucco; Kufic inscriptions |
 
 ---
 
@@ -157,6 +157,79 @@ classDiagram
     bot_Element --> persarch_PresentationResource : hasPresentation
 ```
 
+CRM overlay on the same individuals (agents, time, materials, types). External vocabularies are linked with `skos:exactMatch`, so GraphDB `owl:sameAs` reasoning does not merge AAT or Wikidata nodes into the local graph.
+
+```mermaid
+classDiagram
+    direction TB
+
+    class bot_Building {
+        <<BOT topology>>
+    }
+    class crmba_B1 {
+        <<CRMba identity>>
+        B1 Built Work
+    }
+    class crm_E12 {
+        <<CIDOC CRM>>
+        E12 Production
+    }
+    class crm_E11 {
+        <<CIDOC CRM>>
+        E11 Modification
+    }
+    class crm_E21 {
+        E21 Person
+        patron / architect / calligrapher
+    }
+    class crm_E74 {
+        E74 Group
+        workshop
+    }
+    class crm_E52 {
+        E52 Time-Span
+    }
+    class crm_E55 {
+        E55 Type
+        building type / style / script
+    }
+    class crm_E57 {
+        E57 Material
+    }
+    class crm_E34 {
+        E34 Inscription
+    }
+    class AAT {
+        <<Getty AAT>>
+    }
+    class Wikidata {
+        <<Wikidata>>
+    }
+
+    bot_Building <|-- persarch_Madrasa
+    crmba_B1 <|-- persarch_Madrasa
+    bot_Building <|-- persarch_Caravanserai
+    crmba_B1 <|-- persarch_Caravanserai
+
+    crm_E12 --> persarch_Madrasa : P108 produced
+    crm_E12 --> crm_E21 : commissionedBy
+    crm_E12 --> crm_E21 : designedBy
+    crm_E12 --> crm_E21 : calligraphedBy
+    crm_E12 --> crm_E74 : executedBy
+    crm_E12 --> crm_E52 : P4 has time-span
+    crm_E12 --> crm_E57 : P126 employed
+    crm_E11 --> persarch_Caravanserai : P31 modified
+
+    persarch_Madrasa --> crm_E55 : P2 has type
+    persarch_Madrasa --> crm_E57 : P45 consists of
+    persarch_Caravanserai --> crm_E55 : P2 has type
+    crm_E34 --> crm_E55 : hasScriptStyle
+    crm_E55 --> AAT : skos:exactMatch
+    crm_E55 --> Wikidata : skos:exactMatch
+    crm_E57 --> AAT : skos:exactMatch
+    crm_E21 --> Wikidata : skos:exactMatch
+```
+
 Separate visual Layer
 
 ```mermaid
@@ -189,6 +262,7 @@ graph TD
 | Site = Naqsh-e Jahan Square | Demonstrates multi-building urban topology while remaining fully BOT-compliant. |
 | Functional extents as bare `bot:Zone` | Residential, instructional, public-service, and royal-suite groupings are zones that are not a Site, Building, Storey, or Space. They use `bot:containsZone` directly. |
 | Vertical shafts as intersecting zones | Stairwells and the Khargerd badgir are `bot:Zone` instances that `bot:intersectsZone` more than one storey — BOT’s own example of that property. |
+| CRM events for agents and time | Patron, architect, and calligrapher are roles on an `E12`/`E11`, not properties of the building. Materials and styles are `E57`/`E55` reconciled to AAT and Wikidata with `skos:exactMatch`. |
 
 ### 3.3 Using `bot:Zone` beyond Site / Building / Storey / Space
 
@@ -211,6 +285,23 @@ The same zone may then relate to fabric with three element properties:
 `bot:intersectingElement` is available when fabric, rather than a zone, passes through a volume (a windcatcher tower through two storeys). Do not assert both `adjacentZone` and `intersectsZone` on the same pair of zones.
 
 The Ghiyathiyya madrasa and Ribat-i Sharaf samples below instantiate these properties on purpose. They keep the existing `persarch:` space and element subclasses, and they add plain `bot:Zone` individuals wherever a functional or vertical extent is not a room.
+
+### 3.4 Agents, time, materials, styles, and controlled vocabularies
+
+BOT answers “what sits next to what.” CIDOC CRM answers “who made it, when, of what, in which style.” The two layers share individuals; they do not share properties.
+
+| Need | CRM pattern | `persarch:` shortcut | Vocabulary |
+|------|-------------|----------------------|------------|
+| Patron, architect, calligrapher | `E12`/`E11` → `P14 carried out by` → `E21 Person` or `E74 Group` | `commissionedBy`, `designedBy`, `calligraphedBy`, `executedBy` (sub-properties of `P14`) | Wikidata / ULAN for named people; AAT for occupation types |
+| Dating a campaign | `P4 has time-span` → `E52 Time-Span` with `P82` / `P82a` / `P82b` | — | Hijri and Gregorian as labels on the same `E52` |
+| Building type and dynastic style | `P2 has type` → `E55 Type` | — | AAT (`madrasas`, `caravanserais`, `Timurid`, `Seljuk`); Wikidata as hub |
+| Material of fabric | `P45 consists of` → `E57 Material`; production uses `P126 employed` | — | AAT brick, glazed mosaic tile, stucco |
+| Script of an inscription | `E34 Inscription` carried by fabric (`P128`); typed by script | `hasScriptStyle` (sub-property of `P2`) | AAT / Wikidata Thuluth, Kufic |
+| Motif on a tile panel | `P2 has type` on the `bot:Element` | `hasMotifType` | AAT arabesques, geometric ornament, muqarnas |
+
+Roles stay distinct. An architect is not collapsed into a patron: both `P14` the same event, through different sub-properties. Anonymous labour is an `E74 Group` (tile workshop, brick masons, calligraphers of a campaign), never omitted.
+
+Reconcile local `E55`/`E57` nodes to Getty AAT and Wikidata with **`skos:exactMatch`**, matching the Jāmeʿ GraphDB profile. Do not use `owl:sameAs` for those alignments.
 
 ---
 
@@ -868,6 +959,168 @@ SELECT ?part WHERE { :Khargerd_Mihrab bot:hasSubElement ?part }
 
 Because `bot:containsZone` is transitive, and `bot:hasStorey` / `bot:hasSpace` are sub-properties of it, the first query also returns storeys, hujras, the lecture hall, and the mosque hall once RDFS-Plus (or equivalent) reasoning is enabled — the same ruleset used in the GraphDB Jāmeʿ case study.
 
+### 7.5 CRM campaign: architects, time, materials, script
+
+Topology stays on BOT. Who built the madrasa, when, of what, and in which script is a CIDOC CRM campaign on the same individuals. Shared vocabulary: [`data/persarch-crm-vocab.ttl`](data/persarch-crm-vocab.ttl).
+
+An inscription on the building records that work **began under Qavam al-Din Shirazi** (d. 21 February 1438) and was **completed by Ghiyath al-Din Shirazi** in 1442–44, for the vizier **Ghiyath al-Din Pir Ahmad Khvafi** during the reign of Shah Rukh. No named calligrapher is asserted; the script workshop is an `E74 Group`.
+
+```mermaid
+flowchart LR
+    subgraph Agents["crm:E21 / E74"]
+        Patron["E21 Person<br/>Ghiyath al-Din Pir Ahmad Khvafi<br/>patron · vizier"]
+        Qavam["E21 Person<br/>Qavam al-Din Shirazi<br/>wd:Q5722389 · architect"]
+        Ghiyath["E21 Person<br/>Ghiyath al-Din Shirazi<br/>architect, completed the work"]
+        Callig["E74 Group<br/>Khargerd inscription workshop"]
+        Tile["E74 Group<br/>Timurid tile workshop"]
+    end
+
+    subgraph Event["crm:E12 Production"]
+        Evt["Construction of the Ghiyathiyya<br/>841–848 AH / 1438–1444 CE"]
+        TS["E52 Time-Span<br/>P82a 1438 · P82b 1444"]
+    end
+
+    subgraph Products["BOT + CRM products"]
+        Bldg["persarch:Madrasa / B1<br/>P2 Timurid · madrasa · four-iwan<br/>P45 brick, glazed mosaic tile"]
+        Mih["persarch:Mihrab"]
+        Ins["E34 Inscription<br/>hasScriptStyle Thuluth"]
+        Pan["persarch:TilePanel<br/>hasMotifType arabesque"]
+    end
+
+    subgraph Vocab["Controlled vocabularies"]
+        AAT["Getty AAT<br/>madrasas 300006563<br/>Timurid 300018863<br/>brick · mosaic tile · Thuluth"]
+        WD["Wikidata<br/>Q5854526 madrasa<br/>Q5722389 Qavam"]
+    end
+
+    Patron -->|persarch:commissionedBy| Evt
+    Qavam -->|persarch:designedBy| Evt
+    Ghiyath -->|persarch:designedBy| Evt
+    Callig -->|persarch:calligraphedBy| Evt
+    Tile -->|persarch:executedBy| Evt
+    Evt -->|crm:P4_has_time-span| TS
+    Evt -->|crm:P108_has_produced| Bldg
+    Evt -->|crm:P108_has_produced| Mih
+    Evt -->|crm:P126_employed| Mat["E57 glazed mosaic tile"]
+    Mih -->|crm:P128_carries| Ins
+    Bldg -->|crm:P2_has_type| AAT
+    Bldg -->|skos:exactMatch| WD
+```
+
+```turtle
+@prefix crm:      <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmba:    <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+@prefix bot:      <https://w3id.org/bot#> .
+@prefix persarch: <https://w3id.org/persian-architecture#> .
+@prefix wd:       <http://www.wikidata.org/entity/> .
+@prefix :         <https://w3id.org/persian-architecture/data/khargerd#> .
+
+:place_khargerd a crm:E53_Place ;
+    rdfs:label "Khargerd (Khargird), Khaf County"@en ;
+    skos:exactMatch wd:Q5854526 .
+
+:actor_pir_ahmad a crm:E21_Person ;
+    rdfs:label "Ghiyath al-Din Pir Ahmad Khvafi"@en ;
+    rdfs:label "غیاث‌الدین پیر احمد خوافی"@fa ;
+    crm:P2_has_type persarch:role_patron ;
+    crm:P3_has_note "Timurid vizier of Shah Rukh; patron of the madrasa in his home district."@en .
+
+:actor_qavam a crm:E21_Person ;
+    rdfs:label "Qavam al-Din ibn Zayn al-Din Shirazi"@en ;
+    rdfs:label "قوام‌الدین شیرازی"@fa ;
+    crm:P2_has_type persarch:role_architect ;
+    skos:exactMatch wd:Q5722389 ;
+    crm:P3_has_note "Began the madrasa; died 21 February 1438 before completion."@en .
+
+:actor_ghiyath_shirazi a crm:E21_Person ;
+    rdfs:label "Ghiyath al-Din Shirazi"@en ;
+    rdfs:label "غیاث‌الدین شیرازی"@fa ;
+    crm:P2_has_type persarch:role_architect ;
+    crm:P3_has_note "Completed the madrasa after Qavam al-Din's death; named in the building inscription."@en .
+
+:group_khargerd_calligraphers a crm:E74_Group ;
+    rdfs:label "Calligraphers of the Ghiyathiyya inscription campaign"@en ;
+    crm:P2_has_type persarch:role_calligrapher .
+
+:group_khargerd_tile_workshop a crm:E74_Group ;
+    rdfs:label "Timurid tile workshop of the Ghiyathiyya campaign"@en ;
+    crm:P2_has_type persarch:role_workshop .
+
+:ts_ghiyathiyya a crm:E52_Time-Span ;
+    rdfs:label "841–848 AH / 1438–1444 CE"@en ;
+    crm:P82a_begin_of_the_begin "1438"^^xsd:gYear ;
+    crm:P82b_end_of_the_end "1444"^^xsd:gYear .
+
+:Ghiyathiyya_Madrasa
+    a crmba:B1_Built_Work ;
+    crm:P2_has_type persarch:type_madrasa ,
+                    persarch:type_four_iwan_plan ,
+                    persarch:style_timurid ;
+    crm:P45_consists_of persarch:mat_brick , persarch:mat_glazed_tile ;
+    crm:P53_has_former_or_current_location :place_khargerd ;
+    skos:exactMatch wd:Q5854526 .
+
+:evt_ghiyathiyya_construction a crm:E12_Production ;
+    rdfs:label "Construction of the Ghiyathiyya madrasa"@en ;
+    crm:P4_has_time-span :ts_ghiyathiyya ;
+    crm:P7_took_place_at :place_khargerd ;
+    persarch:commissionedBy :actor_pir_ahmad ;
+    persarch:designedBy :actor_qavam , :actor_ghiyath_shirazi ;
+    persarch:calligraphedBy :group_khargerd_calligraphers ;
+    persarch:executedBy :group_khargerd_tile_workshop ;
+    crm:P108_has_produced :Ghiyathiyya_Madrasa , :Khargerd_Mihrab ,
+                          :Khargerd_Pishtaq_Inscription ;
+    crm:P31_has_modified :Ghiyathiyya_Madrasa ;
+    crm:P126_employed persarch:mat_brick , persarch:mat_glazed_tile .
+
+:Khargerd_Mihrab
+    crm:P2_has_type persarch:type_mihrab ;
+    crm:P45_consists_of persarch:mat_glazed_tile , persarch:mat_stucco ;
+    crm:P128_carries :Khargerd_Mihrab_Inscription .
+
+:Khargerd_Mihrab_Inscription a crm:E34_Inscription ;
+    persarch:hasScriptStyle persarch:script_thuluth ;
+    crm:P2_has_type persarch:type_inscription .
+
+:Khargerd_Pishtaq_Inscription a crm:E34_Inscription ;
+    persarch:hasScriptStyle persarch:script_thuluth ;
+    crm:P2_has_type persarch:type_inscription .
+
+:Khargerd_SW_Iwan_Tile_Panel
+    persarch:hasMotifType persarch:motif_arabesque ;
+    crm:P45_consists_of persarch:mat_glazed_tile .
+```
+
+```sparql
+PREFIX crm:      <http://www.cidoc-crm.org/cidoc-crm/>
+PREFIX rdfs:     <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos:     <http://www.w3.org/2004/02/skos/core#>
+PREFIX persarch: <https://w3id.org/persian-architecture#>
+PREFIX :         <https://w3id.org/persian-architecture/data/khargerd#>
+
+# Who designed the madrasa, in which role?
+SELECT ?person ?role ?label WHERE {
+  :evt_ghiyathiyya_construction persarch:designedBy ?person .
+  ?person crm:P2_has_type ?role .
+  OPTIONAL { ?person rdfs:label ?label }
+}
+
+# Materials and dynastic style of the building
+SELECT ?type ?mat WHERE {
+  :Ghiyathiyya_Madrasa crm:P2_has_type ?type ;
+                       crm:P45_consists_of ?mat .
+}
+
+# Inscriptions and their script styles (AAT-reconciled)
+SELECT ?ins ?script ?aat WHERE {
+  ?ins a crm:E34_Inscription ;
+       persarch:hasScriptStyle ?script .
+  OPTIONAL { ?script skos:exactMatch ?aat }
+}
+```
+
 ---
 
 ## 8. Case Study – Ribat-i Sharaf Caravanserai
@@ -1162,6 +1415,164 @@ SELECT ?z WHERE {
 SELECT ?part WHERE { :Ribat_Pishtaq bot:hasSubElement ?part }
 ```
 
+### 8.4 CRM campaigns: foundation, restoration, brick, Kufic
+
+Two events keep the Seljuk foundation distinct from the 1154–55 restoration. The connecting corridor is still a BOT zone; the stucco Kufic band on the pishtaq is a CRM `E34` produced in the restoration.
+
+```mermaid
+flowchart TB
+    subgraph Foundation["508 AH / 1114–15  ·  crm:E12 Production"]
+        F["Foundation of Ribat-i Sharaf"]
+        PatronF["E21 Sharaf al-Din Abu Tahir<br/>governor / later vizier of Sanjar"]
+        Arch["E21 Katib Ali al-Mansur<br/>Asad b. Muhammad al-Sarahsi<br/>architect"]
+        Masons["E74 Seljuk brick masons"]
+        TSf["E52 1114–1115"]
+    end
+
+    subgraph Restoration["549 AH / 1154–55  ·  crm:E11 Modification"]
+        R["Restoration after the Ghuzz invasion"]
+        PatronR["E21 Turkan Khatun<br/>wife of Sultan Sanjar"]
+        StuccoW["E74 Stucco / inscription workshop"]
+        TSr["E52 1154–1155"]
+    end
+
+    subgraph Work["Continuing built work"]
+        Bldg["persarch:Caravanserai / B1<br/>P2 caravanserai · four-iwan · Seljuk<br/>P45 baked brick<br/>wd:Q2577338"]
+        Pishtaq["bot:Element pishtaq"]
+        Ins["E34 Kufic stucco band<br/>hasScriptStyle Kufic"]
+        Mih["persarch:Mihrab · outer mosque"]
+    end
+
+    PatronF -->|commissionedBy| F
+    Arch -->|designedBy| F
+    Masons -->|executedBy| F
+    F -->|P4| TSf
+    F -->|P108 produced| Bldg
+    F -->|P126 employed| Brick["E57 baked brick"]
+
+    PatronR -->|commissionedBy| R
+    StuccoW -->|calligraphedBy| R
+    R -->|P4| TSr
+    R -->|P31 modified| Bldg
+    R -->|P108 produced| Ins
+    R -->|P126 employed| Stucco["E57 stucco"]
+    Pishtaq -->|P128 carries| Ins
+```
+
+```turtle
+@prefix crm:      <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmba:    <http://www.cidoc-crm.org/extensions/crmba/> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+@prefix persarch: <https://w3id.org/persian-architecture#> .
+@prefix wd:       <http://www.wikidata.org/entity/> .
+@prefix :         <https://w3id.org/persian-architecture/data/ribat-sharaf#> .
+
+:place_ribat a crm:E53_Place ;
+    rdfs:label "Site of Ribat-i Sharaf, Sarakhs–Nishapur road"@en .
+
+:actor_sharaf_al_din a crm:E21_Person ;
+    rdfs:label "Sharaf al-Din Abu Tahir"@en ;
+    rdfs:label "شرف‌الدین ابو طاهر"@fa ;
+    crm:P2_has_type persarch:role_patron ;
+    crm:P3_has_note "Governor of Khurasan, later vizier of Sultan Sanjar; founder of the ribat, 508 AH / 1114–15."@en .
+
+:actor_katib_ali a crm:E21_Person ;
+    rdfs:label "Katib Ali al-Mansur Asad b. Muhammad al-Sarahsi"@en ;
+    rdfs:label "کاتب علی المنصور اسعد بن محمد سرخسی"@fa ;
+    crm:P2_has_type persarch:role_architect ;
+    crm:P3_has_note "Architect named in the foundation record of Ribat-i Sharaf."@en .
+
+:actor_turkan_khatun a crm:E21_Person ;
+    rdfs:label "Turkan Khatun (Terken bint al-Kaghan)"@en ;
+    rdfs:label "ترکان خاتون"@fa ;
+    crm:P2_has_type persarch:role_patron ;
+    crm:P3_has_note "Wife of Sultan Sanjar; restored the ribat in 549 AH / 1154–55 after Ghuzz damage."@en .
+
+:group_seljuk_masons a crm:E74_Group ;
+    rdfs:label "Seljuk brick masons of the Ribat-i Sharaf foundation"@en ;
+    crm:P2_has_type persarch:role_workshop .
+
+:group_stucco_workshop a crm:E74_Group ;
+    rdfs:label "Stucco and inscription workshop of the 1154–55 restoration"@en ;
+    crm:P2_has_type persarch:role_calligrapher , persarch:role_workshop .
+
+:ts_foundation a crm:E52_Time-Span ;
+    rdfs:label "508 AH / 1114–1115 CE"@en ;
+    crm:P82a_begin_of_the_begin "1114"^^xsd:gYear ;
+    crm:P82b_end_of_the_end "1115"^^xsd:gYear .
+
+:ts_restoration a crm:E52_Time-Span ;
+    rdfs:label "549 AH / 1154–1155 CE"@en ;
+    crm:P82a_begin_of_the_begin "1154"^^xsd:gYear ;
+    crm:P82b_end_of_the_end "1155"^^xsd:gYear .
+
+:Ribat_i_Sharaf
+    a crmba:B1_Built_Work ;
+    crm:P2_has_type persarch:type_caravanserai ,
+                    persarch:type_four_iwan_plan ,
+                    persarch:style_seljuk ;
+    crm:P45_consists_of persarch:mat_brick ;
+    crm:P53_has_former_or_current_location :place_ribat ;
+    skos:exactMatch wd:Q2577338 .
+
+:evt_ribat_foundation a crm:E12_Production ;
+    rdfs:label "Foundation of Ribat-i Sharaf"@en ;
+    crm:P4_has_time-span :ts_foundation ;
+    crm:P7_took_place_at :place_ribat ;
+    persarch:commissionedBy :actor_sharaf_al_din ;
+    persarch:designedBy :actor_katib_ali ;
+    persarch:executedBy :group_seljuk_masons ;
+    crm:P108_has_produced :Ribat_i_Sharaf , :Ribat_Pishtaq , :Ribat_Outer_Mihrab ;
+    crm:P126_employed persarch:mat_brick .
+
+:evt_ribat_restoration a crm:E11_Modification ;
+    rdfs:label "Restoration of Ribat-i Sharaf after the Ghuzz invasion"@en ;
+    crm:P4_has_time-span :ts_restoration ;
+    crm:P7_took_place_at :place_ribat ;
+    persarch:commissionedBy :actor_turkan_khatun ;
+    persarch:calligraphedBy :group_stucco_workshop ;
+    persarch:executedBy :group_stucco_workshop ;
+    crm:P31_has_modified :Ribat_i_Sharaf ;
+    crm:P108_has_produced :Ribat_Pishtaq_Inscription ;
+    crm:P126_employed persarch:mat_stucco .
+
+:Ribat_Pishtaq
+    crm:P45_consists_of persarch:mat_brick , persarch:mat_stucco ;
+    crm:P128_carries :Ribat_Pishtaq_Inscription .
+
+:Ribat_Pishtaq_Inscription a crm:E34_Inscription ;
+    persarch:hasScriptStyle persarch:script_kufic ;
+    crm:P2_has_type persarch:type_inscription .
+
+:Ribat_Outer_Mihrab
+    crm:P2_has_type persarch:type_mihrab ;
+    crm:P45_consists_of persarch:mat_brick , persarch:mat_stucco .
+```
+
+```sparql
+PREFIX crm:      <http://www.cidoc-crm.org/cidoc-crm/>
+PREFIX persarch: <https://w3id.org/persian-architecture#>
+PREFIX :         <https://w3id.org/persian-architecture/data/ribat-sharaf#>
+
+# Foundation vs restoration: who, when, what material
+SELECT ?evt ?when ?who ?role ?material WHERE {
+  ?evt crm:P4_has_time-span ?when .
+  OPTIONAL { ?when rdfs:label ?whenLabel }
+  ?evt persarch:commissionedBy|persarch:designedBy|persarch:calligraphedBy ?who .
+  ?who crm:P2_has_type ?role .
+  OPTIONAL { ?evt crm:P126_employed ?material }
+  FILTER(STRSTARTS(STR(?evt), STR(:evt_ribat)))
+}
+
+# Kufic inscriptions produced in the restoration
+SELECT ?ins WHERE {
+  :evt_ribat_restoration crm:P108_has_produced ?ins .
+  ?ins persarch:hasScriptStyle persarch:script_kufic .
+}
+```
+
 ---
 
 ## 9. Decorative Layer – Patterns, Inscriptions & AAT
@@ -1173,10 +1584,14 @@ Surface decorations are modelled as subclasses of `bot:Element` so they can be a
 
 **Key properties**  
 - `persarch:decorates` / `persarch:locatedOn`  
-- `persarch:hasScriptStyle` (Thuluth, Kufic, …)  
+- `persarch:hasScriptStyle` (Thuluth, Kufic, …) — sub-property of `crm:P2_has_type`, aligned to AAT/Wikidata  
 - `persarch:hasText` + `persarch:referencesQuranicVerse`  
-- `persarch:hasMotifType` → Getty AAT  
+- `persarch:hasMotifType` → Getty AAT (`skos:exactMatch`)  
+- `crm:P45_consists_of` → `E57 Material` (brick, glazed mosaic tile, stucco)  
+- `crm:P128_carries` — fabric carries an `E34 Inscription`  
 - `persarch:hasSurfaceGeometry` → GeoSPARQL / WKT  
+
+The Khargerd mihrab band and the Ribat-i Sharaf pishtaq band in §§7.5 and 8.4 are the worked examples: each inscription is both a `bot:Element` (topology) and an `E34` (text), typed by script, produced by a dated campaign.  
 
 ---
 
@@ -1194,8 +1609,9 @@ persian-architecture-bot-case-studies/
 │   ├── sheikh-lotfollah.ttl
 │   ├── shah-mosque.ttl
 │   ├── ali-qapu.ttl
-│   ├── ghiyathiyya-khargerd.ttl   # bot:Zone, intersectsZone, element mereology
-│   └── ribat-i-sharaf.ttl         # dual-court caravanserai, functional zones
+│   ├── persarch-crm-vocab.ttl     # roles, E55/E57 types, AAT/Wikidata
+│   ├── ghiyathiyya-khargerd.ttl   # zones + CRM campaign (architects, materials)
+│   └── ribat-i-sharaf.ttl         # dual-court zones + foundation/restoration
 ├── queries/
 │   └── competency-questions.rq
 ├── docs/
@@ -1788,7 +2204,11 @@ CRMarchaeo is the only one of the three that is allowed to destroy evidence in i
 7. Which `bot:Zone` individuals are contained in the Ghiyathiyya madrasa, including functional zones that are not a `bot:Space`?  
 8. Which zones are `bot:adjacentZone` to the Khargerd sahn, and which zones `bot:intersectsZone` both of its storeys?  
 9. Which sub-elements does the Khargerd mosque mihrab (or the Ribat-i Sharaf pishtaq) have via `bot:hasSubElement`?  
-10. Which spaces belong to the public-service zone of Ribat-i Sharaf, and which single space `bot:intersectsZone` both the public-service and royal-suite zones?
+10. Which spaces belong to the public-service zone of Ribat-i Sharaf, and which single space `bot:intersectsZone` both the public-service and royal-suite zones?  
+11. Who commissioned and who designed the Ghiyathiyya madrasa, and what is the time-span of that production?  
+12. Which materials (`E57`) and dynastic styles (`E55`, AAT-aligned) does each building consist of / have type?  
+13. Which inscriptions are carried by the Khargerd mihrab or the Ribat pishtaq, and in which script style?  
+14. Which restoration event modified Ribat-i Sharaf, who commissioned it, and which Kufic inscription did it produce?
 
 ---
 
@@ -1799,8 +2219,12 @@ CRMarchaeo is the only one of the three that is allowed to destroy evidence in i
 - UNESCO World Heritage documentation for Naqsh-e Jahan Square (Reference 115).  
 - ArchNet, Madrasa-i Ghiyathiyya (Khargird): https://www.archnet.org/sites/4726  
 - ArchNet, Ribat-i Sharaf: https://www.archnet.org/sites/3873  
+- Bernard O’Kane, “The Madrasa al-Ghiyasiyya at Khargird,” *Iran* 14 (1976), 79–92.  
+- Donald N. Wilber, “Qavam al-Din ibn Zayn al-Din Shirazi: A Fifteenth-Century Timurid Architect,” *Architectural History* 30 (1987), 31–44.  
 - BOT specification: https://w3c-lbd-cg.github.io/bot/ (especially `bot:Zone`, `containsZone`, `adjacentZone`, `intersectsZone`, and the element properties)  
-- Getty Art & Architecture Thesaurus (AAT).
+- CIDOC CRM: https://cidoc-crm.org/  
+- Getty Art & Architecture Thesaurus (AAT): madrasas `aat:300006563`, caravanserais `aat:300007148`, Timurid `aat:300021796`, Seljuk `aat:300021736` / Great Seljuk `aat:300021741`.  
+- Wikidata: Ghiyasiyeh Madrasa `wd:Q5854526`, Qavam al-Din Shirazi `wd:Q5722389`, Sharaf Caravanserai `wd:Q2577338`.
 
 ---
 
@@ -1811,7 +2235,7 @@ CRMarchaeo is the only one of the three that is allowed to destroy evidence in i
 3. Complete the remaining hujras at Khargerd (32 cells, 8 classrooms) and the remaining bays of both Ribat-i Sharaf courts.  
 4. Add real geometric data (vector plan + surveyed WKT).  
 5. Link historic photographs, plans, and IIIF manifests.  
-6. Introduce decorative elements, inscriptions, and AAT alignments.  
+6. Expand decorative elements, named calligraphers where the inscriptions give them, and further AAT/ULAN alignments.  
 7. Create SPARQL query library and NotebookLM-friendly documentation.
 
 After this foundational version is stable we can discuss concrete strategies for enriching the model with high-resolution plans, images, slides, and measured drawings.
