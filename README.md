@@ -21,7 +21,7 @@ It demonstrates how a minimal, standards-compliant topological core can be syste
 - Digital documentation of historic mosques, madrasas, caravanserais, and urban ensembles
 - Knowledge-graph construction for cultural heritage
 - SPARQL querying of spaces, elements, inscriptions, and motifs
-- Integration with IIIF, GeoSPARQL (WKT), Getty AAT, and CIDOC-CRM / CRMtex
+- Integration with IIIF, GeoSPARQL (WKT), Getty AAT, CIDOC-CRM / CRMtex, and (when a model exists) Revit / IFC as a BOT feeder
 - Future AI / GraphRAG applications over architectural heritage data
 
 The work follows a deliberate iterative strategy: start from BOT’s core classes and properties, then expand according to clear priorities and real case studies.
@@ -67,6 +67,8 @@ This repository implements that extension under the namespace `persarch:` (Persi
 
 ## 3. Ontology Extension Overview
 
+The diagrams below are GitHub-safe Mermaid (no HTML stereotypes, no self-closing `<br/>`). GitHub draws them in a sandbox on `viewscreen.githubusercontent.com`. If that host is blocked, the source stays as a code block; that is a network filter, not a syntax error.
+
 ### 3.1 High-Level Class Hierarchy
 
 ```mermaid
@@ -74,19 +76,19 @@ classDiagram
     direction TB
 
     class bot_Zone {
-        <<BOT>>
+        (BOT)
     }
     class bot_Site {
-        <<BOT>>
+        (BOT)
     }
     class bot_Building {
-        <<BOT>>
+        (BOT)
     }
     class bot_Space {
-        <<BOT>>
+        (BOT)
     }
     class bot_Element {
-        <<BOT>>
+        (BOT)
     }
 
     bot_Zone <|-- bot_Site
@@ -143,7 +145,7 @@ classDiagram
 
     %% New media / presentation layer
     class persarch_PresentationResource {
-        <<Media>>
+        (Media)
     }
     class persarch_Photograph
     class persarch_ColorSlide
@@ -164,18 +166,18 @@ classDiagram
     direction TB
 
     class bot_Building {
-        <<BOT topology>>
+        (BOT topology)
     }
     class crmba_B1 {
-        <<CRMba identity>>
+        (CRMba identity)
         B1 Built Work
     }
     class crm_E12 {
-        <<CIDOC CRM>>
+        (CIDOC CRM)
         E12 Production
     }
     class crm_E11 {
-        <<CIDOC CRM>>
+        (CIDOC CRM)
         E11 Modification
     }
     class crm_E21 {
@@ -200,10 +202,10 @@ classDiagram
         E34 Inscription
     }
     class AAT {
-        <<Getty AAT>>
+        (Getty AAT)
     }
     class Wikidata {
-        <<Wikidata>>
+        (Wikidata)
     }
 
     bot_Building <|-- persarch_Madrasa
@@ -224,31 +226,31 @@ classDiagram
     persarch_Madrasa --> crm_E57 : P45 consists of
     persarch_Caravanserai --> crm_E55 : P2 has type
     crm_E34 --> crm_E55 : hasScriptStyle
-    crm_E55 --> AAT : skos:exactMatch
-    crm_E55 --> Wikidata : skos:exactMatch
-    crm_E57 --> AAT : skos:exactMatch
-    crm_E21 --> Wikidata : skos:exactMatch
+    crm_E55 --> AAT : "skos exactMatch"
+    crm_E55 --> Wikidata : "skos exactMatch"
+    crm_E57 --> AAT : "skos exactMatch"
+    crm_E21 --> Wikidata : "skos exactMatch"
 ```
 
 Separate visual Layer
 
 ```mermaid
 graph TD
-    Space["bot:Space / persarch:Iwan<br/>e.g. Schroeder_042"]
+    Space["bot:Space / persarch:Iwan<br>e.g. Schroeder_042"]
     Building["bot:Building"]
-    Element["bot:Element<br/>e.g. Tile Panel / Inscription"]
+    Element["bot:Element<br>e.g. Tile Panel / Inscription"]
 
-    Photo["persarch:Photograph<br/>+ AAT classification"]
-    Slide["persarch:ColorSlide<br/>+ AAT classification"]
-    Plan["Plan / Drawing<br/>(IIIF Manifest)"]
+    Photo["persarch:Photograph<br>+ AAT classification"]
+    Slide["persarch:ColorSlide<br>+ AAT classification"]
+    Plan["Plan / Drawing<br>(IIIF Manifest)"]
 
     Space -->|persarch:hasPresentation| Photo
     Space -->|persarch:hasPresentation| Plan
     Building -->|persarch:hasPresentation| Slide
     Element -->|persarch:hasPresentation| Photo
 
-    Photo --> Agent["foaf:Person<br/>Myron Bement Smith"]
-    Slide --> Agent2["foaf:Person<br/>Harrison Forman"]
+    Photo --> Agent["foaf:Person<br>Myron Bement Smith"]
+    Slide --> Agent2["foaf:Person<br>Harrison Forman"]
 ```
 
 ### 3.2 Key Modelling Decisions
@@ -267,6 +269,43 @@ graph TD
 ### 3.3 Using `bot:Zone` beyond Site / Building / Storey / Space
 
 The mosque samples in this repository subclass `bot:Space` and hang those spaces from a building with `bot:hasSpace`. That is correct and sufficient for a room inventory. BOT also defines a parent class, **`bot:Zone`**, for any 3D extent that you need to group, subdivide, or relate topologically.
+
+#### Space versus Zone
+
+`bot:Space` is a *kind of* `bot:Zone`. Every space is a zone; many zones are not spaces. Use **Space** for a room-like volume on a plan. Use a **bare Zone** when the extent is a grouping, a shaft, or an axis that is not itself a room.
+
+```mermaid
+flowchart TB
+    Zone["bot:Zone - any 3D extent"]
+    Zone --> Site["bot:Site - urban ensemble"]
+    Zone --> Building["bot:Building - mosque, madrasa, ribat"]
+    Zone --> Storey["bot:Storey - one floor"]
+    Zone --> Space["bot:Space - room-like volume"]
+    Zone --> Bare["bare bot:Zone - grouping or shaft"]
+    Space --> Iwan["persarch:Iwan"]
+    Space --> Sahn["persarch:Sahn"]
+    Space --> Dome["persarch:DomeChamber"]
+    Space --> Hujra["persarch:Hujra"]
+    Bare --> Func["residential / prayer / royal-suite zone"]
+    Bare --> Shaft["stairwell / badgir shaft / processional axis"]
+```
+
+| | `bot:Zone` | `bot:Space` |
+|---|---|---|
+| BOT role | Parent class: any 3D extent you need to group, subdivide, or relate | Subclass of `bot:Zone`: a room-like volume in a building |
+| Instantiated as | `bot:Site`, `bot:Building`, `bot:Storey`, `bot:Space`, or a **bare** `bot:Zone` | `bot:Space` and `persarch:` subclasses (Iwan, Sahn, Hujra, Hashti, …) |
+| Typical properties | `containsZone` (transitive), `adjacentZone`, `intersectsZone` | The same Zone properties, plus `bot:hasSpace` from a Building or Storey |
+| Use when | The extent is not a site, building, storey, or room | You are inventorying rooms, bays, iwans, courtyards, cells |
+| Persian-architecture example | Khargerd residential / instructional / prayer zones; Ribat public-service and royal-suite zones; corner stairwell; badgir shaft; processional axis | Schroeder 042 (south iwan); Khargerd sahn; Lotfollah dome chamber; Ribat outer court |
+| Not this | A tile panel, mihrab, or minaret (`bot:Element`) | A functional grouping that spans several rooms (that grouping is a bare Zone) |
+
+A **bare** `bot:Zone` is an individual typed only as `bot:Zone`. It is the right class for:
+
+- functional suites that collect rooms (residential zone contains hujras)
+- vertical volumes that cut storeys (stairwell, windcatcher shaft)
+- circulation extents that overlap other zones (Ribat connecting corridor intersecting public and royal suites)
+
+`bot:hasBuilding`, `bot:hasStorey`, and `bot:hasSpace` are typed sub-properties of `bot:containsZone`. A query on `containsZone` with RDFS-Plus reasoning therefore returns storeys and spaces as well as the bare zones.
 
 An instance of `bot:Zone` may:
 
@@ -314,12 +353,12 @@ Laid out under Shah Abbas I (construction period approximately 1598–1629). UNE
 
 ```mermaid
 graph TD
-    Site["bot:Site<br/>Naqsh-e Jahan Square<br/>(Maydān-e Naqsh-e Jahān)"]
+    Site["bot:Site<br>Naqsh-e Jahan Square<br>(Maydān-e Naqsh-e Jahān)"]
     
-    Site -->|bot:hasBuilding| Shah["persarch:Mosque<br/>Shah / Imam Mosque<br/>(South side)"]
-    Site -->|bot:hasBuilding| Lotfollah["persarch:Mosque<br/>Sheikh Lotfollah Mosque<br/>(East side)"]
-    Site -->|bot:hasBuilding| AliQapu["persarch:Palace<br/>Ali Qapu Palace<br/>(West side)"]
-    Site -->|bot:hasBuilding| Qeysarieh["bot:Building<br/>Qeysarieh Portal / Bazaar<br/>(North side)"]
+    Site -->|bot:hasBuilding| Shah["persarch:Mosque<br>Shah / Imam Mosque<br>(South side)"]
+    Site -->|bot:hasBuilding| Lotfollah["persarch:Mosque<br>Sheikh Lotfollah Mosque<br>(East side)"]
+    Site -->|bot:hasBuilding| AliQapu["persarch:Palace<br>Ali Qapu Palace<br>(West side)"]
+    Site -->|bot:hasBuilding| Qeysarieh["bot:Building<br>Qeysarieh Portal / Bazaar<br>(North side)"]
 
     style Site fill:#e1f5fe,stroke:#01579b
     style Shah fill:#fff3e0,stroke:#e65100
@@ -389,6 +428,8 @@ Agents (photographers) become reusable nodes:
 @prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
 @prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+@prefix wd:       <http://www.wikidata.org/entity/> .
 
 persarch:hasPresentation a owl:ObjectProperty ;
     rdfs:label "has presentation"@en ;
@@ -405,8 +446,10 @@ persarch:hasSlidePresentation    rdfs:subPropertyOf persarch:hasPresentation .
     rdfs:label "Masjid-i Jāmiʿ of Isfahan"@en ;
     rdfs:label "مسجد جامع اصفهان"@fa ;
     dcterms:source <https://www.archnet.org/sites/1621?media_content_id=62965> ;
-    dcterms:source <https://www.si.edu/object/archives/components/sova-fsa-a-06-ref24401>
-    dcterms:description "The Friday Mosque of Isfahan (Great Mosque). Multi-period complex documented in Eric Schroeder’s 1931 numbered plan."@en .
+    dcterms:source <https://www.si.edu/object/archives/components/sova-fsa-a-06-ref24401> ;
+    dcterms:description "The Friday Mosque of Isfahan (Great Mosque). Multi-period complex documented in Eric Schroeder’s 1931 numbered plan."@en ;
+    skos:exactMatch wd:Q1256501 ;
+    skos:exactMatch <https://www.archnet.org/sites/1621> .
 
 # South / Qibla Iwan (illustrative Schroeder number 42)
 :Schroeder_042 a persarch:Iwan , bot:Space ;
@@ -481,18 +524,18 @@ persarch:hasSlidePresentation    rdfs:subPropertyOf persarch:hasPresentation .
 ```mermaid
 graph TB
     subgraph Courtyard
-        Sahn["persarch:Sahn<br/>Central Courtyard"]
+        Sahn["persarch:Sahn<br>Central Courtyard"]
     end
 
-    Sahn --- N["persarch:Iwan<br/>North Iwan"]
-    Sahn --- S["persarch:Iwan<br/>South / Qibla Iwan"]
-    Sahn --- E["persarch:Iwan<br/>East Iwan"]
-    Sahn --- W["persarch:Iwan<br/>West Iwan"]
+    Sahn --- N["persarch:Iwan<br>North Iwan"]
+    Sahn --- S["persarch:Iwan<br>South / Qibla Iwan"]
+    Sahn --- E["persarch:Iwan<br>East Iwan"]
+    Sahn --- W["persarch:Iwan<br>West Iwan"]
 
-    S --> DomeS["persarch:DomeChamber<br/>South / Qibla Dome"]
-    N --> DomeN["persarch:DomeChamber<br/>North Dome<br/>(Taj al-Mulk)"]
+    S --> DomeS["persarch:DomeChamber<br>South / Qibla Dome"]
+    N --> DomeN["persarch:DomeChamber<br>North Dome<br>(Taj al-Mulk)"]
 
-    Sahn --- Hypostyle["persarch:Shabestan<br/>Hypostyle Prayer Halls"]
+    Sahn --- Hypostyle["persarch:Shabestan<br>Hypostyle Prayer Halls"]
 
     style Sahn fill:#bbdefb,stroke:#1565c0
     style S fill:#ffcdd2,stroke:#c62828
@@ -504,29 +547,31 @@ graph TB
 
 ## 6. Case Study – Naqsh-e Jahan Square as a Large 3D Site
 
-Naqsh-e Jahan Square is modelled as a single `bot:Site` that contains three major buildings. Each building is given at least one `bot:Storey` (Ground Storey) that in turn contains its principal spaces. This demonstrates multi-building urban topology while remaining fully BOT-compliant and ready for later 3D enrichment.
+Naqsh-e Jahan Square is modelled as a single `bot:Site` that contains four principal buildings (Shah Mosque, Sheikh Lotfollah, Ali Qapu, Qeysarieh Portal). Each building is given at least one `bot:Storey` (Ground Storey) that in turn contains its principal spaces. This demonstrates multi-building urban topology while remaining fully BOT-compliant and ready for later 3D enrichment.
 
 ### 6.1 Site Hierarchy Overview
 
 ```mermaid
 graph TD
-    Site["bot:Site<br/>Naqsh-e Jahan Square"]
+    Site["bot:Site<br>Naqsh-e Jahan Square"]
 
-    Site -->|bot:hasBuilding| Shah["persarch:Mosque<br/>Shah / Imam Mosque"]
-    Site -->|bot:hasBuilding| Lotfollah["persarch:Mosque<br/>Sheikh Lotfollah Mosque"]
-    Site -->|bot:hasBuilding| AliQapu["persarch:Palace<br/>Ali Qapu Palace"]
+    Site -->|bot:hasBuilding| Shah["persarch:Mosque<br>Shah / Imam Mosque"]
+    Site -->|bot:hasBuilding| Lotfollah["persarch:Mosque<br>Sheikh Lotfollah Mosque"]
+    Site -->|bot:hasBuilding| AliQapu["persarch:Palace<br>Ali Qapu Palace"]
+    Site -->|bot:hasBuilding| Qeysarieh["bot:Building<br>Qeysarieh Portal / Bazaar"]
 
-    Shah -->|bot:hasStorey| ShahGS["bot:Storey<br/>Ground Storey"]
-    Lotfollah -->|bot:hasStorey| LotfGS["bot:Storey<br/>Ground Storey"]
-    AliQapu -->|bot:hasStorey| AQGS["bot:Storey<br/>Ground Storey"]
+    Shah -->|bot:hasStorey| ShahGS["bot:Storey<br>Ground Storey"]
+    Lotfollah -->|bot:hasStorey| LotfGS["bot:Storey<br>Ground Storey"]
+    AliQapu -->|bot:hasStorey| AQGS["bot:Storey<br>Ground Storey"]
 
     style Site fill:#e1f5fe,stroke:#01579b,stroke-width:2px
     style Shah fill:#fff3e0,stroke:#e65100
     style Lotfollah fill:#f3e5f5,stroke:#6a1b9a
     style AliQapu fill:#e8f5e9,stroke:#2e7d32
+    style Qeysarieh fill:#fce4ec,stroke:#ad1457
 ```
 
-### 6.2 Sample Instance Data – Site + Three Buildings with Ground Storeys
+### 6.2 Sample Instance Data – Site + Four Buildings with Ground Storeys
 
 ```turtle
 @prefix bot:      <https://w3id.org/bot#> .
@@ -534,6 +579,8 @@ graph TD
 @prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix dcterms:  <http://purl.org/dc/terms/> .
 @prefix geo:      <http://www.opengis.net/ont/geosparql#> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+@prefix wd:       <http://www.wikidata.org/entity/> .
 
 #################################################################
 # The Site
@@ -542,10 +589,13 @@ graph TD
 :Naqsh_e_Jahan_Square a bot:Site ;
     rdfs:label "Naqsh-e Jahan Square"@en ;
     rdfs:label "میدان نقش جهان"@fa ;
-    dcterms:description "UNESCO World Heritage Site (1979). Safavid urban ensemble laid out under Shah Abbas I (approx. 1598–1629). Dimensions ~160 × 560 m."@en ;
+    dcterms:description "UNESCO World Heritage Site (1979). Safavid urban ensemble laid out under Shah Abbas I (approx. 1598–1629). Dimensions ~160 x 560 m."@en ;
+    skos:exactMatch wd:Q4519 ;
+    skos:exactMatch <https://www.archnet.org/sites/2717> ;
     bot:hasBuilding :Shah_Mosque ,
                     :Sheikh_Lotfollah_Mosque ,
-                    :Ali_Qapu_Palace .
+                    :Ali_Qapu_Palace ,
+                    :Qeysarieh_Portal .
 
 #################################################################
 # 1. Shah Mosque (Imam Mosque) – South side
@@ -554,6 +604,8 @@ graph TD
 :Shah_Mosque a persarch:Mosque , bot:Building ;
     rdfs:label "Shah Mosque (Imam Mosque)"@en ;
     rdfs:label "مسجد شاه (مسجد امام)"@fa ;
+    skos:exactMatch wd:Q643098 ;
+    skos:exactMatch <https://www.archnet.org/sites/1622> ;
     bot:hasStorey :Shah_Ground_Storey .
 
 :Shah_Ground_Storey a bot:Storey ;
@@ -579,6 +631,8 @@ graph TD
 :Sheikh_Lotfollah_Mosque a persarch:Mosque , bot:Building ;
     rdfs:label "Sheikh Lotfollah Mosque"@en ;
     rdfs:label "مسجد شیخ لطف‌الله"@fa ;
+    skos:exactMatch wd:Q856356 ;
+    skos:exactMatch <https://www.archnet.org/sites/1623> ;
     bot:hasStorey :Lotfollah_Ground_Storey .
 
 :Lotfollah_Ground_Storey a bot:Storey ;
@@ -605,6 +659,8 @@ graph TD
 :Ali_Qapu_Palace a persarch:Palace , bot:Building ;
     rdfs:label "Ali Qapu Palace"@en ;
     rdfs:label "عالی‌قاپو"@fa ;
+    skos:exactMatch wd:Q2429287 ;
+    skos:exactMatch <https://www.archnet.org/sites/2712> ;
     bot:hasStorey :AliQapu_Ground_Storey .
 
 :AliQapu_Ground_Storey a bot:Storey ;
@@ -617,6 +673,16 @@ graph TD
 
 :AliQapu_Reception a bot:Space ;
     rdfs:label "Ceremonial / Reception spaces"@en .
+
+#################################################################
+# 4. Qeysarieh Portal - North side
+#################################################################
+
+:Qeysarieh_Portal a bot:Building ;
+    rdfs:label "Qeysarieh Portal / Bazaar gate"@en ;
+    rdfs:label "سردر قیصریه"@fa ;
+    skos:exactMatch wd:Q5871275 ;
+    skos:exactMatch <https://www.archnet.org/sites/4353> .
 ```
 
 This structure is deliberately minimal yet complete. It can be expanded later with additional storeys (Ali Qapu is multi-storey), more detailed spaces, elements (mihrabs, minarets, tile panels), and real geometric data.
@@ -654,42 +720,42 @@ The Friday Mosque samples show inheritance from `bot:Space`. Khargerd is the pla
 
 ```mermaid
 graph TD
-    M["persarch:Madrasa / bot:Building<br/>Ghiyathiyya, Khargerd"]
+    M["persarch:Madrasa / bot:Building<br>Ghiyathiyya, Khargerd"]
 
-    M -->|bot:hasStorey| GS["bot:Storey<br/>Ground storey"]
-    M -->|bot:hasStorey| US["bot:Storey<br/>Upper storey"]
+    M -->|bot:hasStorey| GS["bot:Storey<br>Ground storey"]
+    M -->|bot:hasStorey| US["bot:Storey<br>Upper storey"]
 
-    M -->|bot:containsZone| RZ["bot:Zone<br/>Residential zone"]
-    M -->|bot:containsZone| IZ["bot:Zone<br/>Instructional zone"]
-    M -->|bot:containsZone| PZ["bot:Zone<br/>Prayer zone"]
+    M -->|bot:containsZone| RZ["bot:Zone<br>Residential zone"]
+    M -->|bot:containsZone| IZ["bot:Zone<br>Instructional zone"]
+    M -->|bot:containsZone| PZ["bot:Zone<br>Prayer zone"]
 
-    GS -->|bot:hasSpace| Sahn["persarch:Sahn<br/>Courtyard ~28 m"]
-    GS -->|bot:hasSpace| Hashti["persarch:Hashti<br/>Domed vestibule"]
-    GS -->|bot:hasSpace| Mosque["persarch:DomeChamber<br/>NW mosque hall"]
-    GS -->|bot:hasSpace| Lecture["persarch:LectureHall<br/>SE lecture hall"]
-    GS -->|bot:hasSpace| IwanSW["persarch:Iwan<br/>SW iwan + badgir"]
-    GS -->|bot:hasSpace| Hujra["persarch:Hujra<br/>Student cells (×32)"]
+    GS -->|bot:hasSpace| Sahn["persarch:Sahn<br>Courtyard ~28 m"]
+    GS -->|bot:hasSpace| Hashti["persarch:Hashti<br>Domed vestibule"]
+    GS -->|bot:hasSpace| Mosque["persarch:DomeChamber<br>NW mosque hall"]
+    GS -->|bot:hasSpace| Lecture["persarch:LectureHall<br>SE lecture hall"]
+    GS -->|bot:hasSpace| IwanSW["persarch:Iwan<br>SW iwan + badgir"]
+    GS -->|bot:hasSpace| Hujra["persarch:Hujra<br>Student cells (x32)"]
 
     RZ -->|bot:containsZone| Hujra
     IZ -->|bot:containsZone| Lecture
     IZ -->|bot:containsZone| Sahn
     PZ -->|bot:containsZone| Mosque
 
-    Stair["bot:Zone<br/>Corner stairwell"]
-    Shaft["bot:Zone<br/>Badgir shaft"]
+    Stair["bot:Zone<br>Corner stairwell"]
+    Shaft["bot:Zone<br>Badgir shaft"]
     Stair -.->|bot:intersectsZone| GS
     Stair -.->|bot:intersectsZone| US
     Shaft -.->|bot:intersectsZone| GS
     Shaft -.->|bot:intersectsZone| US
-    PZ -.->|bot:intersectsZone| IwanNW["persarch:Iwan<br/>NW courtyard iwan"]
+    PZ -.->|bot:intersectsZone| IwanNW["persarch:Iwan<br>NW courtyard iwan"]
 
     style M fill:#fff8e1,stroke:#f9a825
     style Sahn fill:#bbdefb,stroke:#1565c0
     style RZ fill:#e8f5e9,stroke:#2e7d32
     style IZ fill:#fff3e0,stroke:#e65100
     style PZ fill:#f3e5f5,stroke:#6a1b9a
-    style Stair fill:#eceff1,stroke:#546e7a,stroke-dasharray: 5 5
-    style Shaft fill:#eceff1,stroke:#546e7a,stroke-dasharray: 5 5
+    style Stair fill:#eceff1,stroke:#546e7a
+    style Shaft fill:#eceff1,stroke:#546e7a
 ```
 
 `bot:hasStorey` and `bot:hasSpace` remain the typed shortcuts. Functional groupings and vertical shafts use the parent property `bot:containsZone` / `bot:intersectsZone` because they are not storeys or rooms.
@@ -727,6 +793,8 @@ Reusable file: [`data/ghiyathiyya-khargerd.ttl`](data/ghiyathiyya-khargerd.ttl).
 @prefix dcterms:  <http://purl.org/dc/terms/> .
 @prefix geo:      <http://www.opengis.net/ont/geosparql#> .
 @prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+@prefix wd:       <http://www.wikidata.org/entity/> .
 
 #################################################################
 # Building, storeys, functional zones  (containsZone)
@@ -737,6 +805,8 @@ Reusable file: [`data/ghiyathiyya-khargerd.ttl`](data/ghiyathiyya-khargerd.ttl).
     rdfs:label "مدرسه غیاثیه خرگرد"@fa ;
     dcterms:description "Timurid four-iwan madrasa, 1438–1444. Exterior ≈ 42 × 56 m; courtyard ≈ 28 m square."@en ;
     dcterms:source <https://www.archnet.org/sites/4726> ;
+    skos:exactMatch wd:Q5854526 ;
+    skos:exactMatch <https://www.archnet.org/sites/4726> ;
     bot:hasStorey :Khargerd_Ground_Storey , :Khargerd_Upper_Storey ;
     bot:containsZone :Khargerd_Residential_Zone ,
                      :Khargerd_Instructional_Zone ,
@@ -968,28 +1038,28 @@ An inscription on the building records that work **began under Qavam al-Din Shir
 ```mermaid
 flowchart LR
     subgraph Agents["crm:E21 / E74"]
-        Patron["E21 Person<br/>Ghiyath al-Din Pir Ahmad Khvafi<br/>patron · vizier"]
-        Qavam["E21 Person<br/>Qavam al-Din Shirazi<br/>wd:Q5722389 · architect"]
-        Ghiyath["E21 Person<br/>Ghiyath al-Din Shirazi<br/>architect, completed the work"]
-        Callig["E74 Group<br/>Khargerd inscription workshop"]
-        Tile["E74 Group<br/>Timurid tile workshop"]
+        Patron["E21 Person<br>Ghiyath al-Din Pir Ahmad Khvafi<br>patron - vizier"]
+        Qavam["E21 Person<br>Qavam al-Din Shirazi<br>wd:Q5722389 - architect"]
+        Ghiyath["E21 Person<br>Ghiyath al-Din Shirazi<br>architect, completed the work"]
+        Callig["E74 Group<br>Khargerd inscription workshop"]
+        Tile["E74 Group<br>Timurid tile workshop"]
     end
 
     subgraph Event["crm:E12 Production"]
-        Evt["Construction of the Ghiyathiyya<br/>841–848 AH / 1438–1444 CE"]
-        TS["E52 Time-Span<br/>P82a 1438 · P82b 1444"]
+        Evt["Construction of the Ghiyathiyya<br>841-848 AH / 1438-1444 CE"]
+        TS["E52 Time-Span<br>P82a 1438 - P82b 1444"]
     end
 
     subgraph Products["BOT + CRM products"]
-        Bldg["persarch:Madrasa / B1<br/>P2 Timurid · madrasa · four-iwan<br/>P45 brick, glazed mosaic tile"]
+        Bldg["persarch:Madrasa / B1<br>P2 Timurid - madrasa - four-iwan<br>P45 brick, glazed mosaic tile"]
         Mih["persarch:Mihrab"]
-        Ins["E34 Inscription<br/>hasScriptStyle Thuluth"]
-        Pan["persarch:TilePanel<br/>hasMotifType arabesque"]
+        Ins["E34 Inscription<br>hasScriptStyle Thuluth"]
+        Pan["persarch:TilePanel<br>hasMotifType arabesque"]
     end
 
     subgraph Vocab["Controlled vocabularies"]
-        AAT["Getty AAT<br/>madrasas 300006563<br/>Timurid 300018863<br/>brick · mosaic tile · Thuluth"]
-        WD["Wikidata<br/>Q5854526 madrasa<br/>Q5722389 Qavam"]
+        AAT["Getty AAT<br>madrasas 300006563<br>Timurid 300018863<br>brick - mosaic tile - Thuluth"]
+        WD["Wikidata<br>Q5854526 madrasa<br>Q5722389 Qavam"]
     end
 
     Patron -->|persarch:commissionedBy| Evt
@@ -1018,8 +1088,7 @@ flowchart LR
 @prefix :         <https://w3id.org/persian-architecture/data/khargerd#> .
 
 :place_khargerd a crm:E53_Place ;
-    rdfs:label "Khargerd (Khargird), Khaf County"@en ;
-    skos:exactMatch wd:Q5854526 .
+    rdfs:label "Khargerd (Khargird), Khaf County"@en .
 
 :actor_pir_ahmad a crm:E21_Person ;
     rdfs:label "Ghiyath al-Din Pir Ahmad Khvafi"@en ;
@@ -1060,7 +1129,8 @@ flowchart LR
                     persarch:style_timurid ;
     crm:P45_consists_of persarch:mat_brick , persarch:mat_glazed_tile ;
     crm:P53_has_former_or_current_location :place_khargerd ;
-    skos:exactMatch wd:Q5854526 .
+    skos:exactMatch wd:Q5854526 ;
+    skos:exactMatch <https://www.archnet.org/sites/4726> .
 
 :evt_ghiyathiyya_construction a crm:E12_Production ;
     rdfs:label "Construction of the Ghiyathiyya madrasa"@en ;
@@ -1152,22 +1222,22 @@ A single-court mosque already shows `hasSpace`. A two-court caravanserai shows *
 
 ```mermaid
 graph TD
-    C["persarch:Caravanserai / bot:Building<br/>Ribat-i Sharaf"]
+    C["persarch:Caravanserai / bot:Building<br>Ribat-i Sharaf"]
 
-    C -->|bot:containsZone| Pub["bot:Zone<br/>Public-service zone"]
-    C -->|bot:containsZone| Roy["bot:Zone<br/>Royal-suite zone"]
-    C -->|bot:containsZone| Axis["bot:Zone<br/>Processional axis"]
-    C -->|bot:hasSpace| Corr["bot:Space<br/>Connecting corridor"]
+    C -->|bot:containsZone| Pub["bot:Zone<br>Public-service zone"]
+    C -->|bot:containsZone| Roy["bot:Zone<br>Royal-suite zone"]
+    C -->|bot:containsZone| Axis["bot:Zone<br>Processional axis"]
+    C -->|bot:hasSpace| Corr["bot:Space<br>Connecting corridor"]
 
-    Pub -->|bot:containsZone| Outer["persarch:Sahn<br/>Outer court 32.4 × 16.5 m"]
+    Pub -->|bot:containsZone| Outer["persarch:Sahn<br>Outer court 32.4 x 16.5 m"]
     Pub -->|bot:containsZone| Stables["persarch:Stable"]
-    Pub -->|bot:containsZone| Rooms["bot:Space<br/>Travellers' rooms"]
-    Pub -->|bot:containsZone| MosqO["persarch:DomeChamber<br/>Outer mosque"]
+    Pub -->|bot:containsZone| Rooms["bot:Space<br>Travellers' rooms"]
+    Pub -->|bot:containsZone| MosqO["persarch:DomeChamber<br>Outer mosque"]
 
-    Roy -->|bot:containsZone| Inner["persarch:Sahn<br/>Inner court 31.8 × 31.3 m"]
-    Roy -->|bot:containsZone| Suites["bot:Space<br/>Royal suites"]
-    Roy -->|bot:containsZone| Kitchen["bot:Space<br/>Kitchen"]
-    Roy -->|bot:containsZone| MosqI["persarch:DomeChamber<br/>Inner mosque"]
+    Roy -->|bot:containsZone| Inner["persarch:Sahn<br>Inner court 31.8 x 31.3 m"]
+    Roy -->|bot:containsZone| Suites["bot:Space<br>Royal suites"]
+    Roy -->|bot:containsZone| Kitchen["bot:Space<br>Kitchen"]
+    Roy -->|bot:containsZone| MosqI["persarch:DomeChamber<br>Inner mosque"]
 
     Corr -.->|bot:intersectsZone| Pub
     Corr -.->|bot:intersectsZone| Roy
@@ -1181,8 +1251,8 @@ graph TD
     style C fill:#efebe9,stroke:#4e342e
     style Pub fill:#fff3e0,stroke:#e65100
     style Roy fill:#e8eaf6,stroke:#3949ab
-    style Corr fill:#eceff1,stroke:#546e7a,stroke-dasharray: 5 5
-    style Axis fill:#eceff1,stroke:#546e7a,stroke-dasharray: 5 5
+    style Corr fill:#eceff1,stroke:#546e7a
+    style Axis fill:#eceff1,stroke:#546e7a
 ```
 
 The corridor is **adjacent** to each courtyard (they share an iwan arch) and **intersects** each functional zone (part of its volume belongs to public circulation and part to royal circulation). That is exactly the distinction BOT draws between `adjacentZone` and `intersectsZone`.
@@ -1196,6 +1266,8 @@ Reusable file: [`data/ribat-i-sharaf.ttl`](data/ribat-i-sharaf.ttl).
 @prefix persarch: <https://w3id.org/persian-architecture#> .
 @prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+@prefix wd:       <http://www.wikidata.org/entity/> .
 
 #################################################################
 # Building and the two functional zones  (containsZone)
@@ -1206,6 +1278,8 @@ Reusable file: [`data/ribat-i-sharaf.ttl`](data/ribat-i-sharaf.ttl).
     rdfs:label "رباط شرف"@fa ;
     dcterms:description "Seljuk two-court ribat/caravanserai on the Nishapur–Sarakhs road. Founded 1114–15; restored 1154–55."@en ;
     dcterms:source <https://www.archnet.org/sites/3873> ;
+    skos:exactMatch wd:Q2577338 ;
+    skos:exactMatch <https://www.archnet.org/sites/3873> ;
     bot:hasStorey :Ribat_Ground_Storey ;
     bot:containsZone :Ribat_Public_Zone , :Ribat_Royal_Zone ,
                      :Ribat_Processional_Axis .
@@ -1421,26 +1495,26 @@ Two events keep the Seljuk foundation distinct from the 1154–55 restoration. T
 
 ```mermaid
 flowchart TB
-    subgraph Foundation["508 AH / 1114–15  ·  crm:E12 Production"]
+    subgraph Foundation["508 AH / 1114-15  -  crm:E12 Production"]
         F["Foundation of Ribat-i Sharaf"]
-        PatronF["E21 Sharaf al-Din Abu Tahir<br/>governor / later vizier of Sanjar"]
-        Arch["E21 Katib Ali al-Mansur<br/>Asad b. Muhammad al-Sarahsi<br/>architect"]
+        PatronF["E21 Sharaf al-Din Abu Tahir<br>governor / later vizier of Sanjar"]
+        Arch["E21 Katib Ali al-Mansur<br>Asad b. Muhammad al-Sarahsi<br>architect"]
         Masons["E74 Seljuk brick masons"]
-        TSf["E52 1114–1115"]
+        TSf["E52 1114-1115"]
     end
 
-    subgraph Restoration["549 AH / 1154–55  ·  crm:E11 Modification"]
+    subgraph Restoration["549 AH / 1154-55  -  crm:E11 Modification"]
         R["Restoration after the Ghuzz invasion"]
-        PatronR["E21 Turkan Khatun<br/>wife of Sultan Sanjar"]
+        PatronR["E21 Turkan Khatun<br>wife of Sultan Sanjar"]
         StuccoW["E74 Stucco / inscription workshop"]
-        TSr["E52 1154–1155"]
+        TSr["E52 1154-1155"]
     end
 
     subgraph Work["Continuing built work"]
-        Bldg["persarch:Caravanserai / B1<br/>P2 caravanserai · four-iwan · Seljuk<br/>P45 baked brick<br/>wd:Q2577338"]
+        Bldg["persarch:Caravanserai / B1<br>P2 caravanserai - four-iwan - Seljuk<br>P45 baked brick<br>wd:Q2577338"]
         Pishtaq["bot:Element pishtaq"]
-        Ins["E34 Kufic stucco band<br/>hasScriptStyle Kufic"]
-        Mih["persarch:Mihrab · outer mosque"]
+        Ins["E34 Kufic stucco band<br>hasScriptStyle Kufic"]
+        Mih["persarch:Mihrab - outer mosque"]
     end
 
     PatronF -->|commissionedBy| F
@@ -1515,7 +1589,8 @@ flowchart TB
                     persarch:style_seljuk ;
     crm:P45_consists_of persarch:mat_brick ;
     crm:P53_has_former_or_current_location :place_ribat ;
-    skos:exactMatch wd:Q2577338 .
+    skos:exactMatch wd:Q2577338 ;
+    skos:exactMatch <https://www.archnet.org/sites/3873> .
 
 :evt_ribat_foundation a crm:E12_Production ;
     rdfs:label "Foundation of Ribat-i Sharaf"@en ;
@@ -1604,11 +1679,8 @@ persian-architecture-bot-case-studies/
 │   ├── alignments/
 │   └── shapes/
 ├── data/
-│   ├── naqsh-e-jahan-site.ttl
-│   ├── masjid-i-jami.ttl          # Schroeder-numbered spaces
-│   ├── sheikh-lotfollah.ttl
-│   ├── shah-mosque.ttl
-│   ├── ali-qapu.ttl
+│   ├── naqsh-e-jahan-site.ttl     # site + Shah, Lotfollah, Ali Qapu, Qeysarieh (ArchNet + Wikidata)
+│   ├── masjid-i-jami.ttl          # Friday Mosque identity + Schroeder 042/055
 │   ├── persarch-crm-vocab.ttl     # roles, E55/E57 types, AAT/Wikidata
 │   ├── ghiyathiyya-khargerd.ttl   # zones + CRM campaign (architects, materials)
 │   └── ribat-i-sharaf.ttl         # dual-court zones + foundation/restoration
@@ -1657,7 +1729,7 @@ Spaces of use (ṣahn, shabestān, madrasa, library, passage, rooftop) should no
 
 ### BOT is useful, but it is not the heritage layer
 
-BOT is a lean topology vocabulary: `Building`–`Storey`–`Space`–`Element`, containment and adjacency, optional 3D. It is excellent for linking a BIM/HBIM or point-cloud segmentation into RDF. It is **not** designed for standing-building stratigraphy, uncertain dating, or argumentation about phases.
+BOT is a lean topology vocabulary: `Building`–`Storey`–`Space`–`Element`, containment and adjacency, optional 3D. It is excellent for linking a BIM/HBIM or point-cloud segmentation into RDF. It is **not** designed for standing-building stratigraphy, uncertain dating, or argumentation about phases. How Revit and IFC sit in that stack is spelled out in [§14](#14-revit--hbim-as-a-complementary-source).
 
 For this mosque I would invert the stack:
 
@@ -1716,7 +1788,8 @@ Insist on groups (brick masons of campaign X, tile workshop of campaign Y). Othe
 ```turtle
 jame:mosque a jame:MosqueComplex ;          # subclass of crmba:B1 + bot:Building
     crm:P2_has_type jame:type_mosque ;       # aat:300007544
-    owl:sameAs wd:Q1256501 .
+    skos:exactMatch wd:Q1256501 ;
+    skos:exactMatch <https://www.archnet.org/sites/1621> .
 
 jame:evt_south_dome a crm:E12_Production ;
     crm:P4_has_time-span jame:ts_1086 ;
@@ -1939,14 +2012,14 @@ B4 Empty Section and `bot:Space` look similar and are not the same. B4 is an int
 
 ```mermaid
 flowchart LR
-  subgraph BOT["BOT — present topology"]
+  subgraph BOT["BOT - present topology"]
     Site --> Building
     Building --> Storey
     Building --> Space
     Space --> Element
     Space -. adjacent .-> Space
   end
-  subgraph CRMba["CRMba — historical anatomy"]
+  subgraph CRMba["CRMba - historical anatomy"]
     B1["B1 Built Work"] --> B2["B2 Morphological section"]
     B2 --> B3["B3 Filled / matter"]
     B2 --> B4["B4 Empty / intentional void"]
@@ -2059,19 +2132,19 @@ Two families: **things in the ground** and **events that made or opened them**.
 flowchart TB
   subgraph Things
     A8["A8 Stratigraphic Unit"]
-    A2["A2 Stratigraphic Volume Unit<br/>the fill / layer / dump"]
-    A3["A3 Stratigraphic Interface<br/>the surface / cut"]
+    A2["A2 Stratigraphic Volume Unit<br>the fill / layer / dump"]
+    A3["A3 Stratigraphic Interface<br>the surface / cut"]
     A10["A10 Excavation Interface"]
-    A7["A7 Embedding<br/>find-in-layer"]
+    A7["A7 Embedding<br>find-in-layer"]
     A8 --> A2
     A8 --> A3
   end
   subgraph Events
     A9["A9 Archaeological Excavation"]
-    A1["A1 Excavation Processing Unit<br/>one recorded spit / context dig"]
-    A4["A4 Stratigraphic Genesis<br/>layer comes into being"]
+    A1["A1 Excavation Processing Unit<br>one recorded spit / context dig"]
+    A4["A4 Stratigraphic Genesis<br>layer comes into being"]
     A5["A5 Stratigraphic Modification"]
-    A6["A6 Group Declaration Event<br/>archaeologist groups contexts"]
+    A6["A6 Group Declaration Event<br>archaeologist groups contexts"]
     A9 --> A1
     A4 --> A2
     A4 --> A3
@@ -2193,7 +2266,160 @@ CRMarchaeo is the only one of the three that is allowed to destroy evidence in i
 
 
 
-## 14. Competency Questions
+## 14. Revit / HBIM as a complementary source
+
+Use a Revit (or other IFC-capable HBIM) model as a **feeder for present topology and geometry**. Keep it off the heritage spine. BOT was written by the W3C Linked Building Data group so that BIM models can talk on the Web; CIDOC CRM / CRMba were written so that campaigns, actors, and fabric can change through time. Those jobs stay separate even when the same mosque has a `.rvt` file.
+
+Most monuments in this repository are documented from plans, ArchNet records, and published surveys. A BIM model is an *optional enrichment* for a building that already has one. The graph does not wait for Revit.
+
+### What Revit is good for here
+
+| Revit / IFC object | BOT target | What you gain |
+|---|---|---|
+| Project / Site | `bot:Site` | The urban envelope (Naqsh-e Jahan as a site) |
+| Building | `bot:Building` | One node to hang `skos:exactMatch` (ArchNet + Wikidata) on |
+| Level | `bot:Storey` | Ground / upper storeys at Khargerd and Ali Qapu |
+| Room / Area | `bot:Space` (then `persarch:Iwan`, `Sahn`, …) | A room inventory that matches a numbered plan |
+| Wall, door, window, loaded family (mihrab, minaret, badgir) | `bot:Element` + `hasSubElement` | Fabric you can attach inscriptions and tile panels to |
+| Host / bounding | `bot:adjacentElement`, `bot:interfaceOf` | Interfaces that rooms share |
+| IfcGloballyUniqueId | stable local IRI fragment | A join key back to the native model |
+| Mesh / IFC body | `bot:hasSimple3DModel` or GeoSPARQL | A 3D body for viewers and GraphRAG |
+
+The same RDF individual can then carry CRM types. A Revit room called “South Iwan” becomes `bot:Space` + `persarch:Iwan` + (if you accept the alignment) CRMba `B4` for the void and `B2`/`B3` for the fabric. Revit supplies the *current* tree; CRM supplies *who built which campaign*.
+
+```mermaid
+flowchart LR
+    Revit["Revit / HBIM model"]
+    IFC["IFC export"]
+    BOT["BOT: Site Building Storey Space Element"]
+    CRM["CRM / CRMba: events, agents, B1-B5"]
+    Ext["ArchNet + Wikidata via skos exactMatch"]
+    Revit --> IFC
+    IFC --> BOT
+    BOT --> CRM
+    BOT --> Ext
+```
+
+A practical converter path is IFC to Linked Building Data (for example IFCtoLBD), which already emits BOT. Map `persarch:` subclasses in a second pass from room names, family types, or a lookup table (Schroeder numbers, iwan vs sahn vs hujra).
+
+### Limits of the Revit layer
+
+- **History stays on CRM.** Revit phasing is a construction-management filter. Campaigns remain `E12` / `E11` / `E79` / `E80`. A demolished Timurid hall is missing from the live model; CRMba still holds that `B2`.
+- **Persian types stay on `persarch:` and AAT.** Revit has walls, rooms, and generic models. “Iwan” and “mihrab” are applied after export.
+- **Scholarly identity stays on `skos:exactMatch`.** ArchNet and Wikidata hang on the building node. An IfcGUID is a join key back to the native file.
+- **Functional groupings stay bare `bot:Zone`.** A prayer zone that overlaps an iwan, or a royal-suite zone that groups several rooms, is typed as Zone. Extra Revit Areas, if you draw them, follow the same typing.
+- **Inscriptions stay `E34` / CRMtex.** Tile families can carry parameters; script, transcription, and speech-act live on the CRM text node.
+
+
+
+## Bluprint for scoped Control Vocabularies
+
+**Organize the abstract concepts as a faceted, hierarchical thesaurus (AAT-style), from abstract cultural/formal ideas toward concrete physical artifacts, with polyhierarchy, bilingual preferred/alternate labels, scope notes, and mappings to AAT for interoperability.**
+
+The Art & Architecture Thesaurus (AAT) is a faceted classification system that proceeds conceptually from abstract ideas to concrete physical things. Its main facets relevant here are Associated Concepts, Physical Attributes (including design elements), Styles and Periods, Activities (techniques), Materials, and Objects (especially Built Environment hierarchies and Components). Concepts support preferred terms + alternates (including multilingual), broader/narrower hierarchical relations (polyhierarchical), associative relations, and scope notes. It is published as linked open data using SKOS-like structures.
+
+For a *minimal* ontology focused on Persian/Iranian architecture, borrow this approach but keep the scope tight and expandable. Model primarily in SKOS (concepts with `skos:broader`/`narrower`, `prefLabel`/`altLabel` in English and Persian, `scopeNote`, `related`, and `exactMatch`/`closeMatch` to AAT URIs). You can later add OWL classes and properties (e.g., for “has component,” “exhibits style,” “uses material”) if you need formal reasoning, consistent with your iterative RDF/OWL practice.
+
+### Recommended Minimal Facets
+Use these as top-level concept schemes or top concepts. They mirror AAT’s abstract-to-concrete progression while prioritizing what is distinctive about Persian architecture.
+
+1. **Styles and Periods** (abstract cultural/historical groupings)  
+   Prefer Pirnia’s *sabk* framework (widely used in Iranian architectural historiography) over pure dynastic labels, while allowing dynastic or regional narrower terms.  
+   - Iranian Architectural Styles  
+     - Pre-Islamic  
+       - Parsian (Achaemenid and related)  
+       - Parthian / Parthi (including Seleucid, Parthian, Sasanian)  
+     - Islamic  
+       - Khorasani  
+       - Razi (Samanid, Ziyarid, Seljuk, etc.)  
+       - Azari (Ilkhanid, Timurid, etc.)  
+       - Isfahani (Safavid through Qajar)  
+
+   Map where possible to AAT Styles and Periods (e.g., Achaemenid, Parthian, Sassanian exist under Persian-related hierarchies).
+
+2. **Associated Concepts / Principles** (most abstract)  
+   - Pirnia’s principles as high-level concepts: *mardomvāri* (human scale / human-oriented), *darun-garāʾī* (inward-looking / introversion), self-sufficiency, avoidance of non-essentials, structural rigidity / homogeneous proportions (*niyāresh*), etc.  
+   These sit above or alongside stylistic concepts and can relate associatively to building types or spatial arrangements.
+
+3. **Physical Attributes / Design Elements** (formal and geometric abstractions)  
+   - Arch forms (*chafd* / *chefd*): panj-o-haft, chamane, shabdar, etc.  
+   - Vaulting and transitional systems  
+   - Geometric patterns, floral motifs, calligraphic bands  
+   - Specific systems such as *muqarnas* (honeycomb / stalactite vaulting).  
+
+   AAT already has *muqarnas* (aat:300081762) under surface/architectural elements; map to it.
+
+4. **Objects Facet — Built Works and Components** (concrete)  
+   - **Building types** (single built works):  
+     Mosque, madrasa, imamzadeh, caravanserai, palace, courtyard house, Persian garden / *chahār-bāgh*, bridge, bazaar, chahar-taq / fire temple, mausoleum, etc.  
+   - **Components / architectural elements**:  
+     Iwan / *eyvān* (AAT has *iwans*, aat:300075830 — “large vaulted halls having one side open to a court; prevalent in Parthian, Sassanian, and Islamic architecture”),  
+     *pishtaq* (monumental portal), dome / *gonbad*, minaret, courtyard / *hayat* or *sahn*, squinch, etc.  
+
+   Polyhierarchy is useful here (e.g., a four-iwan plan can relate both to building-type plans and to spatial components).
+
+5. **Materials**  
+   Mudbrick, baked brick, glazed tile, stone, stucco / *gach*, wood, etc.  
+   Mirror AAT’s Materials facet; many of these already exist there.
+
+6. **Activities / Processes and Techniques** (optional in the absolute minimum, but valuable)  
+   Construction techniques, *moʿarraq* (tile mosaic), *haft-rangī*, brickwork patterns (*bannāʾī*), plasterwork, etc.
+
+### Practical Organization Notes
+- **Hierarchy and polyhierarchy**: Keep trees shallow at first. Allow a concept such as *muqarnas* or *iwan* to sit under both Design Elements and Components (or be related across them).  
+- **Labels and notes**: Always provide English and Persian preferred labels, common alternates (e.g., iwan / eyvan / ayvan / ایوان), and a short scope note that clarifies Persian usage.  
+- **Interoperability**: Use `skos:exactMatch` or `skos:closeMatch` to AAT URIs wherever the concept is already covered (iwan, muqarnas, many styles and materials). This keeps your ontology minimal while remaining LOD-compatible with Getty vocabularies, Wikidata, and CIDOC-CRM alignments you already use.  
+- **Expansion path**: Start with the core concepts above (styles + major building types + distinctive elements such as iwan, dome, muqarnas, courtyard + key materials). Add instances (specific monuments), more subtypes, and object properties later according to a systematic plan.  
+- **Modeling choice**: SKOS for the controlled vocabulary layer is the closest borrow from AAT. Overlay a thin OWL layer only for the relations you need (e.g., `hasComponent`, `exhibitsStyle`, `usesMaterial`, `hasPlanType`).
+
+### Minimal Example Hierarchy (Mermaid)
+```mermaid
+graph TD
+    A[Persian Architecture Concepts] --> B[Styles and Periods]
+    A --> C[Design Elements / Physical Attributes]
+    A --> D[Objects: Building Types & Components]
+    A --> E[Materials]
+    A --> F[Techniques]
+
+    B --> B1[Pre-Islamic Styles]
+    B1 --> B1a[Parsian]
+    B1 --> B1b[Parthian / Sasanian]
+    B --> B2[Islamic Styles]
+    B2 --> B2a[Khorasani]
+    B2 --> B2b[Razi]
+    B2 --> B2c[Azari]
+    B2 --> B2d[Isfahani]
+
+    D --> D1[Building Types]
+    D1 --> D1a[Mosque]
+    D1 --> D1b[Caravanserai]
+    D1 --> D1c[Persian Garden]
+    D --> D2[Components]
+    D2 --> D2a[Iwan / Eyvān]
+    D2 --> D2b[Dome / Gonbad]
+    D2 --> D2c[Muqarnas]
+    D2 --> D2d[Pishtaq]
+    D2 --> D2e[Courtyard]
+
+    C --> C1[Arch Forms / Chafd]
+    C --> C2[Vaulting Systems]
+    C --> C3[Muqarnas as surface system]
+```
+
+This structure stays minimal, culturally specific (Pirnia styles, Persian terminology, characteristic elements), AAT-aligned for reuse, and ready for systematic expansion into a fuller ontology or knowledge graph. If you want a starter Turtle file (with a few concepts fully encoded, including AAT mappings and bilingual labels) or a more detailed hierarchy for one facet (e.g., components or styles), say which direction to take next.
+
+
+### Decision rule
+
+- A sentence true of the **live model** (“this level contains these rooms; this wall bounds that room”) is imported from Revit/IFC into BOT.
+- A sentence about **a campaign, a patron, a demolished part, or a script** is authored in CRM / CRMba / CRMtex.
+- **No BIM file:** Schroeder numbers, ArchNet drawings, and surveyed WKT remain the spatial source. That is the default for this repository.
+
+For Islamic plans, two extra cautions. The qibla rotation at the Shah Mosque and Sheikh Lotfollah is a coordinate-system problem in Revit: keep the local WKT honest and do not force the maydan axis onto the prayer hall. Muqarnas, tile skins, and inscription bands are loaded families or generic models — export them as `bot:Element`, not as extra rooms.
+
+---
+
+## 15. Competency Questions
 
 1. Which buildings are contained in the Naqsh-e Jahan Site?  
 2. List all spaces of type `persarch:Iwan` in the Masjid-i Jāmiʿ together with their Schroeder numbers.  
@@ -2209,10 +2435,11 @@ CRMarchaeo is the only one of the three that is allowed to destroy evidence in i
 12. Which materials (`E57`) and dynastic styles (`E55`, AAT-aligned) does each building consist of / have type?  
 13. Which inscriptions are carried by the Khargerd mihrab or the Ribat pishtaq, and in which script style?  
 14. Which restoration event modified Ribat-i Sharaf, who commissioned it, and which Kufic inscription did it produce?
+15. Which `bot:Building` individuals `skos:exactMatch` both an ArchNet site record and a Wikidata item?
 
 ---
 
-## 15. Data Sources & Scholarly Grounding
+## 16. Data Sources & Scholarly Grounding
 
 - Eric Schroeder, Plan of Masjid-i Jāmiʿ of Isfahan, 1931 (American Institute for Persian Art and Archaeology). Smithsonian Institution, Ernst Herzfeld Papers, D-704.  
 - ArchNet media: https://www.archnet.org/sites/1621?media_content_id=62965  
@@ -2224,11 +2451,23 @@ CRMarchaeo is the only one of the three that is allowed to destroy evidence in i
 - BOT specification: https://w3c-lbd-cg.github.io/bot/ (especially `bot:Zone`, `containsZone`, `adjacentZone`, `intersectsZone`, and the element properties)  
 - CIDOC CRM: https://cidoc-crm.org/  
 - Getty Art & Architecture Thesaurus (AAT): madrasas `aat:300006563`, caravanserais `aat:300007148`, Timurid `aat:300021796`, Seljuk `aat:300021736` / Great Seljuk `aat:300021741`.  
-- Wikidata: Ghiyasiyeh Madrasa `wd:Q5854526`, Qavam al-Din Shirazi `wd:Q5722389`, Sharaf Caravanserai `wd:Q2577338`.
+- Wikidata and ArchNet site records, linked on each `bot:Building` with `skos:exactMatch` (not `owl:sameAs`):
+
+| Building / site | Wikidata | ArchNet |
+|-----------------|----------|---------|
+| Naqsh-e Jahan Square | `wd:Q4519` | [sites/2717](https://www.archnet.org/sites/2717) |
+| Shah Mosque (Imam Mosque) | `wd:Q643098` | [sites/1622](https://www.archnet.org/sites/1622) |
+| Sheikh Lotfollah Mosque | `wd:Q856356` | [sites/1623](https://www.archnet.org/sites/1623) |
+| Ali Qapu Palace | `wd:Q2429287` | [sites/2712](https://www.archnet.org/sites/2712) |
+| Qeysarieh Portal | `wd:Q5871275` | [sites/4353](https://www.archnet.org/sites/4353) |
+| Jāmeh Mosque of Isfahan | `wd:Q1256501` | [sites/1621](https://www.archnet.org/sites/1621) |
+| Ghiyasiyeh Madrasa, Khargerd | `wd:Q5854526` | [sites/4726](https://www.archnet.org/sites/4726) |
+| Ribat-i Sharaf | `wd:Q2577338` | [sites/3873](https://www.archnet.org/sites/3873) |
+| Qavam al-Din Shirazi | `wd:Q5722389` | — |
 
 ---
 
-## 16. Next Steps & Enrichment Path
+## 17. Next Steps & Enrichment Path
 
 1. Formalise the full `persarch.ttl` ontology module, including `Hashti`, `LectureHall`, `Stable`, and `Badgir`.  
 2. Expand the instance data with more Schroeder-numbered spaces and complete sequences for Sheikh Lotfollah.  
@@ -2236,13 +2475,14 @@ CRMarchaeo is the only one of the three that is allowed to destroy evidence in i
 4. Add real geometric data (vector plan + surveyed WKT).  
 5. Link historic photographs, plans, and IIIF manifests.  
 6. Expand decorative elements, named calligraphers where the inscriptions give them, and further AAT/ULAN alignments.  
-7. Create SPARQL query library and NotebookLM-friendly documentation.
+7. Create SPARQL query library and NotebookLM-friendly documentation.  
+8. Where an HBIM/Revit model exists, export IFC to BOT and join on the same building IRIs already reconciled to ArchNet and Wikidata.
 
 After this foundational version is stable we can discuss concrete strategies for enriching the model with high-resolution plans, images, slides, and measured drawings.
 
 ---
 
-## 17. License
+## 18. License
 
 This repository is released under the **GNU General Public License v3.0**.
 
@@ -2257,7 +2497,7 @@ Either choice is valid; the important point is to state it clearly in the reposi
 
 ---
 
-## 18. Citation
+## 19. Citation
 
 If you use this work, please cite the repository and acknowledge the underlying scholarly sources (especially Schroeder’s 1931 plan and the UNESCO documentation of Naqsh-e Jahan Square).
 
