@@ -66,6 +66,7 @@ persarch:Inscription a owl:Class ;
     crm:P45_consists_of persarch:mat_brick ;
     crm:P53_has_former_or_current_location :place_ribat ;
     skos:exactMatch wd:Q2577338 ;
+    skos:exactMatch <https://www.archnet.org/sites/3873> ;
     bot:hasStorey :Ribat_Ground_Storey ;
     bot:containsZone :Ribat_Public_Zone , :Ribat_Royal_Zone ,
                      :Ribat_Processional_Axis .

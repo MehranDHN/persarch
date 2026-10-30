@@ -81,6 +81,7 @@ persarch:TilePanel a owl:Class ;
     crm:P45_consists_of persarch:mat_brick , persarch:mat_glazed_tile ;
     crm:P53_has_former_or_current_location :place_khargerd ;
     skos:exactMatch wd:Q5854526 ;
+    skos:exactMatch <https://www.archnet.org/sites/4726> ;
     bot:hasStorey :Khargerd_Ground_Storey , :Khargerd_Upper_Storey ;
     bot:containsZone :Khargerd_Residential_Zone ,
                      :Khargerd_Instructional_Zone ,

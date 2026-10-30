@@ -1,0 +1,146 @@
+# Naqsh-e Jahan Square (Maydan-e Naqsh-e Jahan) as bot:Site
+# plus the four principal buildings on its sides.
+#
+# Building identity is reconciled to Wikidata and ArchNet with
+# skos:exactMatch (GraphDB profile: do not use owl:sameAs here).
+
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+@prefix bot:      <https://w3id.org/bot#> .
+@prefix persarch: <https://w3id.org/persian-architecture#> .
+@prefix wd:       <http://www.wikidata.org/entity/> .
+@prefix :         <https://w3id.org/persian-architecture/data/naqsh-e-jahan#> .
+
+persarch:Mosque a owl:Class ;
+    rdfs:label "Mosque"@en ;
+    rdfs:subClassOf bot:Building .
+
+persarch:Palace a owl:Class ;
+    rdfs:label "Palace"@en ;
+    rdfs:subClassOf bot:Building .
+
+persarch:Sahn a owl:Class ;
+    rdfs:label "Sahn (courtyard)"@en ;
+    rdfs:subClassOf bot:Space .
+
+persarch:Iwan a owl:Class ;
+    rdfs:label "Iwan"@en ;
+    rdfs:subClassOf bot:Space .
+
+persarch:DomeChamber a owl:Class ;
+    rdfs:label "Dome chamber"@en ;
+    rdfs:subClassOf bot:Space .
+
+persarch:PishtaqSpace a owl:Class ;
+    rdfs:label "Pishtaq space"@en ;
+    rdfs:subClassOf bot:Space .
+
+#################################################################
+# The Site
+#################################################################
+
+:Naqsh_e_Jahan_Square a bot:Site ;
+    rdfs:label "Naqsh-e Jahan Square"@en ;
+    rdfs:label "میدان نقش جهان"@fa ;
+    dcterms:description "UNESCO World Heritage Site (1979). Safavid urban ensemble laid out under Shah Abbas I (approx. 1598–1629). Dimensions ~160 x 560 m."@en ;
+    dcterms:source <https://www.archnet.org/sites/2717> ;
+    skos:exactMatch wd:Q4519 ;
+    skos:exactMatch <https://www.archnet.org/sites/2717> ;
+    bot:hasBuilding :Shah_Mosque ,
+                    :Sheikh_Lotfollah_Mosque ,
+                    :Ali_Qapu_Palace ,
+                    :Qeysarieh_Portal .
+
+#################################################################
+# 1. Shah Mosque (Imam Mosque) – South side
+#################################################################
+
+:Shah_Mosque a persarch:Mosque , bot:Building ;
+    rdfs:label "Shah Mosque (Imam Mosque)"@en ;
+    rdfs:label "مسجد شاه (مسجد امام)"@fa ;
+    dcterms:source <https://www.archnet.org/sites/1622> ;
+    skos:exactMatch wd:Q643098 ;
+    skos:exactMatch <https://www.archnet.org/sites/1622> ;
+    bot:hasStorey :Shah_Ground_Storey .
+
+:Shah_Ground_Storey a bot:Storey ;
+    rdfs:label "Ground Storey – Shah Mosque"@en ;
+    bot:hasSpace :Shah_Sahn ,
+                 :Shah_South_Iwan ,
+                 :Shah_Dome_Chamber .
+
+:Shah_Sahn a persarch:Sahn , bot:Space ;
+    rdfs:label "Central Courtyard (Sahn)"@en .
+
+:Shah_South_Iwan a persarch:Iwan , bot:Space ;
+    rdfs:label "South / Qibla Iwan"@en ;
+    bot:adjacentZone :Shah_Dome_Chamber .
+
+:Shah_Dome_Chamber a persarch:DomeChamber , bot:Space ;
+    rdfs:label "Main Dome Chamber"@en .
+
+#################################################################
+# 2. Sheikh Lotfollah Mosque – East side
+#################################################################
+
+:Sheikh_Lotfollah_Mosque a persarch:Mosque , bot:Building ;
+    rdfs:label "Sheikh Lotfollah Mosque"@en ;
+    rdfs:label "مسجد شیخ لطف‌الله"@fa ;
+    dcterms:source <https://www.archnet.org/sites/1623> ;
+    skos:exactMatch wd:Q856356 ;
+    skos:exactMatch <https://www.archnet.org/sites/1623> ;
+    bot:hasStorey :Lotfollah_Ground_Storey .
+
+:Lotfollah_Ground_Storey a bot:Storey ;
+    rdfs:label "Ground Storey – Sheikh Lotfollah"@en ;
+    bot:hasSpace :Lotfollah_Portal ,
+                 :Lotfollah_Corridor ,
+                 :Lotfollah_Dome_Chamber .
+
+:Lotfollah_Portal a persarch:PishtaqSpace , bot:Space ;
+    rdfs:label "Entrance Portal (Pishtaq)"@en .
+
+:Lotfollah_Corridor a bot:Space ;
+    rdfs:label "Twisting Corridor (re-orientation sequence)"@en ;
+    rdfs:comment "Corridor that rotates the visitor approximately 45 then 90 degrees to align the prayer hall with the qibla."@en .
+
+:Lotfollah_Dome_Chamber a persarch:DomeChamber , bot:Space ;
+    rdfs:label "Main Prayer Hall / Dome Chamber"@en ;
+    rdfs:comment "Single domed chamber (~19 m side). No courtyard, no minarets."@en .
+
+#################################################################
+# 3. Ali Qapu Palace – West side
+#################################################################
+
+:Ali_Qapu_Palace a persarch:Palace , bot:Building ;
+    rdfs:label "Ali Qapu Palace"@en ;
+    rdfs:label "عالی‌قاپو"@fa ;
+    dcterms:source <https://www.archnet.org/sites/2712> ;
+    skos:exactMatch wd:Q2429287 ;
+    skos:exactMatch <https://www.archnet.org/sites/2712> ;
+    bot:hasStorey :AliQapu_Ground_Storey .
+
+:AliQapu_Ground_Storey a bot:Storey ;
+    rdfs:label "Ground Storey – Ali Qapu"@en ;
+    bot:hasSpace :AliQapu_Entrance_Hall ,
+                 :AliQapu_Reception .
+
+:AliQapu_Entrance_Hall a bot:Space ;
+    rdfs:label "Entrance Hall / Portal zone"@en .
+
+:AliQapu_Reception a bot:Space ;
+    rdfs:label "Ceremonial / Reception spaces"@en .
+
+#################################################################
+# 4. Qeysarieh Portal – North side
+#################################################################
+
+:Qeysarieh_Portal a bot:Building ;
+    rdfs:label "Qeysarieh Portal / Bazaar gate"@en ;
+    rdfs:label "سردر قیصریه"@fa ;
+    dcterms:source <https://www.archnet.org/sites/4353> ;
+    skos:exactMatch wd:Q5871275 ;
+    skos:exactMatch <https://www.archnet.org/sites/4353> .

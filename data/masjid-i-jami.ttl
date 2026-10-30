@@ -1,0 +1,68 @@
+# Masjid-i Jami of Isfahan (Friday / Great Mosque)
+# Building identity + Schroeder-numbered south iwan and qibla dome.
+#
+# Building identity is reconciled to Wikidata and ArchNet with
+# skos:exactMatch (GraphDB profile: do not use owl:sameAs here).
+# Fuller CRM/CRMba campaign graph: casestudy/graphdb-jame/rdf/03-jame-data.ttl
+
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+@prefix geo:      <http://www.opengis.net/ont/geosparql#> .
+@prefix bot:      <https://w3id.org/bot#> .
+@prefix persarch: <https://w3id.org/persian-architecture#> .
+@prefix wd:       <http://www.wikidata.org/entity/> .
+@prefix :         <https://w3id.org/persian-architecture/data/jami-isfahan#> .
+
+persarch:Mosque a owl:Class ;
+    rdfs:label "Mosque"@en ;
+    rdfs:subClassOf bot:Building .
+
+persarch:Iwan a owl:Class ;
+    rdfs:label "Iwan"@en ;
+    rdfs:subClassOf bot:Space .
+
+persarch:DomeChamber a owl:Class ;
+    rdfs:label "Dome chamber"@en ;
+    rdfs:subClassOf bot:Space .
+
+persarch:schroederNumber a owl:DatatypeProperty ;
+    rdfs:label "Schroeder number"@en ;
+    rdfs:comment "Stable identifier taken from Eric Schroeder's 1931 numbered plan."@en ;
+    rdfs:range xsd:string .
+
+:Masjid_i_Jami a persarch:Mosque , bot:Building ;
+    rdfs:label "Masjid-i Jami of Isfahan"@en ;
+    rdfs:label "مسجد جامع اصفهان"@fa ;
+    dcterms:description "The Friday Mosque of Isfahan (Great Mosque). Multi-period complex documented in Eric Schroeder's 1931 numbered plan."@en ;
+    dcterms:source <https://www.archnet.org/sites/1621> ;
+    dcterms:source <https://www.si.edu/object/archives/components/sova-fsa-a-06-ref24401> ;
+    skos:exactMatch wd:Q1256501 ;
+    skos:exactMatch <https://www.archnet.org/sites/1621> ;
+    bot:hasSpace :Schroeder_042 , :Schroeder_055 .
+
+:Schroeder_042 a persarch:Iwan , bot:Space ;
+    rdfs:label "South Iwan (Qibla Iwan)"@en ;
+    rdfs:label "ایوان جنوبی (ایوان قبله)"@fa ;
+    persarch:schroederNumber "42"^^xsd:string ;
+    rdfs:comment "Main qibla-oriented iwan on the southern side of the central courtyard. Numbered 42 on Eric Schroeder's 1931 plan."@en ;
+    bot:adjacentZone :Schroeder_055 ;
+    geo:hasGeometry :Geom_Schroeder_042 .
+
+:Geom_Schroeder_042 a geo:Geometry ;
+    geo:asWKT """POLYGON((45.2 12.8, 58.7 12.8, 58.7 28.4, 45.2 28.4, 45.2 12.8))"""^^geo:wktLiteral ;
+    rdfs:comment "Illustrative WKT in a local metric coordinate system. Replace with accurate surveyed coordinates."@en .
+
+:Schroeder_055 a persarch:DomeChamber , bot:Space ;
+    rdfs:label "Southern Dome Chamber (Qibla Dome)"@en ;
+    rdfs:label "گنبدخانه جنوبی (گنبد قبله)"@fa ;
+    persarch:schroederNumber "55"^^xsd:string ;
+    rdfs:comment "The main southern dome chamber behind the qibla iwan."@en ;
+    bot:adjacentZone :Schroeder_042 ;
+    geo:hasGeometry :Geom_Schroeder_055 .
+
+:Geom_Schroeder_055 a geo:Geometry ;
+    geo:asWKT """POLYGON((46.1 28.4, 57.9 28.4, 57.9 41.6, 46.1 41.6, 46.1 28.4))"""^^geo:wktLiteral .
