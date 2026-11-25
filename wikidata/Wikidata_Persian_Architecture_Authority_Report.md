@@ -172,14 +172,15 @@ The item [Q32880](https://www.wikidata.org/wiki/Q32880) is **architectural style
 
 The broader item [architecture of Iran (Q1501585)](https://www.wikidata.org/wiki/Q1501585) is itself directly `subclass of` both Persian art (Q2718840) and architecture of the Earth (Q13152867). This is a multi-parent graph rather than a single, exclusive tree: the P279 links express broader classification, while P31 identifies the concepts as architectural styles. A hierarchy diagram or query should preserve that distinction and should not show Q5957125, Q16047695, or Q5718239 as P279 subclasses of Q32880.
 
-Wikidata also has sequential properties for style chronology: `follows` (P155) states that the subject comes after the value in a sequence, while `followed by` (P156) states that it comes before the value. In the checked statements, Timurid architecture follows Ilkhanid architecture and is followed by Safavid architecture; Safavid architecture is followed by Afsharid architecture; and Qajar architecture follows Zand architecture and is followed by Pahlavi architecture. The arrows below run from earlier to later, and each label identifies the item carrying the recorded statement:
+Wikidata also has sequential properties for style chronology: `follows` (P155) states that the subject comes after the value in a sequence, while `followed by` (P156) states that it comes before the value. In the checked statements, Timurid architecture follows Ilkhanid architecture and is followed by Safavid architecture; Safavid architecture is followed by Afsharid architecture; Afsharid architecture is followed by Zand architecture; and Qajar architecture follows Zand architecture and is followed by Pahlavi architecture. The arrows below run from earlier to later, and each label identifies the item carrying the recorded statement:
 
 ```mermaid
 flowchart LR
     ilkhanid["Ilkhanid architecture (Q98399895)"] -->|P155 on Timurid| timurid["Timurid architecture (Q16047695)"]
     timurid -->|P156 on Timurid; P155 on Safavid| safavid["Safavid architecture (Q5957125)"]
-    safavid -->|P156 on Safavid| afsharid["Afsharid architecture (Q98399175)"]
-    zand["Zand architecture (Q5679012)"] -->|P155 on Qajar| qajar["Qajar architecture (Q5718239)"]
+    safavid -->|P156 on Safavid; P155 on Afsharid| afsharid["Afsharid architecture (Q98399175)"]
+    afsharid -->|P156 on Afsharid; P155 on Zand| zand["Zand architecture (Q5679012)"]
+    zand -->|P156 on Zand; P155 on Qajar| qajar["Qajar architecture (Q5718239)"]
     qajar -->|P156 on Qajar| pahlavi["Pahlavi architecture (Q17993891)"]
 ```
 
