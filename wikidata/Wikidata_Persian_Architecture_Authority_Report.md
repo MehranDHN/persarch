@@ -231,7 +231,69 @@ Do not confuse domain/range-like constraints with a **property scope constraint*
 | Medium | Add bounded, monitored SPARQL checks and record retrieval time; plan for the WDQS backend migration. | Makes harvesting reproducible and resilient to service changes. |
 | Medium | Review Commons image rights, availability, and IIIF suitability independently from Wikidata's P18 values. | Avoids treating a media link as a ready-to-use IIIF resource. |
 
-## 9. Example SPARQL quality checks
+## 9. Case studies: richly described instances
+
+For these case studies, “richest” means coverage of useful architectural fields, with referenced claims preferred when candidate items have similar coverage. The candidate search was scoped to items whose country (P17) is Iran (Q794) and whose direct `instance of` (P31) class is the target class or a subclass of it (`P31/P279*`). The broad class path timed out for architectural ensembles, so that category was checked against direct P31 instances instead. The coverage score below gives one point for each of 11 fields present: location (P131), coordinates (P625), inception (P571), architect (P84), architectural style (P149), material (P186), heritage designation (P1435), image (P18), AAT ID (P1014), LCSH ID (P244), and Commons category (P373). Multiple values in one field still count once. P31 and P17 are also harvested but are not part of this score.
+
+The selected examples are candidates, not a definitive “top” list: Wikidata changes, some claims have weak or missing references, and large class paths may time out on WDQS. The query below retrieves the direct item claims and their references for the chosen examples as normalized property/value rows. Its fixed class/item list avoids repeating the broad class-path search during harvesting. A site may appear under more than one class because the Wikidata hierarchy is not mutually exclusive.
+
+**SPARQL harvest query for the case-study sample:**
+
+```sparql
+SELECT DISTINCT ?class ?item ?itemLabel ?property ?propertyLabel
+                ?value ?valueLabel ?reference WHERE {
+  VALUES (?class ?item) {
+    (wd:Q32815 wd:Q856356)
+    (wd:Q32815 wd:Q643098)
+    (wd:Q186347 wd:Q6394061)
+    (wd:Q186347 wd:Q6558875)
+    (wd:Q162875 wd:Q5952145)
+    (wd:Q162875 wd:Q5860687)
+    (wd:Q4989906 wd:Q5952145)
+    (wd:Q4989906 wd:Q5860687)
+    (wd:Q1497375 wd:Q4993148)
+    (wd:Q1497375 wd:Q4243)
+  }
+
+  {
+    { ?item p:P31 ?statement. ?statement ps:P31 ?value. BIND(wd:P31 AS ?property) }
+    UNION { ?item p:P17 ?statement. ?statement ps:P17 ?value. BIND(wd:P17 AS ?property) }
+    UNION { ?item p:P131 ?statement. ?statement ps:P131 ?value. BIND(wd:P131 AS ?property) }
+    UNION { ?item p:P625 ?statement. ?statement ps:P625 ?value. BIND(wd:P625 AS ?property) }
+    UNION { ?item p:P571 ?statement. ?statement ps:P571 ?value. BIND(wd:P571 AS ?property) }
+    UNION { ?item p:P84 ?statement. ?statement ps:P84 ?value. BIND(wd:P84 AS ?property) }
+    UNION { ?item p:P149 ?statement. ?statement ps:P149 ?value. BIND(wd:P149 AS ?property) }
+    UNION { ?item p:P186 ?statement. ?statement ps:P186 ?value. BIND(wd:P186 AS ?property) }
+    UNION { ?item p:P1435 ?statement. ?statement ps:P1435 ?value. BIND(wd:P1435 AS ?property) }
+    UNION { ?item p:P18 ?statement. ?statement ps:P18 ?value. BIND(wd:P18 AS ?property) }
+    UNION { ?item p:P1014 ?statement. ?statement ps:P1014 ?value. BIND(wd:P1014 AS ?property) }
+    UNION { ?item p:P244 ?statement. ?statement ps:P244 ?value. BIND(wd:P244 AS ?property) }
+    UNION { ?item p:P373 ?statement. ?statement ps:P373 ?value. BIND(wd:P373 AS ?property) }
+  }
+  OPTIONAL { ?statement prov:wasDerivedFrom ?reference. }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,fa". }
+}
+ORDER BY ?classLabel ?itemLabel ?propertyLabel ?valueLabel
+```
+
+Each result row represents one selected property/value statement; `?reference` is absent where the statement has no reference. `?value` preserves the actual value, while `?valueLabel` makes item-valued claims readable. This shape keeps multi-valued fields and statement-level provenance visible instead of flattening them into one unqualified label.
+
+| Class | Candidate item | Field coverage | Referenced property/value pairs (13 harvested properties) | Data-structure highlights |
+|---|---|---:|---:|---|
+| Mosque | [Sheikh Lotfollah Mosque (Q856356)](https://www.wikidata.org/wiki/Q856356) | 10/11 | 13 | Multiple P31 types; location, coordinates, inception, architect, Safavid style, five P186 materials, heritage designation, image, Commons category, and LCSH ID. |
+| Mosque | [Shah Mosque (Q643098)](https://www.wikidata.org/wiki/Q643098) | 9/11 | 12 | Mosque, cultural property, and architectural-landmark types; location, coordinates, inception, architect, Safavid style, brick/mortar/stone/tile, designation, and image. |
+| Caravanserai | [Dayr-e Gachin Caravanserai (Q6394061)](https://www.wikidata.org/wiki/Q6394061) | 7/11 | 11 | Multiple P149 styles (Sasanian, Seljuk, Safavid); brick and plaster; coordinates, image, and designation values for Iranian National Heritage and “part of UNESCO World Heritage Site.” |
+| Caravanserai | [Khajeh Nazar Caravanserai (Q6558875)](https://www.wikidata.org/wiki/Q6558875) | 7/11 | 8 | Safavid style; rubble and mortar; coordinates, image, and designation values for Iranian National Heritage and “part of UNESCO World Heritage Site.” The mortar claim has no reference in the checked revision. |
+| Mausoleum | [Avicenna Mausoleum (Q5952145)](https://www.wikidata.org/wiki/Q5952145) | 9/11 | 11 | P31 types include mausoleum and tower; 1951 inception, architect Hooshang Seyhoun, granite and reinforced concrete, coordinates, heritage designation, and image. |
+| Mausoleum | [Imamzadeh Harun-e Velayat (Q5860687)](https://www.wikidata.org/wiki/Q5860687) | 9/11 | 16 | Multiple P31 types (including imamzadeh, madrasa, mausoleum, and cultural property); multiple styles and materials; coordinates, architect, designation, and image. |
+| Monument | [Avicenna Mausoleum (Q5952145)](https://www.wikidata.org/wiki/Q5952145) | 9/11 | 11 | Also appears as a monument through its class hierarchy; the same item is intentionally reused, not counted as a separate site. |
+| Monument | [Imamzadeh Harun-e Velayat (Q5860687)](https://www.wikidata.org/wiki/Q5860687) | 9/11 | 16 | Also appears as a monument through its class hierarchy; its multiple P31 types remain direct claims, not subclasses of one another. |
+| Architectural ensemble | [Qasr Prison (Q4993148)](https://www.wikidata.org/wiki/Q4993148) | 9/11 | 10 | Both prison and architectural ensemble; Pahlavi style, architect Nikolai Markov, brick and mortar, coordinates, heritage designation, image, and LCSH ID. |
+| Architectural ensemble | [Sheikh Safi al-Din Khānegāh and Shrine Ensemble (Q4243)](https://www.wikidata.org/wiki/Q4243) | 8/11 | 17 | Multiple P31 types; Ilkhanid, Timurid, and Safavid styles; coordinates, several materials, image, and both Iranian and World Heritage designations. |
+
+Coverage and reference-pair counts are dataset measures, not judgments of historical importance or source quality. The values above were checked on 25 November 2026; verify each statement's references and qualifiers before reuse. The overlap between the Mausoleum and Monument examples is expected: a site can be an instance of a specific class while that class is also a subclass of a broader one.
+
+## 11. Example SPARQL quality checks
 
 These queries are starting points for a **scoped review**, not automatic correction rules. Adapt the endpoint and syntax to the active WDQS version. A missing reference is a prompt for investigation; it is not, by itself, proof that a statement is false.
 
@@ -263,7 +325,7 @@ SELECT ?item WHERE {
 
 For a future harvesting pipeline, query only the required fields, set reasonable timeouts and retry limits, log endpoint errors, and validate returned identifiers and datatypes before loading them into the local graph.
 
-## 10. Fetching Wikidata data: JSON and Turtle
+## 12. Fetching Wikidata data: JSON and Turtle
 
 Wikidata's EntityData endpoint can return an item's data in more than one serialization. A format can be selected in the URL or negotiated with the HTTP `Accept` header:
 
@@ -282,7 +344,7 @@ https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q4243%7CQ5939601%7CQ
 
 Here `.ttl` means the Turtle RDF format, not a cache time-to-live. Caching is a separate concern: respect HTTP cache headers, record retrieval dates and item revisions where practical, and handle timeouts or partial responses explicitly because Wikidata statements can change.
 
-## 11. Conclusion
+## 13. Conclusion
 
 Wikidata is a promising complementary authority for Persian architecture, especially for entity identifiers, multilingual discovery, material statements, and links to external vocabularies. Its usefulness depends on item-by-item verification, careful treatment of class hierarchies and style chronology, and transparent provenance. The observed examples illustrate why “queryable” should not be equated with “reliable without review.”
 
@@ -295,8 +357,20 @@ The next stage should extend the seed list with the additional subject concepts 
 - [Wikidata: Help:Property constraints](https://www.wikidata.org/wiki/Help:Property_constraints)
 - [Wikidata: Subject type constraint (domain)](https://www.wikidata.org/wiki/Help:Property_constraints_portal/Subject_class)
 - [Wikidata: Value-type constraint (range)](https://www.wikidata.org/wiki/Help:Property_constraints_portal/Value_class)
+- [Wikidata: Instance of (P31)](https://www.wikidata.org/wiki/Property:P31)
+- [Wikidata: Subclass of (P279)](https://www.wikidata.org/wiki/Property:P279)
+- [Wikidata: Country (P17)](https://www.wikidata.org/wiki/Property:P17)
+- [Wikidata: Located in the administrative territorial entity (P131)](https://www.wikidata.org/wiki/Property:P131)
+- [Wikidata: Coordinate location (P625)](https://www.wikidata.org/wiki/Property:P625)
+- [Wikidata: Inception (P571)](https://www.wikidata.org/wiki/Property:P571)
+- [Wikidata: Architect (P84)](https://www.wikidata.org/wiki/Property:P84)
 - [Wikidata: Architectural style (P149)](https://www.wikidata.org/wiki/Property:P149)
 - [Wikidata: Material (P186)](https://www.wikidata.org/wiki/Property:P186)
+- [Wikidata: Heritage designation (P1435)](https://www.wikidata.org/wiki/Property:P1435)
+- [Wikidata: Image (P18)](https://www.wikidata.org/wiki/Property:P18)
+- [Wikidata: AAT ID (P1014)](https://www.wikidata.org/wiki/Property:P1014)
+- [Wikidata: Library of Congress authority ID (P244)](https://www.wikidata.org/wiki/Property:P244)
+- [Wikidata: Commons category (P373)](https://www.wikidata.org/wiki/Property:P373)
 - [Wikidata: Follows (P155)](https://www.wikidata.org/wiki/Property:P155)
 - [Wikidata: Followed by (P156)](https://www.wikidata.org/wiki/Property:P156)
 - [Wikidata: SPARQL query service](https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service)
@@ -306,4 +380,4 @@ The next stage should extend the seed list with the additional subject concepts 
 - [Persian Architecture project README](../README.md)
 - [Persian Architecture Ontology](../data/turtles/Persian%20Architecture%20Ontology.ttl)
 
-The sample labels, external identifiers, direct class and material statements, style-sequence links, and serialization behavior above were checked against Wikidata on 25 November 2026 using its Query Service, entity data, and API. The review was limited to the listed sample items and does not establish completeness or certify every statement on those items.
+The sample labels, external identifiers, direct class and material statements, style-sequence links, case-study field coverage and reference presence, and serialization behavior above were checked against Wikidata on 25 November 2026 using its Query Service, entity data, and API. The review was limited to the listed sample items and does not establish completeness or certify every statement on those items.
