@@ -92,9 +92,44 @@ A live query of direct `subclass of` statements on 25 November 2026 surfaced the
 
 These are **review candidates**, not findings that the statements are definitively false. The hierarchy is a live dataset and may change after this review. A correction should be based on evidence, not on a preferred local model alone.
 
-## 6. Ontology perspective: architectural styles and property scope
+## 6. Multiple inheritance and multiple classification
 
-### 6.1 Architectural-style hierarchy
+Wikidata models a hierarchy as a graph, not an exclusive single-parent tree. A class can have multiple direct `subclass of` (P279) statements, and an individual item can have multiple `instance of` (P31) statements. These are separate relationships: P279 connects classes to broader classes, while P31 classifies an individual item. Multiple statements can express different, compatible aspects of an item; they should not be reduced to one “primary” parent without a specific modeling reason.
+
+The following examples were checked on 25 November 2026. The arrows in the diagram point from the more specific class or individual item to its stated parent or type. P279 and P31 labels are shown explicitly to avoid conflating the two:
+
+```mermaid
+flowchart LR
+    subgraph Class_hierarchy["Class hierarchy (P279)"]
+        monument["monument (Q4989906)"] -->|P279| built["built structure (Q811979)"]
+        monument -->|P279| artwork["work of art (Q838948)"]
+        madrasa["madrasa (Q132834)"] -->|P279| religiousSchool["religious school (Q1971849)"]
+        madrasa -->|P279| schoolBuilding["school building (Q1244442)"]
+        culturalProperty["cultural property (Q2065736)"] -->|P279| culturalHeritage["cultural heritage (Q210272)"]
+        culturalProperty -->|P279| artificialObject["artificial physical object (Q8205328)"]
+    end
+
+    subgraph Item_types["Individual item types (P31)"]
+        varamin["Jameh Mosque of Varamin (Q3445267)"] -->|P31| mosque["mosque (Q32815)"]
+        varamin -->|P31| culturalProperty
+        chaharbagh["Chaharbagh Madrasa (Q5067540)"] -->|P31| madrasa
+        chaharbagh -->|P31| mosque
+        chaharbagh -->|P31| culturalProperty
+        naqsh["Naqsh-e Jahan Square (Q4519)"] -->|P31| square["square (Q174782)"]
+        naqsh -->|P31| culturalProperty
+        naqsh -->|P31| landmark["architectural landmark (Q2319498)"]
+    end
+```
+
+In the class examples, [monument (Q4989906)](https://www.wikidata.org/wiki/Q4989906) has both built structure and work of art as direct P279 parents; [madrasa (Q132834)](https://www.wikidata.org/wiki/Q132834) has religious school and school building; and [cultural property (Q2065736)](https://www.wikidata.org/wiki/Q2065736) has cultural heritage and artificial physical object. These direct statements place each class along more than one conceptual axis. They are Wikidata's recorded classifications, not a claim that every domain ontology should adopt those exact parents.
+
+The individual examples show that P31 can also have multiple direct values: [Jameh Mosque of Varamin (Q3445267)](https://www.wikidata.org/wiki/Q3445267) is typed as both a mosque and a cultural property; [Chaharbagh Madrasa (Q5067540)](https://www.wikidata.org/wiki/Q5067540) as a madrasa, mosque, and cultural property; and [Naqsh-e Jahan Square (Q4519)](https://www.wikidata.org/wiki/Q4519) as a square, cultural property, and architectural landmark. A query or visualization should preserve these direct statements. Do not infer that the square is a subclass of cultural property, or that the madrasa class is a subclass of mosque, from an item's multiple P31 values. Likewise, graph traversal through P279 may find broader ancestors, but those inferred paths should be distinguished from direct claims.
+
+For the local ontology, decide separately whether a resource is an instance of more than one class and whether one class is a subclass of several others. Preserve the Wikidata property and provenance with each imported relationship, and review whether each asserted type is meaningful for the local use case.
+
+## 7. Ontology perspective: architectural styles and property scope
+
+### 7.1 Architectural-style hierarchy
 
 The item [Q32880](https://www.wikidata.org/wiki/Q32880) is **architectural style** (“visual characteristics of a building”) and is itself a subclass of [art style (Q1792644)](https://www.wikidata.org/wiki/Q1792644). The three style concepts below are related to it by `instance of` (P31), not by `subclass of` (P279). Their direct P279 parents instead place them under architecture of Iran and a dynasty-related art concept:
 
@@ -108,7 +143,7 @@ The broader item [architecture of Iran (Q1501585)](https://www.wikidata.org/wiki
 
 For the local ontology, `mdhn:SubjectTerm` could provide a place to link reviewed style concepts, but the reviewed ontology does not define a dedicated architectural-style class or a property for assigning a style to a building. If the project needs to distinguish styles from general subjects, it should make that distinction explicit in its local model rather than infer it from labels or copy Wikidata's P31/P279 pattern without checking its intended semantics.
 
-### 6.2 Domain and range: Wikidata's property constraints
+### 7.2 Domain and range: Wikidata's property constraints
 
 In RDF Schema or OWL, domain and range axioms are formal schema statements with entailment effects: they infer types for a statement's subject or value rather than reject the triple. Wikidata's closest practical equivalents are **subject type constraints** and **value-type constraints**, represented as constraints on a property using P2302. Wikidata documentation calls these the domain and range, respectively. They are editorial guidance and validation signals, not hard restrictions that prevent a statement from being added.
 
@@ -122,7 +157,7 @@ The current P149 constraints therefore support using style items such as Q595712
 
 Do not confuse domain/range-like constraints with a **property scope constraint**, which indicates whether a property is intended for a statement's main value, a qualifier, or a reference. For this project, use these constraints to flag records for review, then apply stricter local validation (for example, SHACL) if the local graph requires enforced domain/range rules.
 
-## 7. Recommendations for improving data quality
+## 8. Recommendations for improving data quality
 
 ### Before importing Wikidata data
 
@@ -151,7 +186,7 @@ Do not confuse domain/range-like constraints with a **property scope constraint*
 | Medium | Add bounded, monitored SPARQL checks and record retrieval time; plan for the WDQS backend migration. | Makes harvesting reproducible and resilient to service changes. |
 | Medium | Review Commons image rights, availability, and IIIF suitability independently from Wikidata's P18 values. | Avoids treating a media link as a ready-to-use IIIF resource. |
 
-## 8. Example SPARQL quality checks
+## 9. Example SPARQL quality checks
 
 These queries are starting points for a **scoped review**, not automatic correction rules. Adapt the endpoint and syntax to the active WDQS version. A missing reference is a prompt for investigation; it is not, by itself, proof that a statement is false.
 
@@ -183,7 +218,7 @@ SELECT ?item WHERE {
 
 For a future harvesting pipeline, query only the required fields, set reasonable timeouts and retry limits, log endpoint errors, and validate returned identifiers and datatypes before loading them into the local graph.
 
-## 9. Conclusion
+## 10. Conclusion
 
 Wikidata is a promising complementary authority for Persian architecture, especially for entity identifiers, multilingual discovery, and links to external vocabularies. Its usefulness depends on item-by-item verification, careful treatment of class hierarchies, and transparent provenance. The observed hierarchy examples illustrate why “queryable” should not be equated with “reliable without review.”
 
