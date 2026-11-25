@@ -37,8 +37,15 @@ The following labels and identifiers were checked against Wikidata on 25 Novembe
 | Iwan | [Q636232](https://www.wikidata.org/wiki/Q636232) | ایوان | AAT `300075830` |
 | Muqarnas | [Q1356021](https://www.wikidata.org/wiki/Q1356021) | مقرنس | AAT `300081762` |
 | Dome | [Q12493](https://www.wikidata.org/wiki/Q12493) | گنبد | AAT `300001280`; LCSH `sh85038905` |
+| Monument | [Q4989906](https://www.wikidata.org/wiki/Q4989906) | یادمانی | AAT `300006958`; LCSH `sh85087089` |
+| Madrasa | [Q132834](https://www.wikidata.org/wiki/Q132834) | مدرسه اسلامی | AAT IDs `300006563` and `300343428`; LCSH `sh96009872` |
+| Cultural property | [Q2065736](https://www.wikidata.org/wiki/Q2065736) | اموال فرهنگی | AAT `300055593`; LCSH `sh97000183` |
+| Architectural ensemble | [Q1497375](https://www.wikidata.org/wiki/Q1497375) | مجموعه معماری | No AAT ID or LCSH ID observed |
+| Imamzadeh | [Q136868](https://www.wikidata.org/wiki/Q136868) | امامزاده | No AAT ID or LCSH ID observed |
+| Mausoleum | [Q162875](https://www.wikidata.org/wiki/Q162875) | آرامگاه یادمانی | AAT `300005891`; LCSH `sh85082332` |
+| Sufi lodge | [Q833913](https://www.wikidata.org/wiki/Q833913) | خانقاه | AAT `300000665`; LCSH `sh00001752` |
 
-These examples show potential for multilingual lookup and authority reconciliation. They do not establish that every identifier is an exact conceptual match, that every item has adequate references, or that the selected items cover Persian architectural usage. For example, “dome” and *gonbad* may not have identical scope in every scholarly or local context.
+These examples show potential for multilingual lookup and authority reconciliation across building types, architectural concepts, and heritage classifications. They do not establish that every identifier is an exact conceptual match, that every item has adequate references, or that the selected items cover Persian architectural usage. For example, “dome” and *gonbad* may not have identical scope in every scholarly or local context. Wikidata also records materials used in or associated with individual sites through `material` (P186); see the examples in Section 6. A listed material should not be assumed to be exhaustive or to describe every component of a complex.
 
 ## 4. Data-quality weaknesses and risks
 
@@ -118,12 +125,36 @@ flowchart LR
         naqsh["Naqsh-e Jahan Square (Q4519)"] -->|P31| square["square (Q174782)"]
         naqsh -->|P31| culturalProperty
         naqsh -->|P31| landmark["architectural landmark (Q2319498)"]
+        safi["Sheikh Safi al-Din Shrine Ensemble (Q4243)"] -->|P31| ensemble["architectural ensemble (Q1497375)"]
+        safi -->|P31| imamzadeh["imamzadeh (Q136868)"]
+        safi -->|P31| mausoleum["mausoleum (Q162875)"]
+        safi -->|P31| sufiLodge["Sufi lodge (Q833913)"]
+        safi -->|P31| culturalProperty
+        yahya["Imamzadeh Yahya, Varamin (Q5939601)"] -->|P31| imamzadeh
+        yahya -->|P31| mausoleum
+        yahya -->|P31| culturalProperty
+        soltaniyeh["Soltaniyeh Dome (Q20645774)"] -->|P31| mausoleum
+        soltaniyeh -->|P31| culturalProperty
     end
 ```
 
 In the class examples, [monument (Q4989906)](https://www.wikidata.org/wiki/Q4989906) has both built structure and work of art as direct P279 parents; [madrasa (Q132834)](https://www.wikidata.org/wiki/Q132834) has religious school and school building; and [cultural property (Q2065736)](https://www.wikidata.org/wiki/Q2065736) has cultural heritage and artificial physical object. These direct statements place each class along more than one conceptual axis. They are Wikidata's recorded classifications, not a claim that every domain ontology should adopt those exact parents.
 
 The individual examples show that P31 can also have multiple direct values: [Jameh Mosque of Varamin (Q3445267)](https://www.wikidata.org/wiki/Q3445267) is typed as both a mosque and a cultural property; [Chaharbagh Madrasa (Q5067540)](https://www.wikidata.org/wiki/Q5067540) as a madrasa, mosque, and cultural property; and [Naqsh-e Jahan Square (Q4519)](https://www.wikidata.org/wiki/Q4519) as a square, cultural property, and architectural landmark. A query or visualization should preserve these direct statements. Do not infer that the square is a subclass of cultural property, or that the madrasa class is a subclass of mosque, from an item's multiple P31 values. Likewise, graph traversal through P279 may find broader ancestors, but those inferred paths should be distinguished from direct claims.
+
+The diagram also adds [Sheikh Safi al-Din Khānegāh and Shrine Ensemble (Q4243)](https://www.wikidata.org/wiki/Q4243), [Imamzadeh Yahya (Varamin) (Q5939601)](https://www.wikidata.org/wiki/Q5939601), and [Soltaniyeh Dome (Q20645774)](https://www.wikidata.org/wiki/Q20645774). Their multiple P31 values demonstrate that Wikidata can classify the same heritage site by different aspects, such as its function, building form, or heritage status.
+
+### Material statements (P186)
+
+Wikidata can attach one or more `material` (P186) values to a site. The following values were present on 25 November 2026:
+
+| Wikidata item | P186 material values observed | Reference note in the checked revision |
+|---|---|---|
+| [Sheikh Safi al-Din Khānegāh and Shrine Ensemble (Q4243)](https://www.wikidata.org/wiki/Q4243) | [stone (Q22731)](https://www.wikidata.org/wiki/Q22731), [brick (Q40089)](https://www.wikidata.org/wiki/Q40089), [plaster (Q274988)](https://www.wikidata.org/wiki/Q274988), [tile (Q468402)](https://www.wikidata.org/wiki/Q468402), [silver (Q1090)](https://www.wikidata.org/wiki/Q1090) | The silver statement had no reference; the other listed material statements had references. |
+| [Imamzadeh Yahya (Varamin) (Q5939601)](https://www.wikidata.org/wiki/Q5939601) | [brick (Q40089)](https://www.wikidata.org/wiki/Q40089), [plaster (Q274988)](https://www.wikidata.org/wiki/Q274988), [tile (Q468402)](https://www.wikidata.org/wiki/Q468402) | Each listed material statement had a reference; the sources still need to be checked for relevance and scope. |
+| [Soltaniyeh Dome (Q20645774)](https://www.wikidata.org/wiki/Q20645774) | [brick (Q40089)](https://www.wikidata.org/wiki/Q40089), [mortar (Q189566)](https://www.wikidata.org/wiki/Q189566) | Neither listed material statement had a reference. |
+
+These are statements recorded on the items, not a complete bill of materials or proof that the material applies uniformly to every part of a site. Inspect statement references and, for large complexes, consider whether materials should instead be recorded against specific constituent structures or components.
 
 For the local ontology, decide separately whether a resource is an instance of more than one class and whether one class is a subclass of several others. Preserve the Wikidata property and provenance with each imported relationship, and review whether each asserted type is meaningful for the local use case.
 
@@ -140,6 +171,19 @@ The item [Q32880](https://www.wikidata.org/wiki/Q32880) is **architectural style
 | [Qajar architecture (Q5718239)](https://www.wikidata.org/wiki/Q5718239) | architectural style (Q32880) | architecture of Iran (Q1501585); [Qajar art (Q2864726)](https://www.wikidata.org/wiki/Q2864726) |
 
 The broader item [architecture of Iran (Q1501585)](https://www.wikidata.org/wiki/Q1501585) is itself directly `subclass of` both Persian art (Q2718840) and architecture of the Earth (Q13152867). This is a multi-parent graph rather than a single, exclusive tree: the P279 links express broader classification, while P31 identifies the concepts as architectural styles. A hierarchy diagram or query should preserve that distinction and should not show Q5957125, Q16047695, or Q5718239 as P279 subclasses of Q32880.
+
+Wikidata also has sequential properties for style chronology: `follows` (P155) states that the subject comes after the value in a sequence, while `followed by` (P156) states that it comes before the value. In the checked statements, Timurid architecture follows Ilkhanid architecture and is followed by Safavid architecture; Safavid architecture is followed by Afsharid architecture; and Qajar architecture follows Zand architecture and is followed by Pahlavi architecture. The arrows below run from earlier to later, and each label identifies the item carrying the recorded statement:
+
+```mermaid
+flowchart LR
+    ilkhanid["Ilkhanid architecture (Q98399895)"] -->|P155 on Timurid| timurid["Timurid architecture (Q16047695)"]
+    timurid -->|P156 on Timurid; P155 on Safavid| safavid["Safavid architecture (Q5957125)"]
+    safavid -->|P156 on Safavid| afsharid["Afsharid architecture (Q98399175)"]
+    zand["Zand architecture (Q5679012)"] -->|P155 on Qajar| qajar["Qajar architecture (Q5718239)"]
+    qajar -->|P156 on Qajar| pahlavi["Pahlavi architecture (Q17993891)"]
+```
+
+These are chronology/sequence links, not `subclass of` relationships, and they do not prove a complete or uncontested history of architectural influence. Architectural traditions can overlap, continue across political periods, and vary by region. The links should therefore be treated as claims to investigate, not as a definitive linear typology. In the revision checked on 25 November 2026, the listed P155/P156 statements had no attached references; their historical interpretation should be verified against reliable scholarship before reuse. An absent reciprocal statement should not be silently filled in.
 
 For the local ontology, `mdhn:SubjectTerm` could provide a place to link reviewed style concepts, but the reviewed ontology does not define a dedicated architectural-style class or a property for assigning a style to a building. If the project needs to distinguish styles from general subjects, it should make that distinction explicit in its local model rather than infer it from labels or copy Wikidata's P31/P279 pattern without checking its intended semantics.
 
@@ -218,9 +262,28 @@ SELECT ?item WHERE {
 
 For a future harvesting pipeline, query only the required fields, set reasonable timeouts and retry limits, log endpoint errors, and validate returned identifiers and datatypes before loading them into the local graph.
 
-## 10. Conclusion
+## 10. Fetching Wikidata data: JSON and Turtle
 
-Wikidata is a promising complementary authority for Persian architecture, especially for entity identifiers, multilingual discovery, and links to external vocabularies. Its usefulness depends on item-by-item verification, careful treatment of class hierarchies, and transparent provenance. The observed hierarchy examples illustrate why “queryable” should not be equated with “reliable without review.”
+Wikidata's EntityData endpoint can return an item's data in more than one serialization. A format can be selected in the URL or negotiated with the HTTP `Accept` header:
+
+| Representation | Example URL | MIME type |
+|---|---|---|
+| JSON | `https://www.wikidata.org/wiki/Special:EntityData/Q4243.json` | `application/json` |
+| Turtle | `https://www.wikidata.org/wiki/Special:EntityData/Q4243.ttl` | `text/turtle` |
+
+For an extensionless EntityData URL, request `Accept: application/json` or `Accept: text/turtle` to negotiate the representation. The endpoint returned these formats and MIME types when checked on 25 November 2026. JSON is convenient for consuming Wikibase labels, descriptions, claims, qualifiers, and references through code. Turtle (`.ttl`) serializes the data as RDF triples and is convenient for loading into RDF tools and graph stores. They are different representations, so choose based on the receiving system rather than assuming a field-for-field JSON-to-Turtle conversion.
+
+The Wikibase API can also return multiple items in JSON in one request, for example:
+
+```text
+https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q4243%7CQ5939601%7CQ20645774&props=labels%7Cdescriptions%7Cclaims&languages=en%7Cfa&format=json
+```
+
+Here `.ttl` means the Turtle RDF format, not a cache time-to-live. Caching is a separate concern: respect HTTP cache headers, record retrieval dates and item revisions where practical, and handle timeouts or partial responses explicitly because Wikidata statements can change.
+
+## 11. Conclusion
+
+Wikidata is a promising complementary authority for Persian architecture, especially for entity identifiers, multilingual discovery, material statements, and links to external vocabularies. Its usefulness depends on item-by-item verification, careful treatment of class hierarchies and style chronology, and transparent provenance. The observed examples illustrate why “queryable” should not be equated with “reliable without review.”
 
 The next stage should extend the seed list with the additional subject concepts identified for this project, then evaluate coverage and quality against the same documented criteria. Until that work is complete, this report should be read as a preliminary assessment rather than a comprehensive census or a claim that specific Wikidata statements are wrong.
 
@@ -232,9 +295,14 @@ The next stage should extend the seed list with the additional subject concepts 
 - [Wikidata: Subject type constraint (domain)](https://www.wikidata.org/wiki/Help:Property_constraints_portal/Subject_class)
 - [Wikidata: Value-type constraint (range)](https://www.wikidata.org/wiki/Help:Property_constraints_portal/Value_class)
 - [Wikidata: Architectural style (P149)](https://www.wikidata.org/wiki/Property:P149)
+- [Wikidata: Material (P186)](https://www.wikidata.org/wiki/Property:P186)
+- [Wikidata: Follows (P155)](https://www.wikidata.org/wiki/Property:P155)
+- [Wikidata: Followed by (P156)](https://www.wikidata.org/wiki/Property:P156)
 - [Wikidata: SPARQL query service](https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service)
 - [Wikidata Query Service backend migration](https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service/WDQS_backend_update)
+- [Wikibase API: wbgetentities](https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities)
+- [Wikidata data access](https://www.wikidata.org/wiki/Wikidata:Data_access)
 - [Persian Architecture project README](../README.md)
 - [Persian Architecture Ontology](../data/turtles/Persian%20Architecture%20Ontology.ttl)
 
-The sample labels, external identifiers, and hierarchy statements above were checked against Wikidata Query Service on 25 November 2026. The review was limited to the listed sample items and does not establish completeness or certify every statement on those items.
+The sample labels, external identifiers, direct class and material statements, style-sequence links, and serialization behavior above were checked against Wikidata on 25 November 2026 using its Query Service, entity data, and API. The review was limited to the listed sample items and does not establish completeness or certify every statement on those items.
