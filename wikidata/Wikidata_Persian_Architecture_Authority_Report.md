@@ -1,6 +1,6 @@
 # Wikidata as a Complementary Authority for Persian Architecture
 
-*Working report — reviewed 25 November 2026*
+*Working report — initial review 25 November 2026; case-study profiles refreshed 26 November 2026*
 
 ## Executive summary
 
@@ -20,7 +20,7 @@ Wikidata can contribute:
 
 - **Persistent identifiers:** QIDs make it easier to disambiguate a monument or concept across datasets.
 - **Multilingual metadata:** Items may have labels and descriptions in Persian and other languages. Coverage varies by item and should be measured rather than assumed.
-- **External authority links:** Properties such as AAT ID (P1014) and Library of Congress authority ID (P244) can help with reconciliation. An identifier statement is a lead to inspect, not proof that two concepts have identical scope.
+- **External authority links:** Properties such as AAT ID (P1014) and Library of Congress Authorities ID (P244) can help with reconciliation. An identifier statement is a lead to inspect, not proof that two concepts have identical scope.
 - **Structured claims:** Properties can express types, locations, materials, architects, heritage designations, and relationships between entities, where those statements exist.
 - **Query access:** SPARQL can support scoped discovery and quality checks. The Query Service is a public service with operational limits and a dataset that may not be fully current.
 
@@ -278,20 +278,110 @@ ORDER BY ?classLabel ?itemLabel ?propertyLabel ?valueLabel
 
 Each result row represents one selected property/value statement; `?reference` is absent where the statement has no reference. `?value` preserves the actual value, while `?valueLabel` makes item-valued claims readable. This shape keeps multi-valued fields and statement-level provenance visible instead of flattening them into one unqualified label.
 
-| Class | Candidate item | Field coverage | Referenced property/value pairs (13 harvested properties) | Data-structure highlights |
-|---|---|---:|---:|---|
-| Mosque | [Sheikh Lotfollah Mosque (Q856356)](https://www.wikidata.org/wiki/Q856356) | 10/11 | 13 | Multiple P31 types; location, coordinates, inception, architect, Safavid style, five P186 materials, heritage designation, image, Commons category, and LCSH ID. |
-| Mosque | [Shah Mosque (Q643098)](https://www.wikidata.org/wiki/Q643098) | 9/11 | 12 | Mosque, cultural property, and architectural-landmark types; location, coordinates, inception, architect, Safavid style, brick/mortar/stone/tile, designation, and image. |
-| Caravanserai | [Dayr-e Gachin Caravanserai (Q6394061)](https://www.wikidata.org/wiki/Q6394061) | 7/11 | 11 | Multiple P149 styles (Sasanian, Seljuk, Safavid); brick and plaster; coordinates, image, and designation values for Iranian National Heritage and “part of UNESCO World Heritage Site.” |
-| Caravanserai | [Khajeh Nazar Caravanserai (Q6558875)](https://www.wikidata.org/wiki/Q6558875) | 7/11 | 8 | Safavid style; rubble and mortar; coordinates, image, and designation values for Iranian National Heritage and “part of UNESCO World Heritage Site.” The mortar claim has no reference in the checked revision. |
-| Mausoleum | [Avicenna Mausoleum (Q5952145)](https://www.wikidata.org/wiki/Q5952145) | 9/11 | 11 | P31 types include mausoleum and tower; 1951 inception, architect Hooshang Seyhoun, granite and reinforced concrete, coordinates, heritage designation, and image. |
-| Mausoleum | [Imamzadeh Harun-e Velayat (Q5860687)](https://www.wikidata.org/wiki/Q5860687) | 9/11 | 16 | Multiple P31 types (including imamzadeh, madrasa, mausoleum, and cultural property); multiple styles and materials; coordinates, architect, designation, and image. |
-| Monument | [Avicenna Mausoleum (Q5952145)](https://www.wikidata.org/wiki/Q5952145) | 9/11 | 11 | Also appears as a monument through its class hierarchy; the same item is intentionally reused, not counted as a separate site. |
-| Monument | [Imamzadeh Harun-e Velayat (Q5860687)](https://www.wikidata.org/wiki/Q5860687) | 9/11 | 16 | Also appears as a monument through its class hierarchy; its multiple P31 types remain direct claims, not subclasses of one another. |
-| Architectural ensemble | [Qasr Prison (Q4993148)](https://www.wikidata.org/wiki/Q4993148) | 9/11 | 10 | Both prison and architectural ensemble; Pahlavi style, architect Nikolai Markov, brick and mortar, coordinates, heritage designation, image, and LCSH ID. |
-| Architectural ensemble | [Sheikh Safi al-Din Khānegāh and Shrine Ensemble (Q4243)](https://www.wikidata.org/wiki/Q4243) | 8/11 | 17 | Multiple P31 types; Ilkhanid, Timurid, and Safavid styles; coordinates, several materials, image, and both Iranian and World Heritage designations. |
+| Class | Case-study instances (field coverage; referenced property/value pairs) |
+|---|---|
+| Mosque | [Sheikh Lotfollah Mosque (Q856356)](https://www.wikidata.org/wiki/Q856356) (10/11; 13); [Shah Mosque (Q643098)](https://www.wikidata.org/wiki/Q643098) (9/11; 12) |
+| Caravanserai | [Dayr-e Gachin Caravanserai (Q6394061)](https://www.wikidata.org/wiki/Q6394061) (7/11; 11); [Khajeh Nazar Caravanserai (Q6558875)](https://www.wikidata.org/wiki/Q6558875) (7/11; 8) |
+| Mausoleum | [Avicenna Mausoleum (Q5952145)](https://www.wikidata.org/wiki/Q5952145) (9/11; 11); [Imamzadeh Harun-e Velayat (Q5860687)](https://www.wikidata.org/wiki/Q5860687) (9/11; 16) |
+| Monument | [Avicenna Mausoleum (Q5952145)](https://www.wikidata.org/wiki/Q5952145) (9/11; 11); [Imamzadeh Harun-e Velayat (Q5860687)](https://www.wikidata.org/wiki/Q5860687) (9/11; 16). Both also reach the broader Monument class through P31/P279 traversal; their property profiles appear under Mausoleum. |
+| Architectural ensemble | [Qasr Prison (Q4993148)](https://www.wikidata.org/wiki/Q4993148) (9/11; 10); [Sheikh Safi al-Din Khānegāh and Shrine Ensemble (Q4243)](https://www.wikidata.org/wiki/Q4243) (8/11; 17) |
 
-Coverage and reference-pair counts are dataset measures, not judgments of historical importance or source quality. The values above were checked on 25 November 2026; verify each statement's references and qualifiers before reuse. The overlap between the Mausoleum and Monument examples is expected: a site can be an instance of a specific class while that class is also a subclass of a broader one.
+### Property profiles
+
+The profile lines below spell out each property's P-code and current English label alongside the values recorded for the item. `P186` is currently labelled **made from material**. Coordinates are written as longitude, latitude from WDQS's `Point(longitude latitude)` value. Dates are shown as stored; inspect the statement's time precision before treating the month or day as historically exact. Items reused under Monument are described once because they are the same Wikidata records.
+
+#### Mosques
+
+**[Sheikh Lotfollah Mosque (Q856356)](https://www.wikidata.org/wiki/Q856356)** — 10/11 fields; 13 referenced property/value pairs.
+
+- `P31` (instance of): mosque, cultural property, architectural landmark; `P17` (country): Iran; `P131` (located in the administrative territorial entity): District 3; `P625` (coordinate location): 51.678535, 32.657454.
+- `P571` (inception): 1603-01-01; `P84` (architect): Bahāʾ al-dīn al-ʿĀmilī; `P149` (architectural style): Safavid architecture.
+- `P186` (made from material): brick, marble, mortar, stone, tile; `P1435` (heritage designation): Iranian National Heritage.
+- `P18` (image) and `P373` (Commons category): present; `P244` (Library of Congress Authorities ID): `nr2004011340`. No `P1014` (AAT ID) value was returned.
+
+**[Shah Mosque (Q643098)](https://www.wikidata.org/wiki/Q643098)** — 9/11 fields; 12 referenced property/value pairs.
+
+- `P31` (instance of): mosque, cultural property, architectural landmark; `P17` (country): Iran; `P131` (located in the administrative territorial entity): District 3; `P625` (coordinate location): 51.677777777, 32.654805555.
+- `P571` (inception): 1611-04-29; `P84` (architect): Bahāʾ al-dīn al-ʿĀmilī; `P149` (architectural style): Safavid architecture.
+- `P186` (made from material): brick, mortar, stone, tile; `P1435` (heritage designation): Iranian National Heritage; `P18` (image) and `P373` (Commons category): present.
+- No `P1014` (AAT ID) or `P244` (Library of Congress Authorities ID) value was returned.
+
+#### Caravanserais
+
+**[Dayr-e Gachin Caravanserai (Q6394061)](https://www.wikidata.org/wiki/Q6394061)** — 7/11 fields; 11 referenced property/value pairs.
+
+- `P31` (instance of): caravanserai, cultural property; `P17` (country): Iran; `P131` (located in the administrative territorial entity): Qomrud Rural District; `P625` (coordinate location): 51.420111111, 35.058277777.
+- `P149` (architectural style): Sasanian, Seljuk, and Safavid architecture; `P186` (made from material): brick and plaster.
+- `P1435` (heritage designation): Iranian National Heritage and “part of UNESCO World Heritage Site”; `P18` (image) and `P373` (Commons category): present.
+- No `P571` (inception), `P84` (architect), `P1014` (AAT ID), or `P244` (Library of Congress Authorities ID) value was returned.
+
+**[Khajeh Nazar Caravanserai (Q6558875)](https://www.wikidata.org/wiki/Q6558875)** — 7/11 fields; 8 referenced property/value pairs.
+
+- `P31` (instance of): caravanserai, cultural property; `P17` (country): Iran; `P131` (located in the administrative territorial entity): Jolfa County; `P625` (coordinate location): 45.576944444, 38.9775.
+- `P149` (architectural style): Safavid architecture; `P186` (made from material): rubble and mortar. The mortar claim had no reference in the checked revision.
+- `P1435` (heritage designation): Iranian National Heritage and “part of UNESCO World Heritage Site”; `P18` (image) and `P373` (Commons category): present.
+- No `P571` (inception), `P84` (architect), `P1014` (AAT ID), or `P244` (Library of Congress Authorities ID) value was returned.
+
+#### Mausoleums and monuments
+
+**[Avicenna Mausoleum (Q5952145)](https://www.wikidata.org/wiki/Q5952145)** — 9/11 fields; 11 referenced property/value pairs.
+
+- `P31` (instance of): mausoleum, tower, cultural property; `P17` (country): Iran; `P131` (located in the administrative territorial entity): Hamadan County; `P625` (coordinate location): 48.513166666, 34.791527777.
+- `P571` (inception): 1951-01-01; `P84` (architect): Hooshang Seyhoun; `P149` (architectural style): architecture of Iran.
+- `P186` (made from material): granite and reinforced concrete; `P1435` (heritage designation): Iranian National Heritage; `P18` (image) and `P373` (Commons category): present.
+- No `P1014` (AAT ID) or `P244` (Library of Congress Authorities ID) value was returned.
+
+**[Imamzadeh Harun-e Velayat (Q5860687)](https://www.wikidata.org/wiki/Q5860687)** — 9/11 fields; 16 referenced property/value pairs.
+
+- `P31` (instance of): imamzadeh, madrasa, mausoleum, cultural property; `P17` (country): Iran; `P131` (located in the administrative territorial entity): District 3; `P625` (coordinate location): 51.682611111, 32.665777777.
+- `P571` (inception): 1512-01-01 (unreferenced in the checked revision); `P84` (architect): Mirza Shah Hossein; `P149` (architectural style): Islamic, Qajar, and Safavid architecture.
+- `P186` (made from material): adobe, brick, plaster, stone, tile; `P1435` (heritage designation): Iranian National Heritage; `P18` (image) and `P373` (Commons category): present.
+- No `P1014` (AAT ID) or `P244` (Library of Congress Authorities ID) value was returned.
+
+Both mausoleums also appear in the Monument case through the broader `P31`/`P279` class path. This does not add a direct Monument `P31` claim to either building, and their multiple direct `P31` values do not make those types subclasses of one another.
+
+#### Architectural ensembles
+
+**[Qasr Prison (Q4993148)](https://www.wikidata.org/wiki/Q4993148)** — 9/11 fields; 10 referenced property/value pairs.
+
+- `P31` (instance of): architectural ensemble, prison; `P17` (country): Iran; `P131` (located in the administrative territorial entity): District 7; `P625` (coordinate location): 51.448333333, 35.723472222.
+- `P84` (architect): Nikolai Markov; `P149` (architectural style): Pahlavi architecture; `P186` (made from material): brick and mortar.
+- `P1435` (heritage designation): Iranian National Heritage; `P18` (image) and `P373` (Commons category): present; `P244` (Library of Congress Authorities ID): `no2010159471`.
+- No `P571` (inception) or `P1014` (AAT ID) value was returned.
+
+**[Sheikh Safi al-Din Khānegāh and Shrine Ensemble (Q4243)](https://www.wikidata.org/wiki/Q4243)** — 8/11 fields; 17 referenced property/value pairs.
+
+- `P31` (instance of): Sufi lodge, architectural ensemble, cultural property, imamzadeh, mausoleum; `P17` (country): Iran; `P131` (located in the administrative territorial entity): Ardabil County; `P625` (coordinate location): 48.291388888, 38.248611111.
+- `P571` (inception): 1334-01-01 (unreferenced in the checked revision); `P149` (architectural style): Ilkhanid, Timurid, and Safavid architecture.
+- `P186` (made from material): brick, plaster, silver, stone, tile. The silver claim had no reference in the checked revision.
+- `P1435` (heritage designation): Iranian National Heritage and World Heritage Site; `P18` (image) and `P373` (Commons category): present.
+- No `P84` (architect), `P1014` (AAT ID), or `P244` (Library of Congress Authorities ID) value was returned.
+
+Coverage and reference-pair counts are dataset measures, not judgments of historical importance or source quality. The case-study values above were checked on 26 November 2026; verify each statement's references and qualifiers before reuse. The overlap between the Mausoleum and Monument examples is expected: a site can be an instance of a specific class while that class is also a subclass of a broader one.
+
+## 10. OpenStreetMap, Taginfo, and spatial coordination
+
+OpenStreetMap (OSM) and Wikidata can complement one another, but they describe different aspects of a heritage resource. Wikidata can provide an identified item, multilingual labels, structured claims, and a point coordinate through `coordinate location` (P625). OSM can provide the mapped geographic feature and its geometry. A point in Wikidata should not be treated as a replacement for an OSM building footprint or for a relation describing a larger complex.
+
+OSM represents features with **nodes**, **ways**, and **relations**. Nodes have WGS 84 latitude/longitude coordinates; ways are ordered node sequences that can represent lines or area boundaries; and relations group elements for structures such as multipolygons. A complex may therefore be one relation with several ways and member features rather than one point. When storing an OSM link locally, retain both the element type and its ID (`node`, `way`, or `relation`), along with the retrieved geometry and retrieval date.
+
+The OSM `wikidata=*` tag links an OSM element to the Wikidata QID that is about that feature. It can be used on nodes, ways, areas, and relations. The tag should identify the mapped feature itself; for example, an operator or brand should use its role-specific Wikidata tag rather than placing the operator's QID in the feature's `wikidata=*` tag. OSM guidance says that one Wikidata ID will usually correspond to one OSM element, while recognizing valid exceptions. This matters for architectural ensembles and multi-part monuments: check whether a QID refers to the whole complex, a constituent building, or both before treating repeated links as duplicates.
+
+**Taginfo has a different role.** It summarizes tag usage in OSM: which keys and values are present, how frequently they occur, what tags commonly accompany them, and where tags are distributed. Its global site is updated daily and its API provides statistics and related tag data. For this project, Taginfo can help discover and compare OSM tagging practices for building types and heritage attributes, including whether and how `wikidata=*` is used. It is not a substitute for querying an individual OSM feature's geometry, and tag frequency or a documented convention does not prove that a particular site's tag is correct.
+
+```mermaid
+flowchart LR
+    taginfo["Taginfo<br/>Tag usage, combinations, distributions"] -->|tagging context| review["Reviewed crosswalk"]
+    osm["OpenStreetMap<br/>Node / way / relation<br/>Tags and geometry"] -->|spatial feature| review
+    wikidata["Wikidata<br/>QID, claims, P625 point"] -->|identity and attributes| review
+    review --> local["Local record<br/>Keep source and geometry provenance"]
+```
+
+For spatial reconciliation, prefer an explicit OSM `wikidata=Q...` match when the tag clearly identifies the same feature. Otherwise, use P625 as a candidate point and compare it with OSM geometry, names, local administrative context, and feature tags; proximity alone is not enough to establish identity. A Wikidata point may represent a site marker or approximate location, while OSM may map the building outline or an entire compound. Preserve the two sources separately, record the matching method and confidence, and manually review ambiguous cases rather than moving or overwriting coordinates automatically.
+
+For example, `wikidata=Q856356` can be used as a search criterion for a possible OSM representation of Sheikh Lotfollah Mosque. Confirm that the matching node, way, or relation actually represents that mosque before importing its geometry.
+
+Taginfo's API is read-only and resource-limited: use it for bounded statistics requests with a descriptive User-Agent, and use OSM data services or suitable extracts when the task requires feature-level geometries. OSM data and Taginfo data are available under the Open Database License (ODbL); check attribution and license obligations before redistribution or combining them into a derived database.
 
 ## 11. Example SPARQL quality checks
 
@@ -346,7 +436,7 @@ Here `.ttl` means the Turtle RDF format, not a cache time-to-live. Caching is a 
 
 ## 13. Conclusion
 
-Wikidata is a promising complementary authority for Persian architecture, especially for entity identifiers, multilingual discovery, material statements, and links to external vocabularies. Its usefulness depends on item-by-item verification, careful treatment of class hierarchies and style chronology, and transparent provenance. The observed examples illustrate why “queryable” should not be equated with “reliable without review.”
+Wikidata is a promising complementary authority for Persian architecture, especially for entity identifiers, multilingual discovery, material statements, and links to external vocabularies. OSM can complement it with feature geometries, while Taginfo can help assess how OSM tags are actually used. Their usefulness depends on item-by-item identity checks, careful treatment of class hierarchies and style chronology, and transparent provenance. The observed examples illustrate why “queryable” should not be equated with “reliable without review.”
 
 The next stage should extend the seed list with the additional subject concepts identified for this project, then evaluate coverage and quality against the same documented criteria. Until that work is complete, this report should be read as a preliminary assessment rather than a comprehensive census or a claim that specific Wikidata statements are wrong.
 
@@ -365,11 +455,11 @@ The next stage should extend the seed list with the additional subject concepts 
 - [Wikidata: Inception (P571)](https://www.wikidata.org/wiki/Property:P571)
 - [Wikidata: Architect (P84)](https://www.wikidata.org/wiki/Property:P84)
 - [Wikidata: Architectural style (P149)](https://www.wikidata.org/wiki/Property:P149)
-- [Wikidata: Material (P186)](https://www.wikidata.org/wiki/Property:P186)
+- [Wikidata: Made from material (P186)](https://www.wikidata.org/wiki/Property:P186)
 - [Wikidata: Heritage designation (P1435)](https://www.wikidata.org/wiki/Property:P1435)
 - [Wikidata: Image (P18)](https://www.wikidata.org/wiki/Property:P18)
 - [Wikidata: AAT ID (P1014)](https://www.wikidata.org/wiki/Property:P1014)
-- [Wikidata: Library of Congress authority ID (P244)](https://www.wikidata.org/wiki/Property:P244)
+- [Wikidata: Library of Congress Authorities ID (P244)](https://www.wikidata.org/wiki/Property:P244)
 - [Wikidata: Commons category (P373)](https://www.wikidata.org/wiki/Property:P373)
 - [Wikidata: Follows (P155)](https://www.wikidata.org/wiki/Property:P155)
 - [Wikidata: Followed by (P156)](https://www.wikidata.org/wiki/Property:P156)
@@ -377,7 +467,12 @@ The next stage should extend the seed list with the additional subject concepts 
 - [Wikidata Query Service backend migration](https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service/WDQS_backend_update)
 - [Wikibase API: wbgetentities](https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities)
 - [Wikidata data access](https://www.wikidata.org/wiki/Wikidata:Data_access)
+- [OpenStreetMap Wiki: Elements](https://wiki.openstreetmap.org/wiki/Elements)
+- [OpenStreetMap Wiki: `wikidata` key](https://wiki.openstreetmap.org/wiki/Key:wikidata)
+- [Taginfo: About](https://taginfo.openstreetmap.org/about)
+- [Taginfo API documentation](https://taginfo.openstreetmap.org/taginfo/apidoc)
+- [OpenStreetMap copyright and ODbL](https://www.openstreetmap.org/copyright)
 - [Persian Architecture project README](../README.md)
 - [Persian Architecture Ontology](../data/turtles/Persian%20Architecture%20Ontology.ttl)
 
-The sample labels, external identifiers, direct class and material statements, style-sequence links, case-study field coverage and reference presence, and serialization behavior above were checked against Wikidata on 25 November 2026 using its Query Service, entity data, and API. The review was limited to the listed sample items and does not establish completeness or certify every statement on those items.
+The sample labels, external identifiers, direct class and material statements, style-sequence links, and serialization behavior were checked against Wikidata on 25 November 2026; case-study property values and reference presence were refreshed on 26 November 2026. OSM and Taginfo descriptions were checked against their documentation on 26 November 2026. The review was limited to the listed sample items and does not establish completeness or certify every statement on those items.
