@@ -6,6 +6,8 @@
 
 Wikidata can be a useful complementary source for Persian architectural heritage: it provides persistent item identifiers, multilingual labels, links to external authorities, structured relationships, and queryable data. It should not be treated as an authoritative source of truth or as a substitute for scholarly and institutional sources. Wikidata is collaboratively edited, unevenly sourced, and incomplete; a query returning a value does not establish that the value is correct, and a missing value does not establish that the fact is false.
 
+![Persian Architectural Heritage Wikidata Guide](/images/Persian_Architectural_Heritage_Wikidata_Guide.jpg)
+
 For this project, the safest role is as a **discovery, reconciliation, and enrichment layer**. Verify significant claims against sources appropriate to the claim, retain provenance in the local dataset, and treat harvested Wikidata values as candidates until reviewed. This report is an initial assessment, not a complete audit of Persian-architecture coverage. The subject-term inventory and quality checks should be expanded as additional concepts are identified.
 
 ## 1. Scope and project context
